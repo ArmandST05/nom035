@@ -13,7 +13,7 @@ class UserData {
 	}
 
 	public function getUserType(){ 
-		return UserTypeData::getByName($this->user_type); 
+		return UserTypeData::getById($this->user_type); 
 	}
 
 	public function add(){
@@ -38,13 +38,7 @@ class UserData {
 		return Model::one($query[0],new UserData());
 	}
 
-	public static function getLoggedIn(){
-		//Obtener datos del usuario logueado en el sistema
-		$id = isset($_SESSION["user_id"])  ? $_SESSION["user_id"] : null;
-		$sql = "SELECT * FROM ".self::$tablename." WHERE id = '$id'";
-		$query = Executor::doit($sql);
-		return Model::one($query[0],new UserData());
-	}
+	
 
 	public static function getByMail($mail){
 		$sql = "select * from ".self::$tablename." WHERE user_type != 'api' AND email = \"$mail\"";
@@ -65,6 +59,21 @@ class UserData {
 		$query = Executor::doit($sql);
 		return Model::many($query[0],new UserData());
 	}
+
+	public static function getByUserTypeStatus($userType,$status){
+		$sql = "SELECT * FROM ".self::$tablename ." WHERE user_type != 'api' ";
+		if($userType != 0){
+			$sql .= " AND user_type = '$userType' ";
+		}
+		if($status != 'all'){
+			$sql .= " AND is_active = '$status' ";
+		}
+		$sql .= " order by user_type,name ASC ";
+
+		$query = Executor::doit($sql);
+		return Model::many($query[0],new UserData());
+	}
+
 
 	public static function getUnassigned(){
 		//Obtiene los usuarios que no se han asignado a ningún médico.
@@ -90,5 +99,23 @@ class UserData {
 		$sql = "update ".self::$tablename." set is_active=\"$this->status_id\" where id=$this->id";
 		Executor::doit($sql);
 	}
+	public static function getLoggedIn(){
+		//Obtener datos del usuario logueado en el sistema
+		$id = isset($_SESSION["user_id"])  ? $_SESSION["user_id"] : null;
+		$sql = "SELECT * FROM ".self::$tablename." WHERE id = '$id'";
+		$query = Executor::doit($sql);
+		return Model::one($query[0],new UserData());
+	}
+
+
+
+	public static function getLoggedInNurse() {
+		$id = isset($_SESSION["user_id"]) ? $_SESSION["user_id"] : null;
+		$sql = "SELECT *, user_type as role FROM users WHERE id = '$id'";
+		$query = Executor::doit($sql);
+		return Model::one($query[0], new UserData());
+	}
+	
+	
 }
 ?>

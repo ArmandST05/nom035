@@ -1,61 +1,7 @@
 <!DOCTYPE html>
 <?php
 $user = UserData::getLoggedIn();
-$availableSmsData = NotificationData::getAvailableSms();
-$availableSmsTotal = $availableSmsData["total"];
-if ($user) {
-  $userType = (isset($user)) ? $user->user_type : null;
-  $user_name = (isset($user)) ? $user->username : null;
-  $medic = MedicData::getByUserId($user->id);
-}
-$date = date("Y-m-d");
-date_default_timezone_set('America/Mexico_City');
-$configuration = ConfigurationData::getAll();
-require_once 'vendor/autoload.php';
 
-//NOTIFICACIONES CORREO ELECTRÓNICO
-//Se realiza el envío de las notificaciones por correo electrónico si está el sistema configurado.
-use PHPMailer\PHPMailer\PHPMailer;
-
-$endDateNotifications = date("Y-m-d", strtotime(date("Y-m-d") . "+ " . ($configuration["notifications_default_previous_days_reservation"]->value) . " days"));
-$startDateTimeNotifications = date("Y-m-d") . " 00:00:01";
-$endDateTimeNotifications = $endDateNotifications . " 23:59:59";
-
-if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "notifications/index") && $configuration["notifications_active_email_reservations"]->value == 1 && $configuration['email']->value) {
-  $reservations = ReservationData::getBetweenDates($startDateTimeNotifications, $endDateTimeNotifications, 0, $reservationType = "patient", 1, 1);
-
-  foreach ($reservations as $reservation) {
-    $defaultMessage = NotificationData::getDefaultMessageByModuleType(1, 1);
-    $mailReservation = new PHPMailer();
-    $mailReservation->Host = $configuration['name']->value;
-    $mailReservation->From = $configuration['email']->value;
-    $mailReservation->FromName = $configuration['name']->value;
-    $mailReservation->Subject = "Recordatorio de cita " . $configuration["name"]->value;
-    $mailReservation->AddAddress($reservation->patient_email); //Destinatarios
-    if (isset($configuration['notifications_email_file_path']->value)) {
-      /*$varname = $_FILES['file']['name'];
-      $vartemp = $_FILES['file']['tmp_name'];
-      $mailReservation->AddAttachment($vartemp, $varname);*/
-    }
-    $body = "Buen día, nos comunicamos de " . $configuration["name"]->value . " para recordarte que tienes una cita el día " . $reservation->date_at_format . " con " . $reservation->medic_name . " en " . $configuration["address"]->value . ".<br>
-    Si tienes algún comentario sobre tu asistencia a la cita, comunícate al " . $configuration["phone"]->value . "<br>Saludos<br><img src='assets/clinic-logo.png' rows='20'>";
-    $mailReservation->Body = $body;
-    $mailReservation->IsHTML(true);
-    if ($mailReservation->Send()) {
-      //Registrar notifación en el sistema
-      $notification = new NotificationData();
-      $notification->patient_id = $reservation->patient_id;
-      $notification->reservation_id = $reservation->id;
-      $notification->type_id = 1; //Correo
-      $notification->direction_id = 1; //Enviado
-      $notification->status_id = 1;
-      $notification->module_id = 1; //Recordatorios
-      $notification->receptor = $reservation->patient_email;
-      $notification->message = $body;
-      $notification->add();
-    }
-  }
-}
 ?>
 <html>
 
@@ -99,6 +45,11 @@ if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "
   <link rel="stylesheet" href="plugins/morris/example.css">
   <script src="plugins/jspdf/jspdf.min.js"></script>
   <script src="plugins/jspdf/jspdf.plugin.autotable.js"></script>
+
+  <!-- StackTable.js -->
+  <link rel="stylesheet" href="/plugins/stacktablejs/stacktable.css" />
+  <script src="plugins/stacktablejs/stacktable.js"></script>
+  <!-- StackTable.js -->
 
   <?php if (isset($_GET["view"]) && $_GET["view"] == "sales") : ?>
     <script type="text/javascript" src="plugins/jsqrcode/llqrcode.js"></script>
@@ -184,88 +135,36 @@ if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "
                 <meta charset="UTF-8">
                 <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
                 <!--li><a href="./?view=sell"><i class='fa fa-usd'></i> <span>Vender</span></a></li-->
-                <li><a href="./?view=patients/index"><i class='fas fa-user-alt'></i> <span>Pacientes</span></a></li>
                 <li class="treeview">
-                  <a href="#"><i class='fa fa-diagnoses'></i> <span>SUIVE</span> <i class="fa fa-angle-left pull-right"></i></a>
-                  <ul class="treeview-menu">
-                    <li><a href="./?view=suive/index">Formatos</a></li>
-                    <li><a href="./?view=suive/diagnostic-report">Reporte Diagnósticos</span></a></li>
-                  </ul>
+                  <a href="#"><i class="fa-solid fa-user-nurse"></i> <span>Enfermería</span> <i class="fa fa-angle-left pull-right"></i></a>
+                  <!-- <ul class="treeview-menu">
+                    <li><a href="./?view=infirmary-daily-notes/index">Notas enfermería</a></li>
+                    <li><a href="./?view=infirmary-kardex/index">Kardex enfermería</a></li>
+                    <li><a href="./?view=infirmary-fluid-balance/index">Balance de líquidos</a></li>
+                    <li><a href="./?view=infirmary-vital-signs/index">Signos vitales</a></li>
+                    <li><a href="./?view=infirmary-surgical-formats/index">Formatos quirúrgicos</a></li>
+                    <li><a href="./?view=informed-consents/index">Consentimientos informados</a></li>
+                    <li><a href="./?view=beds/hospitalization-index">Hosptalización camas</a></li>
+                  </ul> -->
                 </li>
+               
 
-                <li class="treeview">
+                <!-- <li class="treeview">
                   <a href="#"><i class='fa fa-th-list'></i> <span>Catálogos</span> <i class="fa fa-angle-left pull-right"></i></a>
                   <ul class="treeview-menu">
+                    <li><a href="./?view=areas/index">Áreas</span></a></li>
+                    <li><a href="./?view=beds/index">Camas</span></a></li>
                     <li><a href="./?view=diagnostics/index">Diagnósticos</a></li>
-                    <li><a href="./?view=medic-categories/index">Especialidades Médico</span></a></li>
+                    <li><a href="./?view=medic-categories/index">Especialidades personal</span></a></li>
                     <li><a href="./?view=laboratories/index">Laboratorios/Consultorios</a></li>
-                    <li><a href="./?view=medics/index">Médicos</a></li>
+                    <li><a href="./?view=medics/index">Personal médico</a></li>
                     <li><a href="./?view=medicines/index">Medicamentos</a></li>
+                    <li><a href="./?view=bed-symbols/index">Simbología de camas</span></a></li>
+                    <li><a href="./?view=workshifts/index">Turnos</span></a></li>
                   </ul>
-                </li>
+                </li> -->
 
-                 <!--<li class="treeview">
-                  <a href="#"><i class="fas fa-pills"></i> <span>Productos e insumos</span> <i class="fa fa-angle-left pull-right"></i></a>
-                  <ul class="treeview-menu">
-                    <li><a href="./?view=products/index">Productos</a></li>
-                    <li><a href="./?view=supplies/index">Insumos</a></li>
-                  </ul>
-                </li>-->
 
-                <!--<li class="treeview">
-                  <a href="#"><i class='fas fa-money-bill-alt'></i> <span>Gastos</span> <i class="fa fa-angle-left pull-right"></i></a>
-                  <ul class="treeview-menu">
-                    <li><a href="./?view=expense-categories/index">Categoría gastos</a></li>
-                    <li><a href="./?view=expense-concepts/index">Conceptos gastos</a></li>
-                    <li><a href="./?view=expenses/index&limit">Gastos</a></li>
-                  </ul>
-                </li>
-              -->
-
-                <!--<li class="treeview">
-                  <a href="#"><i class='fa fa-database'></i> <span>Ingresos</span> <i class="fa fa-angle-left pull-right"></i></a>
-                  <ul class="treeview-menu">
-                    <li><a href="./?view=income-concepts/index">Conceptos</a></li>
-                    <li><a href="./?view=sales/index">Ingresos</a></li>
-                    <li><a href="./?view=cashier-balance/index">Cortes</a></li>
-                    <li><a href="./?view=cashier-balance/index-personal">Cortes Personal</a></li>
-                  </ul>
-                </li>
-              -->
-
-                <!--<li class="treeview">
-                  <a href="#"><i class='fas fa-boxes'></i> <span>Inventario</span> <i class="fa fa-angle-left pull-right"></i></a>
-                  <ul class="treeview-menu">
-                    <li><a href="./?view=inventory/index-products">Inventario Medicamento</a></li>
-                    <li><a href="./?view=inventory/index-supplies">Inventario Insumos</a></li>
-                    <li><a href="./?view=inventory/index-outputs">Salidas</a></li>
-                  </ul>
-                </li>
-              -->
-                <!--<li class="treeview">
-                  <a href="#"><i class='fas fa-file-alt'></i> <span>Reportes</span> <i class="fa fa-angle-left pull-right"></i></a>
-                  <ul class="treeview-menu">
-                    <li><a href="./?view=reports/inventory&ed=<?php echo $date ?>">Reporte inventario medicamentos</a></li>
-                    <li><a href="./?view=reports/inventory-supplies&ed=<?php echo $date ?>">Reporte inventario insumos</a></li>
-                    <li><a href="./?view=reports/product-sales&ed=<?php echo $date ?>">Reporte ventas producto</a></li>-->
-                    <!--
-                    <li><a href="./?view=reports/incomeexpenses">Reporte Ingresos y Egresos</a></li>
-                    <li><a href="./?view=reportsSellCir">Cirugías por cobrar y cobradas</a></li>
-                    <li><a href="./?view=reportsSell">Cuentas por cobrar y cobradas</a></li>
-                    <li><a href="./?view=reportsExp">Cuentas por pagar y pagadas</a></li>
-                    <li><a href="./?view=utilidad">Margen de utilidad</a></li>
-                    <li><a href="./?view=reports/invoices">Facturado</a></li>
-                    <li><a href="./?view=reports/noinvoice">No facturado</a></li>
-              -->
-                   <!--</ul>
-                </li>-->
-                <li class="treeview">
-                  <a href="#"><i class="fas fa-envelope"></i> <span>Notificaciones</span> <i class="fas fa-angle-left pull-right"></i></a>
-                  <ul class="treeview-menu">
-                    <li><a href="./?view=notifications/index">Notificación Citas</a></li>
-                    <li><a href="./?view=emails/new">Felicitación correo</a></li>
-                  </ul>
-                </li>
                 <li class="treeview">
                   <a href="#"><i class='fas fa-cog'></i> <span>Configuración</span> <i class="fas fa-angle-left pull-right"></i></a>
                   <ul class="treeview-menu">
@@ -295,6 +194,18 @@ if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "
             <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
             <!--li><a href="./?view=sell"><i class='fa fa-usd'></i> <span>Vender</span></a></li-->
             <li><a href="./?view=patients/index"><i class='fas fa-user-alt'></i> <span>Pacientes</span></a></li>
+            <li class="treeview">
+              <a href="#"><i class="fa-solid fa-user-nurse"></i> <span>Enfermería</span> <i class="fa fa-angle-left pull-right"></i></a>
+              <ul class="treeview-menu">
+                <li><a href="./?view=infirmary-daily-notes/index">Notas enfermería</a></li>
+                <li><a href="./?view=infirmary-kardex/index">Kardex enfermería</a></li>
+                <li><a href="./?view=infirmary-fluid-balance/index">Balance de líquidos</a></li>
+                <li><a href="./?view=infirmary-vital-signs/index">Signos vitales</a></li>
+                    <li><a href="./?view=infirmary-surgical-formats/index">Formatos quirúrgicos</a></li>
+                <li><a href="./?view=informed-consents/index">Consentimientos informados</a></li>
+                <li><a href="./?view=beds/hospitalization-index">Hosptalización Camas</a></li>
+              </ul>
+            </li>
             <li><a href="./?view=configuration/edit-medic-profile"><i class='fas fa-cog'></i> <span>Perfil</span></a></li>
           <?php endif; ?>
 
@@ -305,7 +216,18 @@ if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "
               <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
               <!--li><a href="./?view=sell"><i class='fa fa-usd'></i> <span>Vender</span></a></li-->
               <li><a href="./?view=patients/index"><i class='fas fa-user-alt'></i> <span>Pacientes</span></a></li>
-
+              <li class="treeview">
+                <a href="#"><i class="fa-solid fa-user-nurse"></i> <span>Enfermería</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <ul class="treeview-menu">
+                  <li><a href="./?view=infirmary-daily-notes/index">Notas enfermería</a></li>
+                  <li><a href="./?view=infirmary-kardex/index">Kardex enfermería</a></li>
+                  <li><a href="./?view=infirmary-fluid-balance/index">Balance de líquidos</a></li>
+                  <li><a href="./?view=infirmary-vital-signs/index">Signos vitales</a></li>
+                    <li><a href="./?view=infirmary-surgical-formats/index">Formatos quirúrgicos</a></li>
+                  <li><a href="./?view=informed-consents/index">Consentimientos informados</a></li>
+                  <li><a href="./?view=beds/hospitalization-index">Hosptalización Camas</a></li>
+                </ul>
+              </li>
               <!--<li class="treeview">
                 <a href="#"><i class='fas fa-money-bill-alt'></i> <span>Gastos</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
@@ -314,14 +236,13 @@ if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "
                 </ul>
               </li>-->
 
-               <!--<li class="treeview">
+              <li class="treeview">
                 <a href="#"><i class='fa fa-database'></i> <span>Ingresos</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
                   <li><a href="./?view=sales/index">Ingresos</a></li>
                   <li><a href="./?view=cashier-balance/index-personal">Cortes Personal</a></li>
                 </ul>
               </li>
-            -->
               <li class="treeview">
                 <a href="#"><i class="fas fa-envelope"></i> <span>Notificaciones</span> <i class="fas fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
@@ -329,32 +250,6 @@ if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "
                 </ul>
               </li>
             <?php endif; ?>
-
-            <!-- Enfermera-->
-            <ul class="sidebar-menu">
-
-              <?php if ((isset($_SESSION["user_id"])) && ($_SESSION['typeUser'] == "a")) : ?>
-                <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
-                <li><a href="./?view=patients/index"><i class='fas fa-user-alt'></i> <span>Pacientes</span></a></li>
-
-                <!--<li class="treeview">
-                  <a href="#"><i class='fas fa-boxes'></i> <span>Inventario</span> <i class="fa fa-angle-left pull-right"></i></a>
-                  <ul class="treeview-menu">
-                    <li><a href="./?view=inventory/index-products">Inventario Medicamento</a></li>
-                    <li><a href="./?view=reports/inventory&ed=<?php echo $date ?>">Reporte inventario medicamentos</a></li>
-                    <li><a href="./?view=reports/inventory-supplies&ed=<?php echo $date ?>">Reporte inventario insumos</a></li>
-                  </ul>
-                </li>
-              -->$argv
-
-              <?php endif; ?>
-
-              <!-- Enfermera-->
-              <ul class="sidebar-menu">
-                <?php if ((isset($_SESSION["user_id"])) && ($_SESSION['typeUser'] == "au")) : ?>
-                  <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
-                  <li><a href="./index.php?view=reports/invoices"><i class='fa fa-file-text-o'></i> <span>Ventas y Compras</span></a></li>
-                <?php endif; ?>
           </section>
         </aside>
       <?php endif; ?>
@@ -370,7 +265,7 @@ if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "
         <footer class="main-footer">
           <div class="pull-right hidden-xs">
           </div>
-          Copyright © <a href="https://www.v2technoconsulting.com" target="_blank">Techno Consulting</a> <!-- Credit: www.templatemo.com -->
+          Copyright © <a href="https://www.v2technoconsulting.com" target="_blank">Techno Consulting</a>
         </footer>
       <?php else : ?>
         <style>
@@ -392,8 +287,9 @@ if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "
             <form action="./?action=processLogin" method="post">
 
               <!--<span class="label label-primary"></span>-->
-              <div class="form-group">
-                <img src="assets/powerdr-logo.png" width="300px;">
+              <div class="form-group" style="text-align: center;">
+                <img src="assets/powerdr-logo.png" width="250px;"><hr>
+                <img src="assets/<?php echo $configuration['logo']->value ?>" width="200px;">
               </div>
               <div class="form-group has-feedback">
                 <input type="text" name="username" required class="form-control" placeholder="Usuario" />
@@ -436,100 +332,5 @@ if (isset($_GET["view"]) && ($_GET["view"] != "emails/new" && $_GET["view"] != "
             user experience. Slimscroll is required when using the
             fixed layout. -->
 
-  <script type="text/javascript">
-    $(document).ready(function() {
-      //Sweet Alert
-      /*Swal.fire({
-          title: '¡Atención!',
-          text: 'Estimado usuario, tu sistema presenta un saldo vencido. Te invitamos a regularizarlo a la brevedad posible.',
-          icon: 'error',
-          confirmButtonText: 'Aceptar'
-      });*/
-      if ("<?php echo (isset($_GET["view"]) && $_GET["view"] != "notifications/index") ?>" == true && <?php echo $configuration["notifications_active_sms_reservations"]->value ?> == 1 && "<?php echo $availableSmsTotal ?>" > 0) {
-        sendSmsNotificationsAll();
-      }
-    });
-
-    const removeAccents = (str) => {
-      return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    }
-
-    function sendSmsNotificationsAll() {
-      var username = '<?php echo $configuration["notifications_sms_username"]->value ?>';
-      var authenticationToken = '<?php echo $configuration["notifications_sms_authentication_token"]->value ?>';
-      var reservations = <?php echo json_encode(ReservationData::getBetweenDates($startDateTimeNotifications, $endDateTimeNotifications, 0, $reservationType = "patient", 2, 2)) ?>;
-
-      var availableSmsData = <?php echo $availableSmsTotal; ?>;
-
-      $.each(reservations, function(i, reservation) {
-        if (availableSmsData > 0) {
-          var cellphone = reservation["patient_phone"];
-          var reservationId = reservation["id"];
-          var sendedMessage = false;
-
-          var message = "Buen dia, te recordamos que tienes una cita agendada el dia " + reservation["date_at_format"] + " ";
-          message += "<?php echo $configuration["name"]->value ?>" + " Tel: " + "<?php echo $configuration["phone"]->value ?>";
-          message = message.replace(/\//g, "-");
-          messageContent = removeAccents(message);
-
-          if (cellphone.trim().length == 10) {
-            cellphone = 52 + cellphone;
-            //Envío de SMS https://docs-latam.wavy.global/documentacion-tecnica/api-integraciones/sms-api
-            $.ajax({
-              type: "GET",
-              statusCode: {
-                403: function(xhr) {
-                  //alertify.error("Ha ocurrido un error en el envío");
-                }
-              },
-              url: "https://api-messaging.wavy.global/v1/send-sms",
-              headers: {
-                'Access-Control-Allow-Origin': '*'
-              },
-              dataType: "jsonp",
-              contentType: "application/json",
-              data: {
-                username: username,
-                authenticationToken: authenticationToken,
-                destination: cellphone,
-                messageText: messageContent
-              },
-              success: function(data) {
-                sendedMessage = true;
-                //alertify.success("Mensaje Enviado");
-              },
-              error: function(jqXHR, textStatus, errorThrown) {
-                if (jqXHR.status >= 200 && jqXHR.status <= 299) {
-                  sendedMessage = true;
-                  //alertify.success("Mensaje Enviado");
-                } else {
-                  //alertify.error("Ha ocurrido un error en el envío");
-                }
-              },
-              complete: function(data) {
-                if (sendedMessage == true) {
-                  $.ajax({
-                    type: "POST",
-                    url: "./?action=notifications/add-sms",
-                    data: {
-                      reservationId: reservationId,
-                      receptor: cellphone,
-                      message: messageContent
-                    },
-                    success: function(data) {
-
-                    },
-                    error: function() {},
-                    complete: function(data) {}
-                  })
-                }
-              }
-            })
-          }
-          availableSmsData = availableSmsData - 1;
-        }
-      });
-    }
-  </script>
 
 </html>

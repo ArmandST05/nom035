@@ -8,13 +8,13 @@ class UserTypeData {
 	}
 
 	public static function getById($id){
-		$sql = "select * from ".self::$tablename." where id = $id";
+		$sql = "select * from ".self::$tablename." where id = '$id'";
 		$query = Executor::doit($sql);
 		return Model::one($query[0],new UserTypeData());
 	}
 
-	public static function getByName($name){
-		$sql = "select * from ".self::$tablename." where name = $name";
+	public static function getByDescription($name){
+		$sql = "select * from ".self::$tablename." where description = '$name'";
 		$query = Executor::doit($sql);
 		return Model::one($query[0],new UserTypeData());
 	}

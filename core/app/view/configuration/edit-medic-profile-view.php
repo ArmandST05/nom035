@@ -32,14 +32,6 @@ $categories = CategoryMedicData::getAll();
                   <label for="inputEmail1" class="control-label">Cédula Profesional*</label>
                   <input type="text" name="professionalLicense" class="form-control" id="professionalLicense" value="<?php echo $medic->professional_license ?>" placeholder="Cédula Profesional">
                 </div>
-
-                <div class="form-group">
-                  <label for="inputEmail1" class="col-lg-2 control-label">RFC</label>
-                  <div class="col-md-6">
-                    <input type="text" name="rfc" class="form-control" id="rfc" value="<?php echo $medic->rfc ?>" placeholder="RFC">
-                  </div>
-                </div>
-
                 <div class="col-md-6">
                   <label for="inputEmail1" class="control-label">Centro de Estudios*</label>
                   <input type="text" name="studyCenter" class="form-control" id="studyCenter" value="<?php echo $medic->study_center ?>" placeholder="Centro de Estudios">

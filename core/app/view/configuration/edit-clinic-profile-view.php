@@ -32,6 +32,10 @@ $configuration = ConfigurationData::getAll();
                 <input type="email" class="form-control" value="<?php echo $configuration['email']->value ?>" name="configuration[email]" class="form-control">
               </div>
               <div class="col-lg-6">
+                <label for="inputEmail1" class="control-label">Página web (url):</label>
+                <input type="text" class="form-control" value="<?php echo $configuration['webpage_url']->value ?>" name="configuration[webpage_url]" class="form-control">
+              </div>
+              <div class="col-lg-6">
                 <label for="inputEmail1" class="control-label">Nuevo logo (Formato .png):</label>
                 <input type="file" name="logo" class="form-control" accept="image/jpeg" <?php echo (isset($configuration['logo']->value)) ? "" : "required" ?>>
               </div>
@@ -43,7 +47,7 @@ $configuration = ConfigurationData::getAll();
                 <label for="inputEmail1" class="control-label">Hora fin de agenda:</label>
                 <input type="time" class="form-control" value="<?php echo $configuration['calendar_end_hour']->value ?>" name="configuration[calendar_end_hour]" class="form-control" required>
               </div>
-              <!--<div class="col-lg-6">
+              <div class="col-lg-6">
                 <br>
                 <div class="checkbox">
                   <label>
@@ -52,7 +56,6 @@ $configuration = ConfigurationData::getAll();
                   </label>
                 </div>
               </div>
-              -->
               <div class="col-lg-6" id="divCardCommissionValue" <?php echo ($configuration['active_card_commission']->value == 1) ? '' : "style='display: none;'"; ?> <label for="inputEmail1" class="control-label">Cantidad cobrada por cada transacción de tarjeta</label>
                 <div class="input-group">
                   <span class="input-group-addon">$</span>
