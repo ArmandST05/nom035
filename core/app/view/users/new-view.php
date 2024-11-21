@@ -48,12 +48,12 @@ $user_types = UserTypeData::getAll();
         </div>
       </div>
 
-      <div class="form-group">
+      <!-- <div class="form-group">
           <label for="image" class="col-lg-2 control-label">Imagen de perfil</label>
           <div class="col-md-6">
               <input type="file" name="image" class="form-control" id="image" accept="image/*">
           </div>
-      </div>
+      </div> -->
 
 
           
@@ -79,7 +79,23 @@ $user_types = UserTypeData::getAll();
         <div class="col-md-6">
           <input type="text" name="password" class="form-control" id="password" placeholder="Contraseña" readonly>
         </div>
-      </div>    
+      </div>  
+      
+      
+      <!-- Fecha de Inicio -->
+      <div class="form-group">
+        <label for="fechaInicio" class="col-lg-2 control-label">Fecha de inico*</label>
+        <div class="col-md-3">
+          <input type="date" name="fechaInicio" class="form-control" id="fechaInicio" required>
+        </div>
+        <label for="fechaInicio" class="col-lg-1 control-label">Fecha fin*</label>
+        <div class="col-md-3">
+          <input type="date" name="fechaFin" class="form-control" id="fechaFin" required>
+        </div>
+      </div>
+
+
+      
       <!-- Botón de Enviar -->
       <div class="form-group">
         <div class="col-lg-offset-2 col-lg-10">

@@ -7,7 +7,7 @@ $user = UserData::getLoggedIn();
 
 <head>
   <meta charset="UTF-8">
-  <title>POWER DR</title>
+  <title>NOM035</title>
   <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
   <link rel="icon" href="assets/powerdr-icon.png">
 
@@ -136,7 +136,9 @@ $user = UserData::getLoggedIn();
                 <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
                 <!--li><a href="./?view=sell"><i class='fa fa-usd'></i> <span>Vender</span></a></li-->
                 <li class="treeview">
-                  <a href="#"><i class="fa-solid fa-user-nurse"></i> <span>Enfermería</span> <i class="fa fa-angle-left pull-right"></i></a>
+                  <a href="#"><i class="fa-solid fa-user-nurse"></i> <span>Personal</span> <i class="fa fa-angle-left pull-right"></i></a>
+                  <li><a href="./?view=users/index">Listado Personal</a></li>
+                  <li><a href="./?view=users/carga">Carga Masiva</a></li>
                   <!-- <ul class="treeview-menu">
                     <li><a href="./?view=infirmary-daily-notes/index">Notas enfermería</a></li>
                     <li><a href="./?view=infirmary-kardex/index">Kardex enfermería</a></li>

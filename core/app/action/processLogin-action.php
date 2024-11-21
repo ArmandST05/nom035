@@ -41,4 +41,12 @@
 			window.location='index.php?view=login';
 		</script>";
 	}
+
+	/*$dateNow = date("Y-m-d");
+    if($user->user_type == "e"){
+
+        if($user->fecha_fin > $dateNow){
+            echo "<script>alert('La fecha para realizar la encuesta ya expiro')</script>"
+        }
+    }*/
 ?>

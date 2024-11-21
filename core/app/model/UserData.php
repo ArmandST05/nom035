@@ -4,11 +4,14 @@ class UserData {
 
 	public function __construct(){
 		$this->name = "";
-		$this->is_active = "";
 		$this->lastname = "";
 		$this->email = "";
-		$this->image = "";
+		$this->username = "";
 		$this->password = "";
+		$this->is_active = "";
+		$this->date_of_birth = "";
+		$this->user_type = "";
+		$this->departamento = ""; // Nuevo campo agregado
 		$this->created_at = "NOW()";
 	}
 
@@ -17,15 +20,30 @@ class UserData {
 	}
 
 	public function add(){
-		$sql = "insert into ".self::$tablename." (name,username,password,created_at,user_type) ";
-		$sql .= "value (\"$this->name\",\"$this->username\",\"$this->password\",$this->created_at,\"$this->user_type\")";
+		$sql = "INSERT INTO ".self::$tablename." 
+				(name, lastname, username, email, date_of_birth, password, user_type, departamento, is_active, created_at) 
+				VALUES 
+				(\"$this->name\", \"$this->lastname\", \"$this->username\", \"$this->email\", \"$this->date_of_birth\", \"$this->password\", \"$this->user_type\", \"$this->departamento\", \"$this->is_active\", $this->created_at)";
 		Executor::doit($sql);
 	}
 
 	public function update(){
-		$sql = "update ".self::$tablename." set name=\"$this->name\",username=\"$this->username\",user_type=\"$this->user_type\" WHERE id=$this->id";
+		$sql = "UPDATE ".self::$tablename." 
+				SET 
+					name=\"$this->name\",
+					lastname=\"$this->lastname\",
+					email=\"$this->email\",
+					username=\"$this->username\",
+					password=\"$this->password\",
+					is_active=\"$this->is_active\",
+					date_of_birth=\"$this->date_of_birth\",
+					user_type=\"$this->user_type\",
+					departamento=\"$this->departamento\" 
+				WHERE id=$this->id";
 		Executor::doit($sql);
 	}
+
+
 
 	public function updatePassword(){
 		$sql = "update ".self::$tablename." set password=\"$this->password\" where id = $this->id";
