@@ -80,18 +80,18 @@ $user = UserData::getLoggedIn();
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 </head>
 
-<body onload='' class="<?php if (isset($_SESSION["user_id"]) || isset($_SESSION["client_id"])) : ?>  skin-blue-light sidebar-mini <?php else : ?>login-page<?php endif; ?>">
+<body onload=''  class="<?php if (isset($_SESSION["user_id"]) || isset($_SESSION["client_id"])) : ?>  sidebar-mini <?php else : ?>login-page<?php endif; ?>">
   <div class="background">
     <div class="wrapper">
       <!-- Main Header -->
       <?php if (isset($_SESSION["user_id"]) || isset($_SESSION["client_id"])) : ?>
-        <header class="main-header">
+        <header class="main-header" style="background-color: #0073e6;">
           <!-- Logo -->
-          <a href="./" class="logo">
+          <a href="./" class="logo" style="background-color: white;">
             <!-- mini logo for sidebar mini 50x50 pixels -->
-            <span class="logo-mini"> <img src="assets/clinic-logo.png" width="40"></span>
+            <span class="logo-mini"> <img src="assets/IntelliPsicosocial.png" width="40"></span>
             <!-- logo for regular state and mobile devices -->
-            <img src="assets/clinic-logo.png" width="100" height="40">
+            <img src="assets/IntelliPsicosocial.png" width="100" height="60">
           </a>
 
           <!-- Header Navbar -->
@@ -101,21 +101,21 @@ $user = UserData::getLoggedIn();
               <span class="sr-only">Toggle navigation</span>
             </a>
             <!-- Navbar Right Menu -->
-            <div class="navbar-custom-menu">
+            <div class="navbar-custom-menu" style="color: white;">
               <ul class="nav navbar-nav">
 
                 <!-- User Account Menu -->
-                <li class="dropdown user user-menu">
+                <li class="dropdown user user-menu" >
                   <!-- Menu Toggle Button -->
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <!-- The user image in the navbar-->
                     <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                    <span class=""><i class="fas fa-user"></i> <?php echo $user_name ?> </span>
+                    <span class="" style="color: white;"><i class="fas fa-user"></i> <?php echo $user->name ?> </span>
                   </a>
                 </li>
                 <li class="dropdown user user-menu">
                   <!-- Menu Toggle Button -->
-                  <a href="./logout.php" class="dropdown-toggle">Salir <i class="fas fa-sign-out-alt"></i></a>
+                  <a href="./logout.php" class="dropdown-toggle" style="color: white;">Salir <i class="fas fa-sign-out-alt"></i></a>
                 </li>
                 <!-- Control Sidebar Toggle Button -->
               </ul>
@@ -135,22 +135,18 @@ $user = UserData::getLoggedIn();
                 <meta charset="UTF-8">
                 <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
                 <!--li><a href="./?view=sell"><i class='fa fa-usd'></i> <span>Vender</span></a></li-->
-                <li class="treeview">
-                  <a href="#"><i class="fa-solid fa-user-nurse"></i> <span>Personal</span> <i class="fa fa-angle-left pull-right"></i></a>
-                  <li><a href="./?view=users/index">Listado Personal</a></li>
-                  <li><a href="./?view=users/carga">Carga Masiva</a></li>
-                  <!-- <ul class="treeview-menu">
-                    <li><a href="./?view=infirmary-daily-notes/index">Notas enfermería</a></li>
-                    <li><a href="./?view=infirmary-kardex/index">Kardex enfermería</a></li>
-                    <li><a href="./?view=infirmary-fluid-balance/index">Balance de líquidos</a></li>
-                    <li><a href="./?view=infirmary-vital-signs/index">Signos vitales</a></li>
-                    <li><a href="./?view=infirmary-surgical-formats/index">Formatos quirúrgicos</a></li>
-                    <li><a href="./?view=informed-consents/index">Consentimientos informados</a></li>
-                    <li><a href="./?view=beds/hospitalization-index">Hosptalización camas</a></li>
-                  </ul> -->
-                </li>
-               
+                <li><a href="./?view=departamentos/index"><i class='fa fa-home'></i> <span>Departamentos</span></a></li>
+                <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Empresas</span></a></li>
 
+                <li class="treeview">
+                  
+                <a href="#"><i class="fa-solid fa-user-nurse"></i> <span>Personal</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <ul class="treeview-menu">  
+                <li><a href="./?view=personal/listado">Listado Personal</a></li>
+                  <li><a href="./?view=users/carga">Carga Masiva</a></li>
+                </ul>
+                </li>
+            
                 <!-- <li class="treeview">
                   <a href="#"><i class='fa fa-th-list'></i> <span>Catálogos</span> <i class="fa fa-angle-left pull-right"></i></a>
                   <ul class="treeview-menu">
