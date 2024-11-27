@@ -10,15 +10,14 @@ class PersonalData{
         $this -> id_puesto = "";
         $this -> fecha_alta = "";
         $this -> phone = "";
+        $this -> usuario = "";
+        $this -> clave ="";
     }
 
-    public function add(){
-        $sql = "INSERT INTO ".self::$tablename." 
-                (name, email, id_departamento, id_puesto, fecha_alta, phone) 
-                VALUES 
-                (\"$this->name\", \"$this->email\", \"$this->id_departamento\", 
-                \"$this->id_puesto\", \"$this->fecha_alta\", \"$this->phone\")";
-        Executor::doit($sql);
+    public function add() {
+        $sql = "INSERT INTO " . self::$tablename . " (nombre, correo, id_departamento, id_puesto, fecha_alta, telefono, usuario, clave)
+                VALUES (\"$this->name\", \"$this->email\", \"$this->id_departamento\", \"$this->id_puesto\", \"$this->fecha_alta\", \"$this->phone\", \"$this->usuario\", \"$this->clave\")";
+        return Executor::doit($sql);
     }
     
 

@@ -137,6 +137,7 @@ $user = UserData::getLoggedIn();
                 <!--li><a href="./?view=sell"><i class='fa fa-usd'></i> <span>Vender</span></a></li-->
                 <li><a href="./?view=departamentos/index"><i class='fa fa-home'></i> <span>Departamentos</span></a></li>
                 <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Empresas</span></a></li>
+                <li><a href="./index.php?view=puestos/index"><i class='fa fa-home'></i> <span>Puestos</span></a></li>
 
                 <li class="treeview">
                   

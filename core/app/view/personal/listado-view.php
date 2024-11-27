@@ -18,9 +18,7 @@ $departamentos = DepartamentoData::getAll();
         ul li {
             margin-top: 5px;
         }
-        #nuevoPersonal {
-            background-color: #0016cc;
-        }
+
     </style>
 </head>
 <body>
@@ -68,7 +66,7 @@ $departamentos = DepartamentoData::getAll();
                 </div>
                 <div class="modal-body">
                     <!-- Aquí se colocarán los campos del formulario -->
-                    <form id="addPersonalForm" action="../../action/personal/add-action.php" method="POST"> 
+                    <form id="addPersonal" action="index.php?action=personal/add" method="POST"> 
                         <div class="form-group">
                             <label for="employeeName">Nombre del Personal</label>
                             <input type="text" class="form-control" id="employeeName" placeholder="Ingrese el nombre">
@@ -88,7 +86,7 @@ $departamentos = DepartamentoData::getAll();
                                 <?php 
                                     if(!empty ($departamentos)){
                                         foreach($departamentos as $departamento){
-                                            echo "<option value='{$departamento->id}'>{$departamento->name}</option>";
+                                            echo "<option value='{$departamento->idDepartamento}'>{$departamento->nombre}</option>";
 
                                         }
                                     }
@@ -102,14 +100,15 @@ $departamentos = DepartamentoData::getAll();
                     </div>
                     <div class="form-group">
                         <label for="employeePhone">Teléfono</label>
-                        <input type="text" class="form-control" id="employeePhone" name="phone" placeholder="Ingrese el teléfono">
+                        <input type="text" class="form-control" id="employeePhone" name="phone" placeholder="Ingrese el teléfono (Opcional)">
                     </div>
 
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="button" id="savePersonalBtn" class="btn btn-primary">Guardar</button>                </div>
+                    <button type="button" id="savePersonalBtn" class="btn btn-primary" onclick="addPersonal()">Guardar</button>
+                    </div>
             </div>
         </div>
     </div>
@@ -121,32 +120,44 @@ $departamentos = DepartamentoData::getAll();
             // Configura el contenido dinámico del modal si es necesario.
             $('#PersonalModal').modal('show'); // Muestra el modal.
         }
+        var newPersonalId = null;
+        function addPersonal() {
+    if (!newPersonalId) { // Verifica si el empleado no ha sido agregado
+        // Prepara los datos del formulario
+        var personalData = {
+    "employeeName": $("#employeeName").val(),
+    "employeeEmail": $("#employeeEmail").val(),
+    "employeeRole": $("#employeeRole").val(),
+    "employeeDepartment": $("#employeeDepartment").val(),
+    "employeeDate": $("#employeeDate").val(),
+    "employeePhone": $("#employeePhone").val()
+};
 
-        $(document).ready(function() {
-    // Enviar el formulario al hacer clic en "Guardar"
-    $('#savePersonalBtn').on('click', function() {
-        var formData = $('#addPersonalForm').serialize();  // Obtiene los datos del formulario
 
-        // Realizar la solicitud AJAX
+
+        // Realiza la solicitud AJAX
         $.ajax({
-            url: $('#addPersonalForm').attr('action'),  // Usa la acción definida en el formulario
+            url: "./?action=personal/add", // Cambia a la URL correspondiente de tu backend
             type: 'POST',
-            data: formData,
+            data: personalData,
             success: function(response) {
-                if (response === 'success') {
-                    alert('Personal agregado correctamente');
-                    $('#PersonalModal').modal('hide');  // Cierra el modal
-                    $('#addPersonalForm')[0].reset();  // Resetea el formulario
-                } else {
-                    alert('Hubo un error al agregar al personal');
-                }
+                // Asigna el ID del nuevo personal
+                newPersonalId = response;
+
+                // Muestra un mensaje de éxito y redirecciona
+                alert("Personal agregado correctamente.");
+                window.location = "index.php?view=personal/listado";
             },
             error: function() {
-                alert('Error en la solicitud AJAX');
+                alert("Ha ocurrido un error al almacenar los datos del personal.");
             }
         });
-    });
-});
+    } else {
+        // Si el personal ya existe
+        alert("Este personal ya existe.");
+    }
+}
+
 
 
     </script>
