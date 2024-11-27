@@ -1,6 +1,7 @@
 <?php 
 
 $departamentos = DepartamentoData::getAll();
+$allPersonal = PersonalData::getAll();
 
 ?>
 
@@ -53,7 +54,54 @@ $departamentos = DepartamentoData::getAll();
             </div>
         </div>
     </div>
+    <div class="card" style="width: 90%; margin: auto; margin-top: 20px;">
     
+    <div class="card-body">
+        <table class="table table-striped table-hover">
+            <thead style="background-color: grey; color: white;">
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Departamento / Puesto</th>
+                    <th>Usuario</th>
+                    <th>Clave</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                if (!empty($allPersonal)) {
+                    $index = 1; // Contador para la columna #
+                    foreach ($allPersonal as $personal) {
+                        // Asegúrate de que los nombres de las propiedades coincidan con los campos de tu base de datos
+                        echo "<tr>";
+                        echo "<td>{$index}</td>";
+                        echo "<td>{$personal->nombre}</td>";
+                        echo "<td>{$personal->id_departamento} / {$personal->id_puesto}</td>";
+                        echo "<td>{$personal->usuario}</td>";
+                        echo "<td>{$personal->clave}</td>";
+                        echo "<td>{$personal->correo}</td>";
+                        echo "<td>{$personal->telefono}</td>";
+                        echo "<td>
+                                <button class='btn btn-primary btn-sm' onclick='editPersonal({$personal->id})'>Editar</button>
+                                <button class='btn btn-danger btn-sm' onclick='deletePersonal({$personal->id})'>Eliminar</button>
+                              </td>";
+                        echo "</tr>";
+                        $index++;
+                    }
+                } else {
+                    echo "<tr><td colspan='8' class='text-center'>No hay datos disponibles</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
     <!-- Modal Nuevo Empleado -->
     <div class="modal fade" id="PersonalModal" tabindex="-1" role="dialog" aria-labelledby="PersonalModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">

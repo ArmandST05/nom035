@@ -134,20 +134,26 @@ $user = UserData::getLoggedIn();
               <?php if ((isset($_SESSION["user_id"])) && ($_SESSION['typeUser'] == "su")) : ?>
                 <meta charset="UTF-8">
                 <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
-                <!--li><a href="./?view=sell"><i class='fa fa-usd'></i> <span>Vender</span></a></li-->
-                <li><a href="./?view=departamentos/index"><i class='fa fa-home'></i> <span>Departamentos</span></a></li>
-                <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Empresas</span></a></li>
-                <li><a href="./index.php?view=puestos/index"><i class='fa fa-home'></i> <span>Puestos</span></a></li>
+                <li><a href="./index.php?view=puestos/index"><i class='fa fa-home'></i>  <span>Puestos</span></a></li>
 
                 <li class="treeview">
                   
-                <a href="#"><i class="fa-solid fa-user-nurse"></i> <span>Personal</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <a href="#"><i class="fa-solid fa-user-nurse"></i>  <span>Personal</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">  
                 <li><a href="./?view=personal/listado">Listado Personal</a></li>
                   <li><a href="./?view=users/carga">Carga Masiva</a></li>
                 </ul>
                 </li>
-            
+
+                <li class="treeview">
+                <a href="#"><i class="fa-solid fa-building"></i>  <span>Mis empresas</span> <i class="fa fa-angle-left pull-right"></i></a>
+                  <ul class="treeview-menu">  
+                  <li><a href="./?view=empresas/index">Listado Empresas</a></li>
+                    <li><a href="./?view=users/carga">Logos Empresas</a></li>
+                  </ul>
+                  </li>
+                </li>
+                
                 <!-- <li class="treeview">
                   <a href="#"><i class='fa fa-th-list'></i> <span>Catálogos</span> <i class="fa fa-angle-left pull-right"></i></a>
                   <ul class="treeview-menu">
