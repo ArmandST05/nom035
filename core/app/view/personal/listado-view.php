@@ -11,7 +11,9 @@ $allPersonal = PersonalData::getAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal</title>
-    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         ul {
             list-style-type: none;
@@ -57,51 +59,55 @@ $allPersonal = PersonalData::getAll();
     <div class="card" style="width: 90%; margin: auto; margin-top: 20px;">
     
     <div class="card-body">
-        <table class="table table-striped table-hover">
-            <thead style="background-color: grey; color: white;">
-                <tr>
-                    <th>#</th>
-                    <th>Nombre</th>
-                    <th>Departamento / Puesto</th>
-                    <th>Usuario</th>
-                    <th>Clave</th>
-                    <th>Correo</th>
-                    <th>Teléfono</th>
-                    <th>Opciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php 
-                if (!empty($allPersonal)) {
-                    $index = 1; // Contador para la columna #
-                    foreach ($allPersonal as $personal) {
-                        // Asegúrate de que los nombres de las propiedades coincidan con los campos de tu base de datos
-                        echo "<tr>";
-                        echo "<td>{$index}</td>";
-                        echo "<td>{$personal->nombre}</td>";
-                        echo "<td>{$personal->id_departamento} / {$personal->id_puesto}</td>";
-                        echo "<td>{$personal->usuario}</td>";
-                        echo "<td>{$personal->clave}</td>";
-                        echo "<td>{$personal->correo}</td>";
-                        echo "<td>{$personal->telefono}</td>";
-                        echo "<td>
-                                <button class='btn btn-primary btn-sm' onclick='editPersonal({$personal->id})'>Editar</button>
-                                <button class='btn btn-danger btn-sm' onclick='deletePersonal({$personal->id})'>Eliminar</button>
-                              </td>";
-                        echo "</tr>";
-                        $index++;
-                    }
-                } else {
-                    echo "<tr><td colspan='8' class='text-center'>No hay datos disponibles</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+    <table class="table table-striped table-hover">
+    <thead style="background-color: grey; color: white;">
+        <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Departamento / Puesto</th>
+            <th>Usuario</th>
+            <th>Clave</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Opciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php 
+        if (!empty($allPersonal)) {
+            $index = 1; // Contador para la columna #
+            foreach ($allPersonal as $personal) {
+                echo "<tr>";
+                echo "<td>{$index}</td>";
+                echo "<td>{$personal->nombre}</td>";
+                echo "<td>{$personal->id_departamento} / {$personal->id_puesto}</td>";
+                echo "<td>{$personal->usuario}</td>";
+                echo "<td>{$personal->clave}</td>";
+                echo "<td>{$personal->correo}</td>";
+                echo "<td>{$personal->telefono}</td>";
+                echo "<td>
+                        <div class='dropdown'>
+                            <button class='btn btn-link' type='button' id='dropdownMenuButton{$index}' data-bs-toggle='dropdown' aria-expanded='false'>
+                                <i class='bi bi-three-dots'></i>
+                            </button>
+                            <ul class='dropdown-menu' aria-labelledby='dropdownMenuButton{$index}'>
+                                <li><a class='dropdown-item' href='#' onclick='editPersonal({$personal->id})'>Editar</a></li>
+                                <li><a class='dropdown-item' href='#' onclick='deletePersonal({$personal->id})'>Eliminar</a></li>
+                            </ul>
+                        </div>
+                      </td>";
+                echo "</tr>";
+                $index++;
+            }
+        } else {
+            echo "<tr><td colspan='8' class='text-center'>No hay datos disponibles</td></tr>";
+        }
+        ?>
+    </tbody>
+</table>
+
     </div>
 </div>
-
-
-
     <!-- Modal Nuevo Empleado -->
     <div class="modal fade" id="PersonalModal" tabindex="-1" role="dialog" aria-labelledby="PersonalModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -159,11 +165,132 @@ $allPersonal = PersonalData::getAll();
                     </div>
             </div>
         </div>
+    </div>   
+    
+    
+    <!-- Modal Editar Personal -->
+<div class="modal fade" id="EditPersonalModal" tabindex="-1" role="dialog" aria-labelledby="EditPersonalModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">Editar Personal</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario para editar el personal -->
+                <form id="editPersonalForm">
+                    <div class="form-group">
+                        <label for="editEmployeeName">Nombre del Personal</label>
+                        <input type="text" class="form-control" id="editEmployeeName" placeholder="Ingrese el nombre">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmployeeEmail">Correo Electrónico</label>
+                        <input type="email" class="form-control" id="editEmployeeEmail" placeholder="Ingrese el correo">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmployeeRole">Puesto</label>
+                        <input type="text" class="form-control" id="editEmployeeRole" placeholder="Ingrese el puesto">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmployeeDepartment">Departamento</label>
+                        <select class="form-control" id="editEmployeeDepartment">
+                            <option value="">Seleccione un departamento</option>
+                            <?php
+                            foreach ($departamentos as $departamento) {
+                                echo "<option value='{$departamento->idDepartamento}'>{$departamento->nombre}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmployeeDate">Fecha de Alta</label>
+                        <input type="date" class="form-control" id="editEmployeeDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmployeePhone">Teléfono</label>
+                        <input type="text" class="form-control" id="editEmployeePhone" placeholder="Ingrese el teléfono (Opcional)">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="saveEditPersonalBtn" class="btn btn-primary" onclick="updatePersonal()">Guardar cambios</button>
+            </div>
+        </div>
     </div>
-                                
+</div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+var editingPersonalId = null;
+
+// Función para abrir el modal de edición
+function editPersonal(personalId) {
+    editingPersonalId = personalId;  // Guardamos el ID del personal a editar
+
+    $.ajax({
+    url: "./?action=personal/get&id=" + personalId, // Verifica que el ID se esté pasando correctamente
+    type: 'GET',
+    success: function(response) {
+        console.log(response);  // Verifica la respuesta del servidor en la consola
+
+        if (response.error) {
+            alert(response.error);  // Si hay un error, muéstralo
+        } else {
+            // Cargar los datos en el formulario
+            $('#editEmployeeName').val(response.nombre);
+            $('#editEmployeeEmail').val(response.correo);
+            $('#editEmployeeRole').val(response.puesto);
+            $('#editEmployeeDepartment').val(response.id_departamento);
+            $('#editEmployeeDate').val(response.fecha_alta);
+            $('#editEmployeePhone').val(response.telefono);
+            $('#EditPersonalModal').modal('show');
+        }
+    },
+    error: function(xhr, status, error) {
+        console.log(xhr.responseText);  // Para ver el error en la consola
+        alert("Hubo un error al cargar los datos del personal.");
+    }
+});
+}
+
+// Función para actualizar el personal
+function updatePersonal() {
+    // Recopilamos los datos del formulario
+    var updatedPersonalData = {
+        "personalId": editingPersonalId,
+        "employeeName": $('#editEmployeeName').val(),
+        "employeeEmail": $('#editEmployeeEmail').val(),
+        "employeeRole": $('#editEmployeeRole').val(),
+        "employeeDepartment": $('#editEmployeeDepartment').val(),
+        "employeeDate": $('#editEmployeeDate').val(),
+        "employeePhone": $('#editEmployeePhone').val()
+    };
+
+    // Realizamos la solicitud AJAX para actualizar el personal
+    $.ajax({
+        url: "./?action=personal/update", // Cambia la URL al endpoint de actualización
+        type: 'POST',
+        data: updatedPersonalData,
+        success: function(response) {
+            if (response.success) {
+                // Si la actualización es exitosa, mostramos un mensaje y actualizamos la lista
+                alert("Personal actualizado correctamente.");
+                window.location.reload();  // Recarga la página para reflejar los cambios
+            } else {
+                alert("Error al actualizar los datos del personal.");
+            }
+        },
+        error: function() {
+            alert("Hubo un error al actualizar los datos.");
+        }
+    });
+}
+
+
         function openModalAddPersonal() {
             // Configura el contenido dinámico del modal si es necesario.
             $('#PersonalModal').modal('show'); // Muestra el modal.
