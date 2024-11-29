@@ -80,7 +80,7 @@ $user = UserData::getLoggedIn();
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 </head>
 
-<body onload=''  class="<?php if (isset($_SESSION["user_id"]) || isset($_SESSION["client_id"])) : ?>  sidebar-mini <?php else : ?>login-page<?php endif; ?>">
+<body onload=''  class="<?php if (isset($_SESSION["user_id"]) || isset($_SESSION["client_id"])) : ?>  skin-blue-light sidebar-mini <?php else : ?>login-page<?php endif; ?>">
   <div class="background">
     <div class="wrapper">
       <!-- Main Header -->
@@ -276,8 +276,9 @@ $user = UserData::getLoggedIn();
         <style>
           body::after {
             content: "";
-            background-image: url("assets/background.png") !important;
-            background-size: cover !important;
+            background-image: url("assets/background.jpeg") !important;
+            background-size:  100%!important;
+            background-repeat: no-repeat;
             opacity: 0.2;
             top: 0;
             left: 0;
@@ -293,8 +294,8 @@ $user = UserData::getLoggedIn();
 
               <!--<span class="label label-primary"></span>-->
               <div class="form-group" style="text-align: center;">
-                <img src="assets/powerdr-logo.png" width="250px;"><hr>
-                <img src="assets/<?php echo $configuration['logo']->value ?>" width="200px;">
+                <img src="assets/logo.jpeg" width="230px;"><hr>
+                
               </div>
               <div class="form-group has-feedback">
                 <input type="text" name="username" required class="form-control" placeholder="Usuario" />

@@ -1,8 +1,7 @@
-<?php 
+<?php
 
 $departamentos = DepartamentoData::getAll();
 $allPersonal = PersonalData::getAll();
-
 ?>
 
 <!DOCTYPE html>
@@ -11,21 +10,44 @@ $allPersonal = PersonalData::getAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal</title>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="path_to_bootstrap.css"> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <style>
-        ul {
-            list-style-type: none;
-        }
-        ul li {
-            margin-top: 5px;
-        }
 
-    </style>
+
 </head>
 <body>
-    <div class="container mt-4">
+<style>
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-menu {
+        display: none; /* El menú está oculto por defecto */
+        position: absolute;
+        top: 100%; /* Lo posicionamos debajo del botón */
+        left: 0;
+        background-color: #fff;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        min-width: 160px;
+        z-index: 1;
+    }
+
+    .dropdown-menu li {
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+
+    .dropdown-menu li:hover {
+        background-color: #ddd;
+    }
+</style>
+
+
+
+<div class="container mt-4">
         <div class="row">
             <!-- Columna del texto -->
             <div class="col-md-8">
@@ -41,70 +63,42 @@ $allPersonal = PersonalData::getAll();
             <!-- Columna de los botones -->
             <div class="col-md-4">
                 <div class="d-flex flex-column gap-2">
-                    <ul>
-                        <li>
+                    
                             <button type="button" class="btn btn-primary" onclick="openModalAddPersonal()">Agregar Personal</button>
-                        </li>
-                        <li>
-                            <button type="button" class="btn btn-secondary">Exportar Excel</button>
-                        </li>
-                        <li>
-                            <button type="button" class="btn btn-success">Carga Masiva</button>
-                        </li>
-                    </ul>                    
+                                         
                 </div>
             </div>
         </div>
     </div>
-    <div class="card" style="width: 90%; margin: auto; margin-top: 20px;">
-    
+    <div class="form-group">
+    <label for="filter-department">Filtrar por Departamento:</label>
+    <select id="filter-department" class="form-control">
+        <option value="">Todos los departamentos</option>
+        <!-- Las opciones serán generadas dinámicamente desde el servidor -->
+    </select>
+</div>
+    <div class="card" style="width: 95%;  margin-top: 20px; ">
     <div class="card-body">
-    <table class="table table-striped table-hover">
-    <thead style="background-color: grey; color: white;">
-        <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Departamento / Puesto</th>
-            <th>Usuario</th>
-            <th>Clave</th>
-            <th>Correo</th>
-            <th>Teléfono</th>
-            <th>Opciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php 
-        if (!empty($allPersonal)) {
-            $index = 1; // Contador para la columna #
-            foreach ($allPersonal as $personal) {
-                echo "<tr>";
-                echo "<td>{$index}</td>";
-                echo "<td>{$personal->nombre}</td>";
-                echo "<td>{$personal->id_departamento} / {$personal->id_puesto}</td>";
-                echo "<td>{$personal->usuario}</td>";
-                echo "<td>{$personal->clave}</td>";
-                echo "<td>{$personal->correo}</td>";
-                echo "<td>{$personal->telefono}</td>";
-                echo "<td>
-                        <div class='dropdown'>
-                            <button class='btn btn-link' type='button' id='dropdownMenuButton{$index}' data-bs-toggle='dropdown' aria-expanded='false'>
-                                <i class='bi bi-three-dots'></i>
-                            </button>
-                            <ul class='dropdown-menu' aria-labelledby='dropdownMenuButton{$index}'>
-                                <li><a class='dropdown-item' href='#' onclick='editPersonal({$personal->id})'>Editar</a></li>
-                                <li><a class='dropdown-item' href='#' onclick='deletePersonal({$personal->id})'>Eliminar</a></li>
-                            </ul>
-                        </div>
-                      </td>";
-                echo "</tr>";
-                $index++;
-            }
-        } else {
-            echo "<tr><td colspan='8' class='text-center'>No hay datos disponibles</td></tr>";
-        }
-        ?>
-    </tbody>
-</table>
+        <table id="lookup" class="table table-striped table-hover">
+            <thead style="background-color: grey; color: white;">
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Departamento / Puesto</th>
+                    <th>Usuario</th>
+                    <th>Clave</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- El cuerpo se gestionará dinámicamente por DataTables -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
 
     </div>
 </div>
@@ -221,10 +215,104 @@ $allPersonal = PersonalData::getAll();
         </div>
     </div>
 </div>
+<script>$(document).ready(function() {
+    // Cuando se haga clic en el botón de la dropdown
+    $('.dropdown-toggle').click(function(e) {
+        e.stopPropagation(); // Evita que el clic se propague al documento (lo que podría cerrar el menú inmediatamente)
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        // Obtén el ID del botón y construye el ID del menú correspondiente
+        var buttonId = $(this).attr('id');
+        console.log("buttonId: " + buttonId); // Depuración
 
-    <script>
+        var menuId = '#dropdownMenu' + buttonId.replace('dropdownMenuButton', '');
+        console.log("menuId generado: " + menuId); // Depuración
+
+
+        // Evita que el menú se cierre si clicas en él mismo
+        $(menuId).click(function(e) {
+            e.stopPropagation(); // Evita el cierre cuando haces clic dentro del menú
+        });
+    });
+
+});
+
+
+    // Cerrar el menú cuando se haga clic fuera de él
+    $(document).click(function(event) {
+        // Depuración: Ver si se hizo clic fuera del dropdown
+        console.log("Se hizo clic en el documento.");
+
+        if (!$(event.target).closest('.dropdown').length) {
+            // Si el clic no es sobre el dropdown o su menú, cierra el menú
+            console.log("El clic no fue dentro del dropdown, cerrando el menú.");
+            $('.dropdown-menu').hide();
+        }
+    });
+
+    $(document).ready(function() {
+    var dataTable = $('#lookup').DataTable({
+        "language": {
+            "sProcessing": "Procesando...",
+            "sLengthMenu": "Mostrar _MENU_ registros",
+            "sZeroRecords": "No se encontraron resultados",
+            "sEmptyTable": "Ningún dato disponible en esta tabla",
+            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix": "",
+            "sSearch": "Buscar:",
+            
+            "sUrl": "",
+            "sInfoThousands": ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst": "Primero",
+                "sLast": "Último",
+                "sNext": "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        },
+        "ordering": false,
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "./?action=personal/get-all", // json datasource
+            type: "POST",
+            data: function(d) {
+                // Agregar el valor seleccionado del filtro al request
+                d.department_filter = $('#filter-department').val();
+            },
+            error: function() {
+                $(".lookup-error").html("");
+                $("#lookup").append('<tbody class="employee-grid-error"><tr><th colspan="3">No se han encontrado datos.</th></tr></tbody>');
+                $("#lookup_processing").css("display", "none");
+            }
+        },
+        "responsive": true,
+        "scrollX": true
+    });
+
+    $.ajax({
+    url: './?action=departamentos/get-all', // Endpoint para obtener todos los departamentos
+    method: 'GET',
+    success: function(data) {
+        var departmentSelect = $('#filter-department');
+        data.forEach(function(department) {
+            departmentSelect.append('<option value="' + department.id + '">' + department.nombre + '</option>');
+        });
+    }
+});
+    // Al cambiar el filtro, recargar DataTable
+    $('#filter-department').change(function() {
+        dataTable.ajax.reload();
+    });
+});
+
+
 var editingPersonalId = null;
 
 // Función para abrir el modal de edición
