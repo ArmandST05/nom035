@@ -47,11 +47,11 @@ if (!empty($department_filter)) {
 $query = mysqli_query($conn, $sql);
 $totalData = mysqli_num_rows($query);
 
-// Orden y límite
-$orderColumn = $columns[$requestData['order'][0]['column']];
-$orderDirection = $requestData['order'][0]['dir'];
-$start = $requestData['start'];
-$length = $requestData['length'];
+$orderColumn = isset($requestData['order'][0]['column']) ? $columns[$requestData['order'][0]['column']] : 'id'; // Columna predeterminada
+$orderDirection = isset($requestData['order'][0]['dir']) ? $requestData['order'][0]['dir'] : 'ASC'; // Dirección predeterminada
+$start = isset($requestData['start']) ? intval($requestData['start']) : 0; // Inicio predeterminado
+$length = isset($requestData['length']) ? intval($requestData['length']) : 10; // Longitud predeterminada
+
 
 $sql .= " ORDER BY $orderColumn $orderDirection LIMIT $start, $length";
 $query = mysqli_query($conn, $sql);
@@ -75,13 +75,13 @@ while ($row = mysqli_fetch_assoc($query)) {
         <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $row["id"] . '">
             <i class="bi bi-three-dots"></i> <!-- Icono de tres puntos -->
         </button>
-        <ul class="dropdown-menu" id="dropdownMenu' . $row["id"] . '" style="display: none;">
-            <li><a class="dropdown-item" href="index.php?view=personal/edit&id=' . $row["id"] . '">Editar</a></li>
-            <li><a class="dropdown-item" href="#" onclick="deletePersonal(' . $row["id"] . ',`' . $row["nombre"] . '`)">Eliminar</a></li>
+        <ul class="dropdown-menu" id="dropdownMenu' . $row["id"] . '" style="display: none; position: absolute;">
+            <li><a class="dropdown-item" href="#" onclick="editPersonal(3)">Editar</a></li>
+             <li><a class="dropdown-item" href="#" onclick="deletePersonal(' . $row["id"] . ',`' . $row["nombre"] . '`)">Eliminar</a></li>
         </ul>
     </div>
-';
-
+    ';
+    
 
     $nestedData[] = $buttons;
     $data[] = $nestedData;

@@ -20,13 +20,20 @@ class PersonalData{
                 VALUES (\"$this->name\", \"$this->email\", \"$this->id_departamento\", \"$this->id_puesto\", \"$this->fecha_alta\", \"$this->phone\", \"$this->usuario\", \"$this->clave\")";
         return Executor::doit($sql);
     }   
-
     public static function getById($id){
-		$sql = "select * from ".self::$tablename." where id = '$id'";
-		$query = Executor::doit($sql);
-		return Model::one($query[0],new PersonalData());
-	}
-
+        $sql = "SELECT * FROM " . self::$tablename . " WHERE id = '$id'";
+        $query = Executor::doit($sql);
+    
+        // Depurar el resultado
+        if ($query) {
+            var_dump($query[0]); // Verifica el resultado
+        } else {
+            echo "Error en la consulta";
+        }
+    
+        return Model::one($query[0], new PersonalData());
+    }
+    
 
     public static function getAll(){
         $sql = "SELECT * FROM ".self::$tablename;

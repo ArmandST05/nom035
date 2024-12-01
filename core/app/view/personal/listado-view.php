@@ -1,7 +1,9 @@
 <?php
 
 $departamentos = DepartamentoData::getAll();
-$allPersonal = PersonalData::getAll();
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -18,31 +20,37 @@ $allPersonal = PersonalData::getAll();
 </head>
 <body>
 <style>
+.dropdown {
+    position: absolute;
+    display: inline-block;
+}
 
-    .dropdown {
-        position: relative;
-        display: inline-block;
-    }
+.dropdown-menu {
+    display: none; /* El menú está oculto por defecto */
+    position: absolute;
+    top: 0; /* Al nivel del botón */
+    right: 100%; /* Se posicionará hacia la izquierda del botón */
+    transform: translateX(-8px); /* Ajusta un pequeño margen para separarlo del botón */
+    background-color: #fff;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    min-width: 160px;
+    z-index: 1;
+}
 
-    .dropdown-menu {
-        display: none; /* El menú está oculto por defecto */
-        position: absolute;
-        top: 100%; /* Lo posicionamos debajo del botón */
-        left: 0;
-        background-color: #fff;
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-        min-width: 160px;
-        z-index: 1;
-    }
+.dropdown-menu li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
 
-    .dropdown-menu li {
-        padding: 8px 12px;
-        cursor: pointer;
-    }
+.dropdown-menu li:hover {
+    background-color: #ddd;
+}
+.custom-select-width {
+    max-width: 300px; /* Cambia a lo que necesites */
+    width: 100%; /* Para que se ajuste al contenedor */
+    display: inline-block; /* Evita que se estire */
+}
 
-    .dropdown-menu li:hover {
-        background-color: #ddd;
-    }
 </style>
 
 
@@ -72,11 +80,12 @@ $allPersonal = PersonalData::getAll();
     </div>
     <div class="form-group">
     <label for="filter-department">Filtrar por Departamento:</label>
-    <select id="filter-department" class="form-control">
+    <select id="filter-department" class="form-control custom-select-width">
         <option value="">Todos los departamentos</option>
         <!-- Las opciones serán generadas dinámicamente desde el servidor -->
     </select>
 </div>
+
     <div class="card" style="width: 95%;  margin-top: 20px; ">
     <div class="card-body">
         <table id="lookup" class="table table-striped table-hover">
@@ -161,93 +170,117 @@ $allPersonal = PersonalData::getAll();
         </div>
     </div>   
     
-    
-    <!-- Modal Editar Personal -->
+   <!-- Modal Editar Personal -->
 <div class="modal fade" id="EditPersonalModal" tabindex="-1" role="dialog" aria-labelledby="EditPersonalModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="exampleModalLongTitle">Editar Personal</h4>
+                <h4 class="modal-title" id="EditPersonalModalTitle">Editar Personal</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            <?php 
+            
+            ?>
             <div class="modal-body">
-                <!-- Formulario para editar el personal -->
                 <form id="editPersonalForm">
                     <div class="form-group">
                         <label for="editEmployeeName">Nombre del Personal</label>
-                        <input type="text" class="form-control" id="editEmployeeName" placeholder="Ingrese el nombre">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="editEmployeeName" 
+                            placeholder="Ingrese el nombre" 
+                            value="<?php echo isset($personal->nombre) ? htmlspecialchars($personal->nombre) : ''; ?>"
+                        >
                     </div>
                     <div class="form-group">
                         <label for="editEmployeeEmail">Correo Electrónico</label>
-                        <input type="email" class="form-control" id="editEmployeeEmail" placeholder="Ingrese el correo">
+                        <input 
+                            type="email" 
+                            class="form-control" 
+                            id="editEmployeeEmail" 
+                            placeholder="Ingrese el correo" 
+                            value="<?php echo isset($personal->correo) ? htmlspecialchars($personal->correo) : ''; ?>"
+                        >
                     </div>
                     <div class="form-group">
                         <label for="editEmployeeRole">Puesto</label>
-                        <input type="text" class="form-control" id="editEmployeeRole" placeholder="Ingrese el puesto">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="editEmployeeRole" 
+                            placeholder="Ingrese el puesto" 
+                            value="<?php echo isset($personal->puesto) ? htmlspecialchars($personal->puesto) : ''; ?>"
+                        >
                     </div>
                     <div class="form-group">
                         <label for="editEmployeeDepartment">Departamento</label>
                         <select class="form-control" id="editEmployeeDepartment">
                             <option value="">Seleccione un departamento</option>
-                            <?php
-                            foreach ($departamentos as $departamento) {
-                                echo "<option value='{$departamento->idDepartamento}'>{$departamento->nombre}</option>";
-                            }
-                            ?>
+                            <!-- Opciones dinámicas -->
+                            <?php foreach ($departamentos as $departamento): ?>
+                                <option 
+                                    value="<?php echo $departamento->id; ?>" 
+                                    <?php echo (isset($personal->id_departamento) && $personal->id_departamento == $departamento->id) ? 'selected' : ''; ?>
+                                >
+                                    <?php echo htmlspecialchars($departamento->nombre); ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="editEmployeeDate">Fecha de Alta</label>
-                        <input type="date" class="form-control" id="editEmployeeDate">
+                        <input 
+                            type="date" 
+                            class="form-control" 
+                            id="editEmployeeDate" 
+                            value="<?php echo isset($personal->fecha_alta) ? htmlspecialchars($personal->fecha_alta) : ''; ?>"
+                        >
                     </div>
                     <div class="form-group">
                         <label for="editEmployeePhone">Teléfono</label>
-                        <input type="text" class="form-control" id="editEmployeePhone" placeholder="Ingrese el teléfono (Opcional)">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            id="editEmployeePhone" 
+                            placeholder="Ingrese el teléfono (Opcional)" 
+                            value="<?php echo isset($personal->telefono) ? htmlspecialchars($personal->telefono) : ''; ?>"
+                        >
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" id="saveEditPersonalBtn" class="btn btn-primary" onclick="updatePersonal()">Guardar cambios</button>
+                <button type="button" class="btn btn-primary" onclick="savePersonal()">Guardar Cambios</button>
             </div>
         </div>
     </div>
 </div>
-<script>$(document).ready(function() {
-    // Cuando se haga clic en el botón de la dropdown
-    $('.dropdown-toggle').click(function(e) {
-        e.stopPropagation(); // Evita que el clic se propague al documento (lo que podría cerrar el menú inmediatamente)
 
-        // Obtén el ID del botón y construye el ID del menú correspondiente
-        var buttonId = $(this).attr('id');
-        console.log("buttonId: " + buttonId); // Depuración
-
-        var menuId = '#dropdownMenu' + buttonId.replace('dropdownMenuButton', '');
-        console.log("menuId generado: " + menuId); // Depuración
-
-
-        // Evita que el menú se cierre si clicas en él mismo
-        $(menuId).click(function(e) {
-            e.stopPropagation(); // Evita el cierre cuando haces clic dentro del menú
-        });
+<script>
+    
+    $(document).ready(function () {
+    // Manejador para el botón de tres puntos
+    $(document).on('click', '.dropdown-toggle', function (e) {
+        e.preventDefault();
+        const menuId = $(this).attr('id').replace('dropdownMenuButton', 'dropdownMenu');
+        
+        // Cierra otros menús abiertos
+        $('.dropdown-menu').not(`#${menuId}`).hide();
+        
+        // Alterna el menú asociado
+        $(`#${menuId}`).toggle();
     });
 
-});
-
-
-    // Cerrar el menú cuando se haga clic fuera de él
-    $(document).click(function(event) {
-        // Depuración: Ver si se hizo clic fuera del dropdown
-        console.log("Se hizo clic en el documento.");
-
-        if (!$(event.target).closest('.dropdown').length) {
-            // Si el clic no es sobre el dropdown o su menú, cierra el menú
-            console.log("El clic no fue dentro del dropdown, cerrando el menú.");
+    // Cierra el menú si se hace clic fuera de él
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.dropdown').length) {
             $('.dropdown-menu').hide();
         }
     });
+});
 
     $(document).ready(function() {
     var dataTable = $('#lookup').DataTable({
@@ -312,38 +345,38 @@ $allPersonal = PersonalData::getAll();
     });
 });
 
-
-var editingPersonalId = null;
-
-// Función para abrir el modal de edición
 function editPersonal(personalId) {
     editingPersonalId = personalId;  // Guardamos el ID del personal a editar
 
     $.ajax({
-    url: "./?action=personal/get&id=" + personalId, // Verifica que el ID se esté pasando correctamente
-    type: 'GET',
-    success: function(response) {
-        console.log(response);  // Verifica la respuesta del servidor en la consola
+        url: "./?action=personal/get&id=" + personalId, // Verifica que el ID se esté pasando correctamente
+        type: 'GET',
+        success: function(response) {
+            console.log("Datos recibidos:", response); // Para depuración
 
-        if (response.error) {
-            alert(response.error);  // Si hay un error, muéstralo
-        } else {
-            // Cargar los datos en el formulario
-            $('#editEmployeeName').val(response.nombre);
-            $('#editEmployeeEmail').val(response.correo);
-            $('#editEmployeeRole').val(response.puesto);
-            $('#editEmployeeDepartment').val(response.id_departamento);
-            $('#editEmployeeDate').val(response.fecha_alta);
-            $('#editEmployeePhone').val(response.telefono);
-            $('#EditPersonalModal').modal('show');
+            if (response.error) {
+                alert(response.error); // Si hay un error, muéstralo
+            } else {
+                // Asignar los valores recibidos a los campos del formulario
+                $('#editEmployeeName').val(response.nombre);
+                $('#editEmployeeEmail').val(response.correo);
+                $('#editEmployeeRole').val(response.id_puesto);
+                $('#editEmployeeDepartment').val(response.id_departamento);
+                $('#editEmployeeDate').val(response.fecha_alta);
+                $('#editEmployeePhone').val(response.telefono);
+
+                // Mostrar el modal
+                $('#EditPersonalModal').modal('show');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log(xhr.responseText);  
+            alert("Hubo un error al cargar los datos del personal.");
         }
-    },
-    error: function(xhr, status, error) {
-        console.log(xhr.responseText);  // Para ver el error en la consola
-        alert("Hubo un error al cargar los datos del personal.");
-    }
-});
+    });
 }
+
+
 
 // Función para actualizar el personal
 function updatePersonal() {
