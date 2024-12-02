@@ -8,7 +8,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
             "id" => $personal->id,
             "nombre" => $personal->nombre,
             "correo" => $personal->correo,
-            "puesto" => $personal->id_puesto,
+            "id_puesto" => $personal->id_puesto,
             "id_departamento" => $personal->id_departamento,
             "fecha_alta" => $personal->fecha_alta,
             "telefono" => $personal->telefono,

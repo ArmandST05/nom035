@@ -20,36 +20,7 @@ $departamentos = DepartamentoData::getAll();
 </head>
 <body>
 <style>
-.dropdown {
-    position: absolute;
-    display: inline-block;
-}
 
-.dropdown-menu {
-    display: none; /* El menú está oculto por defecto */
-    position: absolute;
-    top: 0; /* Al nivel del botón */
-    right: 100%; /* Se posicionará hacia la izquierda del botón */
-    transform: translateX(-8px); /* Ajusta un pequeño margen para separarlo del botón */
-    background-color: #fff;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-    min-width: 160px;
-    z-index: 1;
-}
-
-.dropdown-menu li {
-    padding: 8px 12px;
-    cursor: pointer;
-}
-
-.dropdown-menu li:hover {
-    background-color: #ddd;
-}
-.custom-select-width {
-    max-width: 300px; /* Cambia a lo que necesites */
-    width: 100%; /* Para que se ajuste al contenedor */
-    display: inline-block; /* Evita que se estire */
-}
 
 </style>
 
@@ -78,18 +49,44 @@ $departamentos = DepartamentoData::getAll();
             </div>
         </div>
     </div>
-    <div class="form-group">
-    <label for="filter-department">Filtrar por Departamento:</label>
-    <select id="filter-department" class="form-control custom-select-width">
-        <option value="">Todos los departamentos</option>
-        <!-- Las opciones serán generadas dinámicamente desde el servidor -->
-    </select>
+    <div class="row mb-4">
+    <!-- Filtro por Departamento -->
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="filter-department">Filtrar por Departamento:</label>
+            <select id="filter-department" class="form-control custom-select-width">
+    <option value="">Todos los departamentos</option> <!-- Opción por defecto -->
+</select>
+
+        </div>
+    </div>
+    <!-- Campo de Búsqueda -->
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="custom-search">Buscar:</label>
+            <input type="text" id="custom-search" class="form-control" placeholder="Escribe para buscar...">
+        </div>
+    </div>
+
+    <!-- Selección de Cantidad de Resultados -->
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="custom-length">Mostrar registros:</label>
+            <select id="custom-length" class="form-control">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+    </div>
 </div>
 
-    <div class="card" style="width: 95%;  margin-top: 20px; ">
+
+    <div class="card" style="width: 100%;  margin-top: 20px">
     <div class="card-body">
         <table id="lookup" class="table table-striped table-hover">
-            <thead style="background-color: grey; color: white;">
+            <thead style="background-color: #484848; color: white; border-radius: 5px;">
                 <tr>
                     <th>#</th>
                     <th>Nombre</th>
@@ -184,76 +181,45 @@ $departamentos = DepartamentoData::getAll();
             
             ?>
             <div class="modal-body">
-                <form id="editPersonalForm">
-                    <div class="form-group">
-                        <label for="editEmployeeName">Nombre del Personal</label>
-                        <input 
-                            type="text" 
-                            class="form-control" 
-                            id="editEmployeeName" 
-                            placeholder="Ingrese el nombre" 
-                            value="<?php echo isset($personal->nombre) ? htmlspecialchars($personal->nombre) : ''; ?>"
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmployeeEmail">Correo Electrónico</label>
-                        <input 
-                            type="email" 
-                            class="form-control" 
-                            id="editEmployeeEmail" 
-                            placeholder="Ingrese el correo" 
-                            value="<?php echo isset($personal->correo) ? htmlspecialchars($personal->correo) : ''; ?>"
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmployeeRole">Puesto</label>
-                        <input 
-                            type="text" 
-                            class="form-control" 
-                            id="editEmployeeRole" 
-                            placeholder="Ingrese el puesto" 
-                            value="<?php echo isset($personal->puesto) ? htmlspecialchars($personal->puesto) : ''; ?>"
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmployeeDepartment">Departamento</label>
-                        <select class="form-control" id="editEmployeeDepartment">
+            <form id="editPersonalForm" action="index.php?action=personal/update" method="POST">
+    <div class="form-group">
+        <label for="editEmployeeName">Nombre del Personal</label>
+        <input type="text"  class="form-control"  id="editEmployeeName" placeholder="Ingrese el nombre">
+    </div>
+    <div class="form-group">
+        <label for="editEmployeeEmail">Correo Electrónico</label>
+        <input type="email" class="form-control" id="editEmployeeEmail"placeholder="Ingrese el correo">
+    </div>
+    <div class="form-group">
+        <label for="editEmployeeRole">Puesto</label>
+        <input type="text" class="form-control" id="editEmployeeRole" placeholder="Ingrese el puesto">
+    </div>
+    <div class="form-group">
+        <label for="editEmployeeDepartment">Departamento</label>
+        <select class="form-control" id="editEmployeeDepartment">
                             <option value="">Seleccione un departamento</option>
                             <!-- Opciones dinámicas -->
                             <?php foreach ($departamentos as $departamento): ?>
                                 <option 
-                                    value="<?php echo $departamento->id; ?>" 
-                                    <?php echo (isset($personal->id_departamento) && $personal->id_departamento == $departamento->id) ? 'selected' : ''; ?>
-                                >
+                                    value="<?php echo $departamento->idDepartamento; ?>">
                                     <?php echo htmlspecialchars($departamento->nombre); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmployeeDate">Fecha de Alta</label>
-                        <input 
-                            type="date" 
-                            class="form-control" 
-                            id="editEmployeeDate" 
-                            value="<?php echo isset($personal->fecha_alta) ? htmlspecialchars($personal->fecha_alta) : ''; ?>"
-                        >
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmployeePhone">Teléfono</label>
-                        <input 
-                            type="text" 
-                            class="form-control" 
-                            id="editEmployeePhone" 
-                            placeholder="Ingrese el teléfono (Opcional)" 
-                            value="<?php echo isset($personal->telefono) ? htmlspecialchars($personal->telefono) : ''; ?>"
-                        >
-                    </div>
-                </form>
+    </div>
+    <div class="form-group">
+        <label for="editEmployeeDate">Fecha de Alta</label>
+        <input type="date"  class="form-control" id="editEmployeeDate">
+    </div>
+    <div class="form-group">
+        <label for="editEmployeePhone">Teléfono</label>
+        <input type="text" class="form-control" id="editEmployeePhone" placeholder="Ingrese el teléfono (Opcional)">
+    </div>
+</form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="savePersonal()">Guardar Cambios</button>
+                <button type="button" class="btn btn-primary" onclick="updatePersonal()">Guardar Cambios</button>
             </div>
         </div>
     </div>
@@ -281,52 +247,43 @@ $departamentos = DepartamentoData::getAll();
         }
     });
 });
-
-    $(document).ready(function() {
+$(document).ready(function() {
+    
     var dataTable = $('#lookup').DataTable({
         "language": {
             "sProcessing": "Procesando...",
-            "sLengthMenu": "Mostrar _MENU_ registros",
             "sZeroRecords": "No se encontraron resultados",
             "sEmptyTable": "Ningún dato disponible en esta tabla",
             "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-            "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
             "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-            "sInfoPostFix": "",
-            "sSearch": "Buscar:",
-            
-            "sUrl": "",
-            "sInfoThousands": ",",
             "sLoadingRecords": "Cargando...",
             "oPaginate": {
                 "sFirst": "Primero",
                 "sLast": "Último",
                 "sNext": "Siguiente",
                 "sPrevious": "Anterior"
-            },
-            "oAria": {
-                "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
-                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
             }
         },
         "ordering": false,
         "processing": true,
         "serverSide": true,
         "ajax": {
-            url: "./?action=personal/get-all", // json datasource
+            url: "./?action=personal/get-all",
             type: "POST",
             data: function(d) {
-                // Agregar el valor seleccionado del filtro al request
                 d.department_filter = $('#filter-department').val();
+                d.custom_search = $('#custom-search').val();
+                d.length = $('#custom-length').val();
             },
-            error: function() {
-                $(".lookup-error").html("");
-                $("#lookup").append('<tbody class="employee-grid-error"><tr><th colspan="3">No se han encontrado datos.</th></tr></tbody>');
-                $("#lookup_processing").css("display", "none");
+            dataSrc: function(json) {
+                return json.data;  // Asegúrate de que data es lo que DataTable espera
+            },
+            error: function(xhr, error, code) {
             }
         },
         "responsive": true,
-        "scrollX": true
+        "scrollX": true,
+        "dom": '<"datatable-content"t><"datatable-footer"ip>', // Coloca la paginación e información en la parte inferior
     });
 
     $.ajax({
@@ -339,11 +296,23 @@ $departamentos = DepartamentoData::getAll();
         });
     }
 });
-    // Al cambiar el filtro, recargar DataTable
+
+    // Recargar DataTable al cambiar el filtro
     $('#filter-department').change(function() {
         dataTable.ajax.reload();
     });
+
+    // Funcionalidad para la búsqueda
+    $('#custom-search').on('keyup', function () {
+        dataTable.ajax.reload();
+    });
+
+    // Funcionalidad para la selección de longitud
+    $('#custom-length').change(function() {
+        dataTable.ajax.reload();
+    });
 });
+
 
 function editPersonal(personalId) {
     editingPersonalId = personalId;  // Guardamos el ID del personal a editar
@@ -352,8 +321,17 @@ function editPersonal(personalId) {
         url: "./?action=personal/get&id=" + personalId, // Verifica que el ID se esté pasando correctamente
         type: 'GET',
         success: function(response) {
-            console.log("Datos recibidos:", response); // Para depuración
-
+            console.log("Datos recibidoooooos:", response); // Para depuración
+                 // Asegúrate de que sea un objeto, si es un string JSON conviértelo
+    if (typeof response === "string") {
+        try {
+            response = JSON.parse(response);
+        } catch (e) {
+            console.error("Error al parsear JSON:", e);
+            alert("Error al procesar los datos.");
+            return;
+        }
+    }
             if (response.error) {
                 alert(response.error); // Si hay un error, muéstralo
             } else {
@@ -370,45 +348,52 @@ function editPersonal(personalId) {
             }
         },
         error: function(xhr, status, error) {
-            console.log(xhr.responseText);  
             alert("Hubo un error al cargar los datos del personal.");
         }
     });
 }
 
 
-
 // Función para actualizar el personal
 function updatePersonal() {
     // Recopilamos los datos del formulario
-    var updatedPersonalData = {
-        "personalId": editingPersonalId,
-        "employeeName": $('#editEmployeeName').val(),
-        "employeeEmail": $('#editEmployeeEmail').val(),
-        "employeeRole": $('#editEmployeeRole').val(),
-        "employeeDepartment": $('#editEmployeeDepartment').val(),
-        "employeeDate": $('#editEmployeeDate').val(),
-        "employeePhone": $('#editEmployeePhone').val()
-    };
+   var updatedPersonalData = {
+    "id": editingPersonalId,
+    "nombre": $('#editEmployeeName').val(),
+    "correo": $('#editEmployeeEmail').val(),
+    "id_puesto": $('#editEmployeeRole').val(),
+    "id_departamento": $('#editEmployeeDepartment').val(),
+    "fecha_alta": $('#editEmployeeDate').val(),
+    "telefono": $('#editEmployeePhone').val()
+};
 
-    // Realizamos la solicitud AJAX para actualizar el personal
+
     $.ajax({
-        url: "./?action=personal/update", // Cambia la URL al endpoint de actualización
-        type: 'POST',
-        data: updatedPersonalData,
-        success: function(response) {
-            if (response.success) {
-                // Si la actualización es exitosa, mostramos un mensaje y actualizamos la lista
-                alert("Personal actualizado correctamente.");
-                window.location.reload();  // Recarga la página para reflejar los cambios
-            } else {
-                alert("Error al actualizar los datos del personal.");
+    url: "./?action=personal/update",
+    type: 'POST',
+    data: updatedPersonalData,
+    success: function(response) {
+        try {
+            if (typeof response === "string") {
+                response = JSON.parse(response); // Asegúrate de que sea un objeto JSON
             }
-        },
-        error: function() {
-            alert("Hubo un error al actualizar los datos.");
+            if (response.success) {
+                alert("Personal actualizado correctamente.");
+                window.location.reload(); // Recargar la página
+            } else {
+                alert("Error: " + (response.message || "Ocurrió un problema."));
+            }
+        } catch (error) {
+            console.error("Error al procesar la respuesta del servidor:", error, response);
+            alert("Hubo un error inesperado.");
         }
-    });
+    },
+    error: function(xhr, status, error) {
+        alert("Error al comunicarse con el servidor.");
+        console.error("AJAX error:", status, error);
+    }
+});
+
 }
 
 

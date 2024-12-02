@@ -20,8 +20,10 @@ $columns = array(
     6 => 'telefono'
 );
 
-// Filtrar por departamento si el filtro existe
+// Filtros personalizados
 $department_filter = isset($requestData['department_filter']) ? $requestData['department_filter'] : '';
+$custom_search = isset($requestData['custom_search']) ? $requestData['custom_search'] : '';
+$custom_length = isset($requestData['length']) ? intval($requestData['length']) : 10;
 
 // Consulta inicial
 $sql = "SELECT personal.id, personal.nombre, personal.usuario, personal.clave, personal.correo, personal.telefono, 
@@ -29,31 +31,41 @@ $sql = "SELECT personal.id, personal.nombre, personal.usuario, personal.clave, p
         FROM personal
         INNER JOIN departamentos ON personal.id_departamento = departamentos.idDepartamento";
 
-// Filtro de búsqueda
-if (!empty($requestData['search']['value'])) {
-    $searchValue = mysqli_real_escape_string($conn, $requestData['search']['value']);
-    $sql .= " WHERE (personal.nombre LIKE '%$searchValue%' 
-                OR personal.usuario LIKE '%$searchValue%' 
-                OR personal.correo LIKE '%$searchValue%' 
-                OR departamentos.nombre LIKE '%$searchValue%')";
+// Iniciar condición
+$where = [];
+
+// Filtro de búsqueda personalizado
+if (!empty($custom_search)) {
+    $searchValue = mysqli_real_escape_string($conn, $custom_search);
+    $where[] = "(personal.nombre LIKE '%$searchValue%')";
 }
 
-// Aplicar el filtro por departamento si se ha seleccionado uno
+// Aplicar el filtro por departamento
 if (!empty($department_filter)) {
-    $sql .= " AND personal.id_departamento = " . mysqli_real_escape_string($conn, $department_filter);
+    $where[] = "personal.id_departamento = " . mysqli_real_escape_string($conn, $department_filter);
 }
 
-// Total de registros
+// Agregar condiciones al SQL
+if (count($where) > 0) {
+    $sql .= " WHERE " . implode(" AND ", $where);
+}
+
+// Total de registros filtrados
 $query = mysqli_query($conn, $sql);
-$totalData = mysqli_num_rows($query);
+$totalFiltered = mysqli_num_rows($query);
 
-$orderColumn = isset($requestData['order'][0]['column']) ? $columns[$requestData['order'][0]['column']] : 'id'; // Columna predeterminada
-$orderDirection = isset($requestData['order'][0]['dir']) ? $requestData['order'][0]['dir'] : 'ASC'; // Dirección predeterminada
-$start = isset($requestData['start']) ? intval($requestData['start']) : 0; // Inicio predeterminado
-$length = isset($requestData['length']) ? intval($requestData['length']) : 10; // Longitud predeterminada
+// Orden y límite
+$orderColumn = isset($requestData['order'][0]['column']) ? $columns[$requestData['order'][0]['column']] : 'id';
+$orderDirection = isset($requestData['order'][0]['dir']) ? $requestData['order'][0]['dir'] : 'ASC';
+$start = isset($requestData['start']) ? intval($requestData['start']) : 0;
 
+// Aplicar orden y límite
+$sql .= " ORDER BY $orderColumn $orderDirection LIMIT $start, $custom_length";
 
-$sql .= " ORDER BY $orderColumn $orderDirection LIMIT $start, $length";
+// Depuración
+error_log($sql);
+
+// Ejecución de la consulta con paginación
 $query = mysqli_query($conn, $sql);
 
 // Construcción de la respuesta JSON
@@ -68,29 +80,60 @@ while ($row = mysqli_fetch_assoc($query)) {
     $nestedData[] = $row["correo"];
     $nestedData[] = $row["telefono"];
     
-    // Generación de menú desplegable según el tipo de usuario
-    // Generación de menú desplegable
     $buttons = '
+    <style>
+#dropdownMenuButton' . $row["id"] . ' i {
+    background-color: grey; /* Fondo gris para el ícono */
+    color: black; /* Color negro para los puntos */
+    border-radius: 50%; /* Círculo */
+    padding: 8px; /* Ajusta el tamaño del círculo */
+    font-size: 18px; /* Tamaño de los puntos */
+    display: inline-block; /* Asegura que el icono se comporte como un bloque */
+    text-align: center; /* Centra el icono dentro del círculo */
+    line-height: 18px; /* Centra verticalmente el texto dentro del círculo */
+}
+
+.table .dropdown {
+    position: relative; /* Asegura que el botón esté posicionado dentro de la celda */
+    text-align: center; /* Alinea el botón al centro */
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%; /* Coloca el menú justo debajo del botón */
+    left: 50%;
+    transform: translateX(-50%); /* Centra el menú */
+    z-index: 1000; /* Asegura que el menú se superponga sobre otros elementos */
+    width: 150px; /* Ajusta el ancho del menú */
+}
+
+.dropdown-toggle {
+    background-color: transparent;
+    border: none;
+}
+
+
+    </style>
     <div class="dropdown">
-        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $row["id"] . '">
-            <i class="bi bi-three-dots"></i> <!-- Icono de tres puntos -->
+       <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $row["id"] . '">
+            <i class="fa-solid fa-ellipsis"  style="color: black;"></i>
         </button>
+
         <ul class="dropdown-menu" id="dropdownMenu' . $row["id"] . '" style="display: none; position: absolute;">
-            <li><a class="dropdown-item" href="#" onclick="editPersonal(3)">Editar</a></li>
-             <li><a class="dropdown-item" href="#" onclick="deletePersonal(' . $row["id"] . ',`' . $row["nombre"] . '`)">Eliminar</a></li>
+            <li><a class="dropdown-item" href="#" onclick="editPersonal(' . $row["id"] . ')">Editar</a></li>
+            <li><a class="dropdown-item" href="#" onclick="deletePersonal(' . $row["id"] . ',`' . $row["nombre"] . '`)">Eliminar</a></li>
         </ul>
     </div>
     ';
-    
-
     $nestedData[] = $buttons;
     $data[] = $nestedData;
 }
 
+// Respuesta final
 $response = array(
     "draw" => intval($requestData['draw']),
-    "recordsTotal" => intval($totalData),
-    "recordsFiltered" => intval($totalData),
+    "recordsTotal" => intval($totalFiltered),
+    "recordsFiltered" => intval($totalFiltered),
     "data" => $data
 );
 
