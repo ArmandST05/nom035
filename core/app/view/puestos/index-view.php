@@ -30,41 +30,23 @@ $allPuestos = PuestoData::getAll();
         </div>
 
         <!-- Card with table -->
-        <div class="card mt-4" style="width: 90%; margin: auto; margin-top: 20px;"> <!-- Agregar mt-4 para dar un margen superior -->
-            <div class="card-body">
-                <table class="table table-striped table-hover">
-                    <thead style="background-color: grey; color: white;">
-                        <tr>
-                            <th>#</th>
-                            <th>Nombre</th>
-                            <th>Departamento</th>
-                            <th>Opciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php 
-                            if(!empty($allPuestos)){
-                                $index= 1;
-                                foreach ($allPuestos as $puesto) {
-                                    echo "<tr>";
-                                    echo "<td>{$index}</td>";
-                                    echo "<td>{$puesto->nombre}</td>";
-                                    echo "<td>{$puesto->id_departamento}</td>";
-                                    echo "<td>
-                                            <button class='btn btn-primary btn-sm' onclick='editPersonal({$puesto->id})'>Editar</button>
-                                            <button class='btn btn-danger btn-sm' onclick='deletePersonal({$puesto->id})'>Eliminar</button>
-                                          </td>";
-                                    echo "</tr>";
-                                    $index++;
-                                }
-                            }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+        <div class="card" style="width: 95%;  margin-top: 20px; ">
+    <div class="card-body">
+        <table id="lookup" class="table table-striped table-hover">
+            <thead style="background-color: grey; color: white;">
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Departamento</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- El cuerpo se gestionará dinámicamente por DataTables -->
+            </tbody>
+        </table>
     </div>
+</div>
 
     <!-- Modal for adding new puesto -->
     <div class="modal fade" id="PuestoModal" tabindex="-1" role="dialog" aria-labelledby="PuestoModalTitle" aria-hidden="true">
@@ -121,6 +103,41 @@ $allPuestos = PuestoData::getAll();
     </div>
 
     <script>
+           $(document).ready(function () {
+    var dataTable = $('#lookup').DataTable({
+        "language": {
+            "sProcessing": "Procesando...",
+            "sLengthMenu": "Mostrar _MENU_ registros",
+            "sZeroRecords": "No se encontraron resultados",
+            "sEmptyTable": "Ningún dato disponible en esta tabla",
+            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+            "sSearch": "Buscar:",
+            "oPaginate": {
+                "sFirst": "Primero",
+                "sLast": "Último",
+                "sNext": "Siguiente",
+                "sPrevious": "Anterior"
+            }
+        },
+        "ordering": false,
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            url: "./?action=puestos/get-all", // Ruta al endpoint
+            type: "POST",
+            error: function () {
+                $(".lookup-error").html("");
+                $("#lookup").append('<tbody class="employee-grid-error"><tr><th colspan="3">No se han encontrado datos.</th></tr></tbody>');
+                $("#lookup_processing").css("display", "none");
+            }
+        },
+        "responsive": true,
+        "scrollX": true
+    });
+});
+
         function openModalAddPuesto() {
             $('#PuestoModal').modal('show');
         }
