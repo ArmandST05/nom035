@@ -6,24 +6,6 @@ $departamentos = DepartamentoData::getAll();
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal</title>
-    <link rel="stylesheet" href="path_to_bootstrap.css"> 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-
-
-</head>
-<body>
-<style>
-
-
-</style>
-
 
 
 <div class="container mt-4">
@@ -372,19 +354,19 @@ function updatePersonal() {
     url: "./?action=personal/update",
     type: 'POST',
     data: updatedPersonalData,
-    success: function(response) {
+    success: function(updatedPersonalData) {
         try {
-            if (typeof response === "string") {
-                response = JSON.parse(response); // Asegúrate de que sea un objeto JSON
+            if (typeof updatedPersonalData === "string") {
+                updatedPersonalData = JSON.parse(updatedPersonalData); // Asegúrate de que sea un objeto JSON
             }
-            if (response.success) {
+            if (updatedPersonalData.success) {
                 alert("Personal actualizado correctamente.");
                 window.location.reload(); // Recargar la página
             } else {
-                alert("Error: " + (response.message || "Ocurrió un problema."));
+                alert("Error: " + (updatedPersonalData.message || "Ocurrió un problema."));
             }
         } catch (error) {
-            console.error("Error al procesar la respuesta del servidor:", error, response);
+            console.error("Error al procesar la respuesta del servidor:", error, updatedPersonalData);
             alert("Hubo un error inesperado.");
         }
     },
@@ -463,5 +445,3 @@ function deletePersonal(puestoId, puestoName) {
 
 
     </script>
-</body>
-</html>

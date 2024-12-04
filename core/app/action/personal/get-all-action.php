@@ -81,39 +81,40 @@ while ($row = mysqli_fetch_assoc($query)) {
     $nestedData[] = $row["telefono"];
     
     $buttons = '
-    <style>
-#dropdownMenuButton' . $row["id"] . ' i {
-    background-color: grey; /* Fondo gris para el ícono */
-    color: black; /* Color negro para los puntos */
-    border-radius: 50%; /* Círculo */
-    padding: 8px; /* Ajusta el tamaño del círculo */
-    font-size: 18px; /* Tamaño de los puntos */
-    display: inline-block; /* Asegura que el icono se comporte como un bloque */
-    text-align: center; /* Centra el icono dentro del círculo */
-    line-height: 18px; /* Centra verticalmente el texto dentro del círculo */
-}
+        <style>
+    #dropdownMenuButton' . $row["id"] . ' i {
+        background-color: grey; /* Fondo gris para el ícono */
+        color: black; /* Color negro para los puntos */
+        border-radius: 50%; /* Círculo */
+        padding: 8px; /* Ajusta el tamaño del círculo */
+        font-size: 18px; /* Tamaño de los puntos */
+        display: inline-block; /* Asegura que el icono se comporte como un bloque */
+        text-align: center; /* Centra el icono dentro del círculo */
+        line-height: 18px; /* Centra verticalmente el texto dentro del círculo */
+    }
 
-.table .dropdown {
-    position: relative; /* Asegura que el botón esté posicionado dentro de la celda */
-    text-align: center; /* Alinea el botón al centro */
-}
+    .table .dropdown {
+        position: absolute; /* Asegura que el botón esté posicionado dentro de la celda */
+        text-align: center; /* Alinea el botón al centro */
+    }
 
-.dropdown-menu {
-    position: absolute;
-    top: 100%; /* Coloca el menú justo debajo del botón */
-    left: 50%;
-    transform: translateX(-50%); /* Centra el menú */
-    z-index: 1000; /* Asegura que el menú se superponga sobre otros elementos */
-    width: 150px; /* Ajusta el ancho del menú */
-}
+    .dropdown-menu {
+        position: relative; /* Sale del flujo de la tabla */
+        z-index: 10000; /* Aparece por encima de otros elementos */
+        display: none; /* Oculto inicialmente */
+        width: 150px; /* Ancho del menú */
+        background-color: white;
+        border-radius: 4px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para el menú */
+        overflow: hidden;
+    }
+    .dropdown-toggle {
+        background-color: transparent;
+        border: none;
+    }
 
-.dropdown-toggle {
-    background-color: transparent;
-    border: none;
-}
 
-
-    </style>
+        </style>
     <div class="dropdown">
        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $row["id"] . '">
             <i class="fa-solid fa-ellipsis"  style="color: black;"></i>

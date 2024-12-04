@@ -60,7 +60,7 @@ $userTypes = UserTypeData::getAll();
 						<td><?php echo $user->email; ?></td>
 						<td><?php echo $user->username; ?></td>
 						<td><?php echo $user->date_of_birth; ?></td>
-						<td><?php echo $user->departamento ?></td>
+						
 						<td><?php echo $user->getUserType()->description; ?></td>
 						<td>
 							<?php if ($user->is_active) : ?>

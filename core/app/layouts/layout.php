@@ -7,9 +7,9 @@ $user = UserData::getLoggedIn();
 
 <head>
   <meta charset="UTF-8">
-  <title>NOM035</title>
+  <title>INTELLI 035</title>
   <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-  <link rel="icon" href="assets/powerdr-icon.png">
+  <link rel="icon" href="assets/icon-intelli.png">
 
   <!-- Jquery -->
   <script src="assets/jquery-2.1.1.min.js" type="text/javascript"></script>
@@ -89,9 +89,9 @@ $user = UserData::getLoggedIn();
           <!-- Logo -->
           <a href="./" class="logo" style="background-color: white;">
             <!-- mini logo for sidebar mini 50x50 pixels -->
-            <span class="logo-mini"> <img src="assets/IntelliPsicosocial.png" width="40"></span>
+            <span class="logo-mini"> <img src="assets/logoWithe.jpeg" width="60"></span>
             <!-- logo for regular state and mobile devices -->
-            <img src="assets/IntelliPsicosocial.png" width="100" height="60">
+            <img src="assets/logoWithe.jpeg" width="100" height="55">
           </a>
 
           <!-- Header Navbar -->
@@ -173,7 +173,7 @@ $user = UserData::getLoggedIn();
                 <li class="treeview">
                   <a href="#"><i class='fas fa-cog'></i> <span>Configuración</span> <i class="fas fa-angle-left pull-right"></i></a>
                   <ul class="treeview-menu">
-                    <li><a href="./?view=configuration/edit-clinic-profile">Perfil Clínica</a></li>
+                    <li><a href="./?view=configuration/edit-clinic-profile">Perfil Intelli 035</a></li>
                     <?php if (isset($medic)) : ?>
                       <li><a href="./?view=configuration/edit-medic-profile">Perfil Médico</a></li>
                     <?php endif; ?>
@@ -276,10 +276,10 @@ $user = UserData::getLoggedIn();
         <style>
           body::after {
             content: "";
-            background-image: url("assets/background.jpeg") !important;
-            background-size:  100%!important;
+            background-image: url("assets/backgroundLogin.jpeg") !important;
+            background-size:  cover !important;
             background-repeat: no-repeat;
-            opacity: 0.2;
+            opacity: 0.5;
             top: 0;
             left: 0;
             bottom: 0;
@@ -294,7 +294,7 @@ $user = UserData::getLoggedIn();
 
               <!--<span class="label label-primary"></span>-->
               <div class="form-group" style="text-align: center;">
-                <img src="assets/logo.jpeg" width="230px;"><hr>
+                <img src="assets/logoLogin.jpeg" width="230px;"><hr>
                 
               </div>
               <div class="form-group has-feedback">

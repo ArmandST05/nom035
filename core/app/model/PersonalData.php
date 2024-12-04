@@ -38,24 +38,7 @@ class PersonalData{
         $query = Executor::doit($sql);
         return Model::many($query[0], new PersonalData());
     }
-    
-    public static function getAllWithDetails() {
-        $sql = "SELECT 
-                    personal.id, 
-                    personal.nombre, 
-                    personal.correo, 
-                    departamentos.nombre AS departamento_nombre, 
-                    puestos.nombre AS puesto_nombre, 
-                    personal.usuario, 
-                    personal.clave, 
-                    personal.telefono 
-                FROM personal
-                INNER JOIN departamentos ON personal.id_departamento = departamentos.idDepartamento
-                INNER JOIN puestos ON personal.id_puesto = puestos.id";
-        
-        $query = Executor::doit($sql);
-        return Model::many($query[0], new PersonalData());
-    }
+ 
     public function update() {
         $sql = "UPDATE " . self::$tablename . " 
                 SET 
@@ -64,16 +47,12 @@ class PersonalData{
                     id_departamento = \"$this->id_departamento\",
                     id_puesto = \"$this->id_puesto\",
                     fecha_alta = \"$this->fecha_alta\",
-                    telefono = \"$this->telefono\",
-                    usuario = \"$this->usuario\"
+                    telefono = \"$this->telefono\"
                 WHERE id = $this->id";
         Executor::doit($sql);
     }
-    public static function delete($id) {
-        // Elimina el puesto por el ID
-        $sql = "DELETE FROM puestos WHERE id = $id";
-        Executor::doit($sql);
-    }
+    
+
 
 }
 

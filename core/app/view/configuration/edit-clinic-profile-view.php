@@ -10,7 +10,7 @@ $configuration = ConfigurationData::getAll();
         <form class="form-horizontal" method="POST" action="./?action=configuration/update-clinic-profile" role="form" enctype="multipart/form-data">
           <?php if ($configuration['logo']->value) : ?>
             <div class="col-md-3">
-              <img class="img-responsive" src="assets/clinic-logo.png" alt="Logo de la clínica" width="100%">
+              <img class="img-responsive" src="assets/logoLogin.jpeg" alt="Logo de la clínica" width="100%">
             </div>
           <?php endif; ?>
           <div class="col-md-9">
@@ -39,48 +39,8 @@ $configuration = ConfigurationData::getAll();
                 <label for="inputEmail1" class="control-label">Nuevo logo (Formato .png):</label>
                 <input type="file" name="logo" class="form-control" accept="image/jpeg" <?php echo (isset($configuration['logo']->value)) ? "" : "required" ?>>
               </div>
-              <div class="col-lg-6">
-                <label for="inputEmail1" class="control-label">Hora inicio de agenda:</label>
-                <input type="time" class="form-control" value="<?php echo $configuration['calendar_start_hour']->value ?>" name="configuration[calendar_start_hour]" class="form-control" required>
-              </div>
-              <div class="col-lg-6">
-                <label for="inputEmail1" class="control-label">Hora fin de agenda:</label>
-                <input type="time" class="form-control" value="<?php echo $configuration['calendar_end_hour']->value ?>" name="configuration[calendar_end_hour]" class="form-control" required>
-              </div>
-              <div class="col-lg-6">
-                <br>
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" id="activeCardCommission" name="configuration[active_card_commission]" value="1" <?php echo ($configuration['active_card_commission']->value == 1) ? "checked" : "" ?> onclick="selectedCardComission()">
-                    Incluir comisión por cada cobro con tarjeta.
-                  </label>
-                </div>
-              </div>
-              <div class="col-lg-6" id="divCardCommissionValue" <?php echo ($configuration['active_card_commission']->value == 1) ? '' : "style='display: none;'"; ?> <label for="inputEmail1" class="control-label">Cantidad cobrada por cada transacción de tarjeta</label>
-                <div class="input-group">
-                  <span class="input-group-addon">$</span>
-                  <input type="text" name="configuration[card_commission_value]" class="form-control" value="<?php echo $configuration['card_commission_value']->value ?>">
-                </div>
-              </div>
-              <hr>
-              <div class="col-lg-6">
-                <br>
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" name="configuration[notifications_active_email_reservations]" value="1" <?php echo ($configuration['notifications_active_email_reservations']->value == 1) ? "checked" : "" ?>>
-                    Activar recordatorios automáticos de citas por correo
-                  </label>
-                </div>
-              </div>
-              <div class="col-lg-6">
-                <br>
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" name="configuration[notifications_active_sms_reservations]" value="1" <?php echo ($configuration['notifications_active_sms_reservations']->value == 1) ? "checked" : "" ?>>
-                    Activar recordatorios automáticos de citas por SMS
-                  </label>
-                </div>
-              </div>
+              
+              
             </div>
             <div class="form-group">
               <div class="col-lg-2 pull-right">
