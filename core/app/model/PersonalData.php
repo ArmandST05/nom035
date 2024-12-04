@@ -40,16 +40,22 @@ class PersonalData{
     }
  
     public function update() {
-        $sql = "UPDATE " . self::$tablename . " 
-                SET 
-                    nombre = \"$this->nombre\",
-                    correo = \"$this->correo\",
-                    id_departamento = \"$this->id_departamento\",
-                    id_puesto = \"$this->id_puesto\",
-                    fecha_alta = \"$this->fecha_alta\",
-                    telefono = \"$this->telefono\"
-                WHERE id = $this->id";
-        Executor::doit($sql);
+        try {
+            $sql = "UPDATE " . self::$tablename . " 
+                    SET 
+                        nombre = \"$this->nombre\",
+                        correo = \"$this->correo\",
+                        id_departamento = \"$this->id_departamento\",
+                        id_puesto = \"$this->id_puesto\",
+                        fecha_alta = \"$this->fecha_alta\",
+                        telefono = \"$this->telefono\" 
+                    WHERE id = $this->id";
+    
+            Executor::doit($sql);
+            return true; // Si llega aquí, la operación fue exitosa.
+        } catch (Exception $e) {
+            return false; // En caso de cualquier error.
+        }
     }
     
 

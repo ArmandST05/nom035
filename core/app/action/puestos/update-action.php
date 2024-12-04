@@ -1,7 +1,7 @@
 <?php
 if (count($_POST) > 0) {
     // Obtener el registro del puesto por ID
-    $puesto = PuestoModel::getById($_POST["id"]);
+    $puesto = PuestoData::getById($_POST["id"]);
 
     if ($puesto) {
         // Actualizar los campos del puesto con los datos del formulario
