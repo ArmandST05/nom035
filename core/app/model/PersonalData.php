@@ -26,6 +26,13 @@ class PersonalData{
 		return Model::one($query[0],new PersonalData());
 	}
 
+    public static function delete($id) {
+        // Elimina el puesto por el ID
+        $sql = "DELETE FROM personal WHERE id = $id";
+        Executor::doit($sql);
+    }
+
+
     public static function getAll(){
         $sql = "SELECT * FROM ".self::$tablename;
         $query = Executor::doit($sql);
@@ -62,7 +69,11 @@ class PersonalData{
                 WHERE id = $this->id";
         Executor::doit($sql);
     }
-    
+    public static function delete($id) {
+        // Elimina el puesto por el ID
+        $sql = "DELETE FROM puestos WHERE id = $id";
+        Executor::doit($sql);
+    }
 
 }
 
