@@ -21,7 +21,18 @@ class PuestoData{
     public static function getAll(){
         $sql = "SELECT * FROM ".self::$tablename;
         $query = Executor::doit($sql);
-        return Model::many($query[0], new EncuestaData());
+        return Model::many($query[0], new PuestoData());
+    }
+    public static function getById($id){
+        $sql = "SELECT * FROM " . self::$tablename . " WHERE id = '$id'";
+        $query = Executor::doit($sql);
+    
+        return Model::one($query[0], new PuestoData());
+    }
+    public static function delete($id) {
+        // Elimina el puesto por el ID
+        $sql = "DELETE FROM puestos WHERE id = $id";
+        Executor::doit($sql);
     }
 }
 

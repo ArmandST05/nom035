@@ -55,10 +55,11 @@ while ($row = mysqli_fetch_assoc($query)) {
             <i class="bi bi-three-dots"></i>
         </button>
         <ul class="dropdown-menu" id="dropdownMenu' . $row["id"] . '" style="display: none; position: absolute;">
-            <li><a class="dropdown-item" href="#" onclick="editPersonal(3)">Editar</a></li>
-            <li><a class="dropdown-item" href="#" onclick="deletePersonal(' . $row["id"] . ',`' . $row["nombre"] . '`)">Eliminar</a></li>
+            <li><a class="dropdown-item" href="#" onclick="editPuesto(' . $row["id"] . ')">Editar</a></li>
+            <li><a class="dropdown-item" href="#" onclick="deletePuesto(' . $row["id"] . ', \'' . $row["nombre"] . '\')">Eliminar</a></li>
         </ul>
     </div>';
+    
     $nestedData[] = $buttons;
 
     $data[] = $nestedData;
