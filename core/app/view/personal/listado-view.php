@@ -455,6 +455,27 @@ function updatePersonal() {
 }
 
 
+function deletePersonal(puestoId, puestoName) {
+    const swalWithBootstrapButtons = Swal.mixin({
+        buttonsStyling: true
+    });
+
+    swalWithBootstrapButtons.fire({
+        title: '¿Estás seguro de eliminar el puesto ' + puestoName + '?',
+        text: "¡No podrás revertirlo!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminarlo',
+        cancelButtonText: '¡No, cancelarlo!',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.value === true) {
+            // Redirigir a la acción de eliminación de puesto
+            window.location.href = "index.php?action=personal/delete&id=" + puestoId;
+        }
+    });
+}
+
 
     </script>
 </body>

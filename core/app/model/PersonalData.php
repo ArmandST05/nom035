@@ -24,16 +24,13 @@ class PersonalData{
         $sql = "SELECT * FROM " . self::$tablename . " WHERE id = '$id'";
         $query = Executor::doit($sql);
     
-        // Depurar el resultado
-        if ($query) {
-            var_dump($query[0]); // Verifica el resultado
-        } else {
-            echo "Error en la consulta";
-        }
-    
         return Model::one($query[0], new PersonalData());
     }
-    
+    public static function delete($id) {
+        // Elimina el puesto por el ID
+        $sql = "DELETE FROM personal WHERE id = $id";
+        Executor::doit($sql);
+    }
 
     public static function getAll(){
         $sql = "SELECT * FROM ".self::$tablename;
