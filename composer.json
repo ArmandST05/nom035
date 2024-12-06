@@ -4,6 +4,7 @@
         "phpcfdi/credentials": "^1.1",
         "phpoffice/phpword": "^0.18.3",
         "mpdf/mpdf": "^8.1",
-        "chillerlan/php-qrcode": "^4.3"
+        "chillerlan/php-qrcode": "^4.3",
+        "phpoffice/phpspreadsheet": "^3.5"
     }
 }
