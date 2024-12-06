@@ -1,8 +1,25 @@
 <!DOCTYPE html>
 <?php
-$user = UserData::getLoggedIn();
-
+// Obtén el usuario actual basado en la sesión
+if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
+  // Si es un empleado
+  if (isset($_SESSION['user_name'])) {
+      $user_name = $_SESSION['user_name'];
+  } else {
+      $user_name = "Invitado";
+  }
+} else {
+  // Si es un usuario del sistema
+  $user = UserData::getLoggedIn();
+  if ($user) {
+      $user_name = $user->name;
+  } else {
+      $user_name = "Invitado";
+  }
+}
 ?>
+
+
 <html>
 
 <head>
@@ -110,7 +127,9 @@ $user = UserData::getLoggedIn();
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <!-- The user image in the navbar-->
                     <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                    <span class="" style="color: white;"><i class="fas fa-user"></i> <?php echo $user->name ?> </span>
+                    <span class="" style="color: white;">
+    <i class="fas fa-user"></i> <?php echo $user_name; ?>
+</span>
                   </a>
                 </li>
                 <li class="dropdown user user-menu">
@@ -279,7 +298,6 @@ $user = UserData::getLoggedIn();
             background-image: url("assets/backgroundLogin.jpeg") !important;
             background-size:  cover !important;
             background-repeat: no-repeat;
-            opacity: 0.5;
             top: 0;
             left: 0;
             bottom: 0;
@@ -295,6 +313,7 @@ $user = UserData::getLoggedIn();
               <!--<span class="label label-primary"></span>-->
               <div class="form-group" style="text-align: center;">
                 <img src="assets/logoLogin.jpeg" width="230px;"><hr>
+
                 
               </div>
               <div class="form-group has-feedback">
