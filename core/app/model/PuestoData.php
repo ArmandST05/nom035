@@ -10,9 +10,18 @@ class PuestoData{
     }
 
     public function add(){
-        $sql = "INSERT INTO". $tablename . "(nombre, id_departamento, id_encuesta) VALUES
-        (\"$this->nombre\", \"$this->id_departamento\", \"$this->id_encuesta)"
+        $sql = "INSERT INTO " . self::$tablename . " (nombre, id_departamento, id_encuesta) 
+        VALUES (\"$this->nombre\", \"$this->id_departamento\", $this->id_encuesta)";
+
+
         return Executor::doit($sql);
+    }
+
+
+    public static function getAll(){
+        $sql = "SELECT * FROM ".self::$tablename;
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new EncuestaData());
     }
 }
 

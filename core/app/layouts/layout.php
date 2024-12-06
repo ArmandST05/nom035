@@ -1,8 +1,25 @@
 <!DOCTYPE html>
 <?php
-$user = UserData::getLoggedIn();
-
+// Obtén el usuario actual basado en la sesión
+if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
+  // Si es un empleado
+  if (isset($_SESSION['user_name'])) {
+      $user_name = $_SESSION['user_name'];
+  } else {
+      $user_name = "Invitado";
+  }
+} else {
+  // Si es un usuario del sistema
+  $user = UserData::getLoggedIn();
+  if ($user) {
+      $user_name = $user->name;
+  } else {
+      $user_name = "Invitado";
+  }
+}
 ?>
+
+
 <html>
 
 <head>
@@ -80,7 +97,7 @@ $user = UserData::getLoggedIn();
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 </head>
 
-<body onload=''  class="<?php if (isset($_SESSION["user_id"]) || isset($_SESSION["client_id"])) : ?>  sidebar-mini <?php else : ?>login-page<?php endif; ?>">
+<body onload=''  class="<?php if (isset($_SESSION["user_id"]) || isset($_SESSION["client_id"])) : ?>  skin-blue-light sidebar-mini <?php else : ?>login-page<?php endif; ?>">
   <div class="background">
     <div class="wrapper">
       <!-- Main Header -->
@@ -110,7 +127,9 @@ $user = UserData::getLoggedIn();
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <!-- The user image in the navbar-->
                     <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                    <span class="" style="color: white;"><i class="fas fa-user"></i> <?php echo $user->name ?> </span>
+                    <span class="" style="color: white;">
+    <i class="fas fa-user"></i> <?php echo $user_name; ?>
+</span>
                   </a>
                 </li>
                 <li class="dropdown user user-menu">
@@ -134,20 +153,26 @@ $user = UserData::getLoggedIn();
               <?php if ((isset($_SESSION["user_id"])) && ($_SESSION['typeUser'] == "su")) : ?>
                 <meta charset="UTF-8">
                 <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
-                <!--li><a href="./?view=sell"><i class='fa fa-usd'></i> <span>Vender</span></a></li-->
-                <li><a href="./?view=departamentos/index"><i class='fa fa-home'></i> <span>Departamentos</span></a></li>
-                <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Empresas</span></a></li>
-                <li><a href="./index.php?view=puestos/index"><i class='fa fa-home'></i> <span>Puestos</span></a></li>
+                <li><a href="./index.php?view=puestos/index"><i class='fa fa-home'></i>  <span>Puestos</span></a></li>
 
                 <li class="treeview">
                   
-                <a href="#"><i class="fa-solid fa-user-nurse"></i> <span>Personal</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <a href="#"><i class="fa-solid fa-user-nurse"></i>  <span>Personal</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">  
                 <li><a href="./?view=personal/listado">Listado Personal</a></li>
                   <li><a href="./?view=users/carga">Carga Masiva</a></li>
                 </ul>
                 </li>
-            
+
+                <li class="treeview">
+                <a href="#"><i class="fa-solid fa-building"></i>  <span>Mis empresas</span> <i class="fa fa-angle-left pull-right"></i></a>
+                  <ul class="treeview-menu">  
+                  <li><a href="./?view=empresas/index">Listado Empresas</a></li>
+                    <li><a href="./?view=users/carga">Logos Empresas</a></li>
+                  </ul>
+                  </li>
+                </li>
+                
                 <!-- <li class="treeview">
                   <a href="#"><i class='fa fa-th-list'></i> <span>Catálogos</span> <i class="fa fa-angle-left pull-right"></i></a>
                   <ul class="treeview-menu">
@@ -270,8 +295,9 @@ $user = UserData::getLoggedIn();
         <style>
           body::after {
             content: "";
-            background-image: url("assets/background.png") !important;
-            background-size: cover !important;
+            background-image: url("assets/background.jpeg") !important;
+            background-size:  100%!important;
+            background-repeat: no-repeat;
             opacity: 0.2;
             top: 0;
             left: 0;
@@ -287,8 +313,8 @@ $user = UserData::getLoggedIn();
 
               <!--<span class="label label-primary"></span>-->
               <div class="form-group" style="text-align: center;">
-                <img src="assets/powerdr-logo.png" width="250px;"><hr>
-                <img src="assets/<?php echo $configuration['logo']->value ?>" width="200px;">
+                <img src="assets/logo.jpeg" width="230px;"><hr>
+                
               </div>
               <div class="form-group has-feedback">
                 <input type="text" name="username" required class="form-control" placeholder="Usuario" />
