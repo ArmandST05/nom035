@@ -20,11 +20,11 @@ $columns = array(
     6 => 'telefono'
 );
 
-
 // Filtros personalizados
 $department_filter = isset($requestData['department_filter']) ? $requestData['department_filter'] : '';
 $custom_search = isset($requestData['custom_search']) ? $requestData['custom_search'] : '';
 $custom_length = isset($requestData['length']) ? intval($requestData['length']) : 10;
+
 // Consulta inicial
 $sql = "SELECT personal.id, personal.nombre, personal.usuario, personal.clave, personal.correo, personal.telefono, 
         departamentos.nombre AS departamento

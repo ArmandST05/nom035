@@ -30,7 +30,6 @@ $allPuestos = PuestoData::getAll();
         </div>
 
         <!-- Card with table -->
-<<<<<<< HEAD
         <div class="card" style="width: 95%;  margin-top: 20px; ">
     <div class="card-body">
         <table id="lookup" class="table table-striped table-hover">
@@ -46,42 +45,6 @@ $allPuestos = PuestoData::getAll();
                 <!-- El cuerpo se gestionará dinámicamente por DataTables -->
             </tbody>
         </table>
-=======
-        <div class="card mt-4" style="width: 90%; margin: auto; margin-top: 20px;"> <!-- Agregar mt-4 para dar un margen superior -->
-            <div class="card-body">
-                <table class="table table-striped table-hover">
-                    <thead style="background-color: grey; color: white;">
-                        <tr>
-                            <th>#</th>
-                            <th>Nombre</th>
-                            <th>Departamento</th>
-                            <th>Opciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php 
-                            if(!empty($allPuestos)){
-                                $index= 1;
-                                foreach ($allPuestos as $puesto) {
-                                    echo "<tr>";
-                                    echo "<td>{$index}</td>";
-                                    echo "<td>{$puesto->nombre}</td>";
-                                    echo "<td>{$puesto->id_departamento}</td>";
-                                    echo "<td>
-                                            <button class='btn btn-primary btn-sm' onclick='editPersonal({$puesto->id})'>Editar</button>
-                                            <button class='btn btn-danger btn-sm' onclick='deletePersonal({$puesto->id})'>Eliminar</button>
-                                          </td>";
-                                    echo "</tr>";
-                                    $index++;
-                                }
-                            }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
->>>>>>> ada47f10f7c2533aea1589bde8b837e80c29e9a2
     </div>
 </div>
 
@@ -138,7 +101,6 @@ $allPuestos = PuestoData::getAll();
             </div>
         </div>
     </div>
-<<<<<<< HEAD
 <!-- Modal for editing puesto -->
 <div class="modal fade" id="EditPuestoModal" tabindex="-1" role="dialog" aria-labelledby="EditPuestoModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -301,10 +263,6 @@ function updatePuesto() {
     });
 }
 
-=======
-
-    <script>
->>>>>>> ada47f10f7c2533aea1589bde8b837e80c29e9a2
         function openModalAddPuesto() {
             $('#PuestoModal').modal('show');
         }
@@ -336,7 +294,6 @@ function updatePuesto() {
                 alert("Este personal ya existe.");
             }
         }
-<<<<<<< HEAD
         function deletePuesto(puestoId, puestoName) {
     const swalWithBootstrapButtons = Swal.mixin({
         buttonsStyling: true
@@ -359,8 +316,6 @@ function updatePuesto() {
 }
 
 
-=======
->>>>>>> ada47f10f7c2533aea1589bde8b837e80c29e9a2
     </script>
 
 </body>

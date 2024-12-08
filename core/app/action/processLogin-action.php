@@ -1,70 +1,52 @@
 <?php
-    // define('LBROOT',getcwd()); // LegoBox Root ... the server root
-    // include("core/controller/Database.php");
+	// define('LBROOT',getcwd()); // LegoBox Root ... the server root
+	// include("core/controller/Database.php");
 
-    if(!isset($_SESSION["user_id"])) {
-        $user = $_POST['username'];
-        $pass = $_POST['password'];
+	if(!isset($_SESSION["user_id"])) {
+		$user = $_POST['username'];
+		$pass = sha1(md5($_POST['password']));
 
-        $base = new Database();
-        $con = $base->connect();
-        
-        // Validación en la tabla `users`
-        $sql_users = "SELECT * FROM users WHERE (email = '".$user."' OR username = '".$user."') AND password = '".sha1(md5($pass))."'";
-        $query_users = $con->query($sql_users);
-        $found_user = false;
-        $userid = null; 
-        $username = null;
-        $type = null;
+		$base = new Database();
+		$con = $base->connect();
+		$sql = "select * from users where (email= \"".$user."\" or username= \"".$user."\") and password= \"".$pass."\"";
+	
+		$query = $con->query($sql);
+		$found = false;
+		$userid = null; 
+		$username = null;
+		$type = null;
 
-        while($r = $query_users->fetch_array()){
-            $found_user = true;
-            $userid = $r['id'];
-            $username = $r['username'];
-            $type = $r['user_type'];
+		while($r = $query->fetch_array()){
+			$found = true ;
+			$userid = $r['id'];
+			$username = $r['username'];
+			$type = $r['user_type'];
+		}
+		$_SESSION['typeUser'] = $type;
+
+		if($found==true) {
+			$_SESSION['user_id'] = $userid ;
+			print "Cargando ... $user";
+			print "<script>window.location='index.php?view=home';</script>";
+		}else {
+			print "<script>
+				alert('Verifica tus datos'); 
+				window.location='index.php?view=login';
+			</script>";
+		}
+
+	}else{
+		print "<script>
+			alert('Verifica tus datos');
+			window.location='index.php?view=login';
+		</script>";
+	}
+
+	/*$dateNow = date("Y-m-d");
+    if($user->user_type == "e"){
+
+        if($user->fecha_fin > $dateNow){
+            echo "<script>alert('La fecha para realizar la encuesta ya expiro')</script>"
         }
-
-        // Si no se encontró en `users`, buscar en la tabla `personal`
-        if (!$found_user) {
-            $sql_personal = "SELECT * FROM personal WHERE usuario = '".$user."' AND clave = '".$pass."'";
-            $query_personal = $con->query($sql_personal);
-            $found_personal = false;
-            $personal_id = null;
-            $personal_username = null;
-
-            while($r = $query_personal->fetch_array()){
-                $found_personal = true;
-                $personal_id = $r['id'];
-                $personal_username = $r['usuario'];
-            }
-
-            if ($found_personal) {
-                // Sesión para el empleado
-                $_SESSION['user_id'] = $personal_id;
-                $_SESSION['typeUser'] = 'empleado'; // O el tipo que prefieras asignar
-                print "Cargando ... $personal_username";
-                print "<script>window.location='home-personal.php';</script>";
-                exit;
-            }
-        }
-
-        if ($found_user) {
-            // Sesión para el usuario del sistema
-            $_SESSION['user_id'] = $userid;
-            $_SESSION['typeUser'] = $type;
-            print "Cargando ... $user";
-            print "<script>window.location='index.php?view=home';</script>";
-        } else {
-            print "<script>
-                alert('Verifica tus datos');
-                window.location='index.php?view=login';
-            </script>";
-        }
-
-    } else {
-        print "<script>
-            alert('Ya tienes una sesión activa');
-            window.location='index.php?view=home';
-        </script>";
-    }
+    }*/
 ?>

@@ -1,32 +1,15 @@
 <!DOCTYPE html>
 <?php
-// Obtén el usuario actual basado en la sesión
-if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
-  // Si es un empleado
-  if (isset($_SESSION['user_name'])) {
-      $user_name = $_SESSION['user_name'];
-  } else {
-      $user_name = "Invitado";
-  }
-} else {
-  // Si es un usuario del sistema
-  $user = UserData::getLoggedIn();
-  if ($user) {
-      $user_name = $user->name;
-  } else {
-      $user_name = "Invitado";
-  }
-}
+$user = UserData::getLoggedIn();
+
 ?>
-
-
 <html>
 
 <head>
   <meta charset="UTF-8">
-  <title>NOM035</title>
+  <title>INTELLI 035</title>
   <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-  <link rel="icon" href="assets/powerdr-icon.png">
+  <link rel="icon" href="assets/icon-intelli.png">
 
   <!-- Jquery -->
   <script src="assets/jquery-2.1.1.min.js" type="text/javascript"></script>
@@ -106,9 +89,9 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
           <!-- Logo -->
           <a href="./" class="logo" style="background-color: white;">
             <!-- mini logo for sidebar mini 50x50 pixels -->
-            <span class="logo-mini"> <img src="assets/IntelliPsicosocial.png" width="40"></span>
+            <span class="logo-mini"> <img src="assets/logoWithe.jpeg" width="60"></span>
             <!-- logo for regular state and mobile devices -->
-            <img src="assets/IntelliPsicosocial.png" width="100" height="60">
+            <img src="assets/logoWithe.jpeg" width="100" height="55">
           </a>
 
           <!-- Header Navbar -->
@@ -127,9 +110,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     <!-- The user image in the navbar-->
                     <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                    <span class="" style="color: white;">
-    <i class="fas fa-user"></i> <?php echo $user_name; ?>
-</span>
+                    <span class="" style="color: white;"><i class="fas fa-user"></i> <?php echo $user->name ?> </span>
                   </a>
                 </li>
                 <li class="dropdown user user-menu">
@@ -160,7 +141,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                 <a href="#"><i class="fa-solid fa-user-nurse"></i>  <span>Personal</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">  
                 <li><a href="./?view=personal/listado">Listado Personal</a></li>
-                  <li><a href="./?view=personal/carga">Carga Masiva</a></li>
+                  <li><a href="./?view=users/carga">Carga Masiva</a></li>
                 </ul>
                 </li>
 
@@ -192,7 +173,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                 <li class="treeview">
                   <a href="#"><i class='fas fa-cog'></i> <span>Configuración</span> <i class="fas fa-angle-left pull-right"></i></a>
                   <ul class="treeview-menu">
-                    <li><a href="./?view=configuration/edit-clinic-profile">Perfil Clínica</a></li>
+                    <li><a href="./?view=configuration/edit-clinic-profile">Perfil Intelli 035</a></li>
                     <?php if (isset($medic)) : ?>
                       <li><a href="./?view=configuration/edit-medic-profile">Perfil Médico</a></li>
                     <?php endif; ?>
@@ -295,10 +276,10 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
         <style>
           body::after {
             content: "";
-            background-image: url("assets/background.jpeg") !important;
-            background-size:  100%!important;
+            background-image: url("assets/backgroundLogin.jpeg") !important;
+            background-size:  cover !important;
             background-repeat: no-repeat;
-            opacity: 0.2;
+            opacity: 0.5;
             top: 0;
             left: 0;
             bottom: 0;
@@ -313,7 +294,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
 
               <!--<span class="label label-primary"></span>-->
               <div class="form-group" style="text-align: center;">
-                <img src="assets/logo.jpeg" width="230px;"><hr>
+                <img src="assets/logoLogin.jpeg" width="230px;"><hr>
                 
               </div>
               <div class="form-group has-feedback">
