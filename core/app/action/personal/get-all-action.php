@@ -123,7 +123,8 @@ while ($row = mysqli_fetch_assoc($query)) {
         <ul class="dropdown-menu" id="dropdownMenu' . $row["id"] . '" style="display: none; position: absolute;">
             <li><a class="dropdown-item" href="#" onclick="editPersonal(' . $row["id"] . ')">Editar</a></li>
             <li><a class="dropdown-item" href="#" onclick="deletePersonal(' . $row["id"] . ',`' . $row["nombre"] . '`)">Eliminar</a></li>
-        </ul>
+            <li><a class="dropdown-item" href="#" onclick="openAssignSurveyModal(' . $row["id"] . ')">Asignar Encuesta</a></li>
+            </ul>
     </div>
     ';
     $nestedData[] = $buttons;

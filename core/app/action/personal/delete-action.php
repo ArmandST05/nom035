@@ -11,10 +11,10 @@ if (isset($_GET["id"]) && !empty($_GET["id"])) {
     Core::alert("¡Personal eliminado exitosamente!");
 
     // Redirigir a la lista de puestos después de la eliminación
-    print "<script>window.location='index.php?view=personal/index';</script>";
+    print "<script>window.location='index.php?view=personal/listado';</script>";
 } else {
     // En caso de que no se haya enviado un ID válido
     Core::alert("¡ID no válido para eliminar!");
-    print "<script>window.location='index.php?view=puestos/index';</script>";
+    print "<script>window.location='index.php?view=puestos/listado';</script>";
 }
 ?>

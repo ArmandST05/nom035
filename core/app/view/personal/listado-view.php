@@ -1,7 +1,7 @@
 <?php
 
 $departamentos = DepartamentoData::getAll();
-
+$encuestas = EncuestaData::getAll();
 
 
 ?>
@@ -206,6 +206,48 @@ $departamentos = DepartamentoData::getAll();
         </div>
     </div>
 </div>
+<div class="modal fade" id="assignSurveyModal" tabindex="-1" aria-labelledby="assignSurveyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="EditPersonalModalTitle">Asignar Encuesta</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="assignSurveyForm" method="POST" action="procesar_encuestas.php"> <!-- Aquí va la acción a la que envías el formulario -->
+                    <!-- Campo oculto para el ID del empleado -->
+                    <input type="hidden" id="employeeId" name="employeeId" value="<?php echo $personalId; ?>">
+                    
+                    <!-- Lista de encuestas (se genera dinámicamente con PHP) -->
+                    <?php
+                    // Obtener todas las encuestas desde la clase EncuestaData
+                    $encuestas = EncuestaData::getAll();
+
+                    // Verificar si hay encuestas disponibles
+                    if ($encuestas && count($encuestas) > 0) {
+                        foreach ($encuestas as $survey) {
+                            echo '
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="surveys[]" value="' . $survey->id . '" id="survey' . $survey->id . '">
+                                <label class="form-check-label" for="survey' . $survey->id . '">
+                                    ' . htmlspecialchars($survey->title) . ' - <small>' . htmlspecialchars($survey->description) . '</small>
+                                </label>
+                            </div>';
+                        }
+                    } else {
+                        echo '<p>No se encontraron encuestas disponibles.</p>';
+                    }
+                    ?>
+
+                    <button type="submit" class="btn btn-primary mt-3">Asignar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     
@@ -442,6 +484,10 @@ function deletePersonal(puestoId, puestoName) {
         }
     });
 }
+function openAssignSurveyModal() {
+            // Configura el contenido dinámico del modal si es necesario.
+            $('#assignSurveyModal').modal('show'); // Muestra el modal.
+        }
 
 
     </script>

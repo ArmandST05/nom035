@@ -19,7 +19,6 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
 }
 ?>
 
-
 <html>
 
 <head>
