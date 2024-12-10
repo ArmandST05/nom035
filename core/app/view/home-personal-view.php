@@ -39,7 +39,9 @@ if ($_SESSION['typeUser'] === 'e') {
                 <li>
                     <strong><?php echo htmlspecialchars($encuesta->title); ?></strong><br>
                     <p><?php echo htmlspecialchars($encuesta->description); ?></p>
-                    <a href="responder.php?survey_id=<?php echo $encuesta->id; ?>">Responder</a>
+                    <a href="./index.php?view=encuestas/responder&survey_id=<?php echo $encuesta->id ?>">Responder</a>
+
+                    
                 </li>
             <?php endforeach; ?>
         <?php else: ?>

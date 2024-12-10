@@ -216,9 +216,9 @@ $encuestas = EncuestaData::getAll();
                 </button>
             </div>
             <div class="modal-body">
-                <form id="assignSurveyForm" method="POST" action="procesar_encuestas.php"> <!-- Aquí va la acción a la que envías el formulario -->
+                <form id="assignSurveyForm" method="POST" action="index.php?action=personal/process-survey"> <!-- Aquí va la acción a la que envías el formulario -->
                     <!-- Campo oculto para el ID del empleado -->
-                    <input type="hidden" id="employeeId" name="employeeId" value="<?php echo $personalId; ?>">
+                    <input type="hidden" id="employeeId" name="employeeId" value="">
                     
                     <!-- Lista de encuestas (se genera dinámicamente con PHP) -->
                     <?php
@@ -484,10 +484,36 @@ function deletePersonal(puestoId, puestoName) {
         }
     });
 }
-function openAssignSurveyModal() {
-            // Configura el contenido dinámico del modal si es necesario.
-            $('#assignSurveyModal').modal('show'); // Muestra el modal.
+function openAssignSurveyModal(personalId) {
+    console.log("ID del empleado:", personalId); // Para depuración
+    $('#assignSurveyModal #employeeId').val(personalId);
+    $('#assignSurveyModal').modal('show');
+}
+$('#assignSurveyForm').submit(function (e) {
+    e.preventDefault(); // Evita el envío estándar del formulario
+
+    const formData = $(this).serialize(); // Serializa los datos del formulario
+    $.ajax({
+    url: './?action=encuestas/assign-survey', // URL a tu archivo PHP
+    type: 'POST', // Método HTTP
+    data: formData, // Datos serializados del formulario
+    dataType: 'json', // Espera una respuesta JSON
+    success: function (response) {
+        if (response.status === 'success') {
+            alert(response.message);
+            $('#assignSurveyModal').modal('hide');
+        } else {
+            alert(response.message);
         }
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+        console.error('Error:', jqXHR.responseText); // Muestra el contenido de la respuesta
+        alert('Error de conexión con el servidor. Revisa la consola para más detalles.');
+    }
+});
+
+});
+
 
 
     </script>

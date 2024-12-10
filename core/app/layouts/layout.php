@@ -23,7 +23,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
 
 <head>
   <meta charset="UTF-8">
-  <title>NOM035</title>
+  <title>INTELI035</title>
   <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
   <link rel="icon" href="assets/powerdr-icon.png">
 

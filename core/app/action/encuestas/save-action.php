@@ -1,9 +1,5 @@
 <?php
-// guardar_respuestas.php
-include "../controllers/EncuestasController.php";
-include "../models/RespuestaData.php";
 
-// Verifica que el usuario esté autenticado y sea un empleado
 if ($_SESSION['typeUser'] !== 'e') {
     die("Acceso denegado: Solo los empleados pueden responder encuestas.");
 }
@@ -33,6 +29,6 @@ foreach ($respuestas as $question_id => $answer_value) {
 RespuestaData::completeSurvey($personal_id, $survey_id);
 
 // Redirigir al usuario después de guardar las respuestas
-header("Location: encuestas.php?status=completed");
+print "<script>window.location='index.php?view=home';</script>";
 exit();
 ?>
