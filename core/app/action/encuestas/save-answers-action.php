@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['survey_id'], $_POST['
     Executor::doit($sql);
 
     echo "Respuestas guardadas exitosamente.";
-    header("Location: home.php"); // Redirigir al empleado a la página principal
+    header("Location: index.php?view=home-personal"); 
     exit;
 } else {
     die("Datos insuficientes o método no permitido.");

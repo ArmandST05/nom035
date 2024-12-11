@@ -80,6 +80,76 @@ class EncuestaData{
         return null;
     }
     
+    public static function getQuestionsBySection($survey_id) {
+        $sql = "SELECT s.id AS section_id, s.name AS section_name, q.id AS question_id, q.question_text
+                FROM sections s
+                INNER JOIN survey_questions q ON s.id = q.section_id
+                WHERE s.survey_id = $survey_id
+                ORDER BY s.id, q.id";
+        $query = Executor::doit($sql);
+    
+        // Convertimos el resultado en un array asociativo
+        $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC);
+    
+        // Estructuramos los datos en un formato por secciones
+        $sections = [];
+        foreach ($result as $row) {
+            $section_id = $row['section_id'];
+            if (!isset($sections[$section_id])) {
+                $sections[$section_id] = [
+                    'name' => $row['section_name'],
+                    'questions' => []
+                ];
+            }
+            $sections[$section_id]['questions'][] = [
+                'id' => $row['question_id'],
+                'text' => $row['question_text']
+            ];
+        }
+    
+        return $sections; // Retornamos las secciones con sus preguntas agrupadas
+    }
+    public static function getSurveyResponses($survey_id, $personal_id) {
+        $sql = "SELECT sa.* 
+                FROM survey_answers sa
+                WHERE sa.survey_id = $survey_id AND sa.personal_id = $personal_id";
+        $query = Executor::doit($sql);
+        
+        // Convertimos el resultado en un array asociativo
+        $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC);
+        
+        // Si hay resultados, retornamos las respuestas mapeadas a un formato adecuado
+        if (count($result) > 0) {
+            return $result; // Puedes optar por devolver los resultados como objetos si prefieres
+        }
+        
+        // Si no se encuentran respuestas, retornamos un array vacío
+        return [];
+    }
+    
+    public static function getQuestionById($question_id) {
+        $sql = "SELECT q.*, s.id AS section_id
+                FROM survey_questions q
+                LEFT JOIN sections s ON q.section_id = s.id
+                WHERE q.id = $question_id";
+        $query = Executor::doit($sql);
+        
+        // Convertimos el resultado en un array asociativo
+        $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC);
+        
+        // Si se encuentra la pregunta, la retornamos como objeto
+        if (count($result) > 0) {
+            $question = new EncuestaData(); // Puedes cambiar EncuestaData si es necesario
+            $question->id = $result[0]['id'] ?? "";
+            $question->title = $result[0]['question_text'] ?? ""; // Asumí que 'question_text' es el texto de la pregunta
+            $question->section_id = $result[0]['section_id'] ?? ""; // Aseguramos que 'section_id' esté presente
+            return $question;
+        }
+        
+        // Si no se encuentra la pregunta, retornamos null
+        return null;
+    }
+    
     
     
 }
