@@ -2,20 +2,13 @@
 // Obtén el usuario actual basado en la sesión
 if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
     // Si es un empleado
-    if (isset($_SESSION['user_name'])) {
-        $user_name = $_SESSION['user_name'];
-    } else {
-        $user_name = "Invitado";
-    }
-  } else {
+    $user_name = $_SESSION['user_name'] ?? "Invitado";
+} else {
     // Si es un usuario del sistema
     $user = UserData::getLoggedIn();
-    if ($user) {
-        $user_name = $user->name;
-    } else {
-        $user_name = "Invitado";
-    }
-  }
+    $user_name = $user ? $user->name : "Invitado";
+}
+
 if ($_SESSION['typeUser'] === 'e') {
     $personal_id = $_SESSION['user_id'];
     $encuestas = EncuestaData::getAssignedSurveys($personal_id);
@@ -39,9 +32,17 @@ if ($_SESSION['typeUser'] === 'e') {
                 <li>
                     <strong><?php echo htmlspecialchars($encuesta->title); ?></strong><br>
                     <p><?php echo htmlspecialchars($encuesta->description); ?></p>
-                    <a href="./index.php?view=encuestas/responder&survey_id=<?php echo $encuesta->id ?>">Responder</a>
 
-                    
+                    <!-- Verifica el tipo de encuesta y muestra un botón específico -->
+                    <?php if ($encuesta->type === 'psychosocial_risk'): ?>
+                        <a href="./index.php?view=encuestas/factor-psicosocial&survey_id=<?php echo $encuesta->id ?>">
+                            Responder Encuesta de Riesgo Psicosocial
+                        </a>
+                    <?php else: ?>
+                        <a href="./index.php?view=encuestas/responder_general&survey_id=<?php echo $encuesta->id ?>">
+                            Responder Encuesta General
+                        </a>
+                    <?php endif; ?>
                 </li>
             <?php endforeach; ?>
         <?php else: ?>

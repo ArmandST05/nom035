@@ -150,7 +150,22 @@ class EncuestaData{
         return null;
     }
     
-    
+    public static function getPsychosocialRiskQuestions($survey_id) {
+        $sql = "SELECT * FROM psychosocial_risk_questions WHERE survey_id = $survey_id";
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new EncuestaData());
+    }
+    public static function getPsychosocialRiskAnswers($survey_id, $user_id) {
+        $sql = "SELECT * FROM psychosocial_risk_answers WHERE survey_id = $survey_id AND user_id = $user_id";
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new EncuestaData());
+    }
+    public static function savePsychosocialRiskAnswer($survey_id, $user_id, $question_id, $answer) {
+        $sql = "INSERT INTO psychosocial_risk_answers (survey_id, user_id, question_id, answer)
+                VALUES ($survey_id, $user_id, $question_id, '$answer')";
+        Executor::doit($sql);
+    }
+            
     
 }
 

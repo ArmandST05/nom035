@@ -113,7 +113,6 @@ while ($row = mysqli_fetch_assoc($query)) {
         border: none;
     }
 
-
         </style>
     <div class="dropdown">
        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $row["id"] . '">
