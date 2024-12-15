@@ -160,6 +160,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                 <ul class="treeview-menu">  
                 <li><a href="./?view=personal/listado">Listado Personal</a></li>
                   <li><a href="./?view=personal/carga">Carga Masiva</a></li>
+                  <li><a href="./?view=personal/graficacion">graficacion</a></li>
                 </ul>
                 </li>
 
