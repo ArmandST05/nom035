@@ -153,6 +153,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                 <meta charset="UTF-8">
                 <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
                 <li><a href="./index.php?view=puestos/index"><i class='fa fa-home'></i>  <span>Puestos</span></a></li>
+                <li><a href="./?view=encuestas/graficacion"><i class='fa fa-home'></i> <span>Graficación</span></a></li>
 
                 <li class="treeview">
                   

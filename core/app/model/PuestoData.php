@@ -34,6 +34,12 @@ class PuestoData{
         $sql = "DELETE FROM puestos WHERE id = $id";
         Executor::doit($sql);
     }
+    public static function getByDepartment($id_departamento) {
+        $sql = "SELECT * FROM puestos WHERE id_departamento = $id_departamento";
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new PuestoData());
+    }
+    
 }
 
 ?>

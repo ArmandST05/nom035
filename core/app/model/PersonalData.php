@@ -57,6 +57,11 @@ class PersonalData{
             return false; // En caso de cualquier error.
         }
     }
+    public static function getByRole($role_id) {
+        $sql = "SELECT * FROM personal WHERE id_puesto = $role_id";
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new PersonalData());
+    }
     
 
 
