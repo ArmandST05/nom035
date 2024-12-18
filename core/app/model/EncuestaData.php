@@ -203,6 +203,19 @@ class EncuestaData{
     
         return $questions; // Retorna el resultado estructurado
     }
+
+    public static function getServiceClientQuestions(){
+        $sql = "SELECT * FROM psychosocial_risk_questions WHERE id IN (41, 42, 43)";
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new EncuestaData());
+    }
+    
+    public static function getBossQuestions(){
+        $sql = "SELECT * FROM psychosocial_risk_questions WHERE id IN (44, 45, 46)";
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new EncuestaData());
+    }
+    
     
 }
 
