@@ -166,6 +166,43 @@ class EncuestaData{
         Executor::doit($sql);
     }
             
+    public static function getSurveyResults($survey_id) {
+        $sql = "SELECT q.id AS question_id, q.question_text, a.response, COUNT(a.response) AS total_respuestas
+                FROM survey_questions q
+                LEFT JOIN survey_answers a ON q.id = a.question_id
+                WHERE q.survey_id = $survey_id
+                GROUP BY q.id, a.response
+                ORDER BY q.id";
+    
+    $query = Executor::doit($sql);
+    if ($query[0] === false) {
+        // Loguear el error de la consulta
+        error_log("Error en la consulta SQL: " . mysqli_error($query[0]));
+        throw new Exception("Error en la consulta SQL");
+    }
+    
+    $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC);
+        $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC);
+    
+        // Estructuramos los resultados agrupados por preguntas
+        $questions = [];
+        foreach ($result as $row) {
+            $question_id = $row['question_id'];
+            if (!isset($questions[$question_id])) {
+                $questions[$question_id] = [
+                    'question_text' => $row['question_text'],
+                    'answers' => []
+                ];
+            }
+    
+            $questions[$question_id]['answers'][] = [
+                'answer' => $row['answer'] ?? 'Sin respuesta', // Maneja respuestas nulas
+                'count' => $row['total_respuestas']
+            ];
+        }
+    
+        return $questions; // Retorna el resultado estructurado
+    }
     
 }
 

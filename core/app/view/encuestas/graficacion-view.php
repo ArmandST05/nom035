@@ -1,151 +1,101 @@
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Filtros para Gráficos</title>
+    <title>Gráficas Encuestas</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        button{
+            background-color:rgb(70, 166, 250);
+            border-radius: 6px;
+            border-color: none;
+            margin: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        button:hover{
+            background-color:rgb(31, 139, 234);
+            border-radius: 6px;
+            border-color: none;
+        }
+        .section {
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+           
+            
+        }
+        .active {
+            display: block;
+            opacity: 1;
+        }
+        nav {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+       
+
+    </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Gráficos con Filtros</h1>
 
-    <form id="filterForm" class="p-4 border rounded shadow-sm" style="width: 80%; margin: 0 auto;">
-    <div class="row mb-3">
-        <!-- Filtro de encuesta -->
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="survey" class="form-label">Encuesta</label>
-                <select id="survey" name="survey" class="form-control">
-                    <option value="">Seleccione una encuesta</option>
-                    <?php 
-                        $encuestas = EncuestaData::getAll();
-                        if(!empty($encuestas)){
-                            foreach($encuestas as $encuesta){
-                                echo "<option value='" . $encuesta->id . "'>" . $encuesta->title . "</option>";
-                            }
-                        }
-                    ?>
-                </select>
-            </div>
-        </div>
-
-        <!-- Filtro de departamento -->
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="department" class="form-label">Departamento</label>
-                <select id="department" name="department" class="form-control">
-                    <option value="all">Selecciona un departamento</option>
-                    <?php 
-                        $departamento = DepartamentoData::getAll();
-                        if (!empty($departamento)) {
-                            foreach ($departamento as $departamentos) {
-                                echo "<option value='" . $departamentos->idDepartamento . "'>" . $departamentos->nombre . "</option>";
-                            }
-                        }
-                    ?>
-                </select>
-            </div>
-        </div>
+    <!-- Menú de navegación -->
+    <nav>
+        <button class="nav-link" data-section="encuesta1">Encuesta 1</button>
+        <button class="nav-link" data-section="encuesta2">Encuesta 2</button>
+    </nav>
+    <div style="text-align: center; margin-top: 20px;">
+        <button id="barChartButton" onclick="changeChartType('bar')">Gráfico de Barras</button>
+        <button id="pieChartButton" onclick="changeChartType('pie')">Gráfico de Pastel</button>
+    </div>
+    <!-- Sección Encuesta 1 -->
+    <div id="encuesta1" class="section active">
+        <h2 style="text-align: center;">Gráfica Encuesta 1</h2>
+        <canvas id="chartEncuesta1"></canvas>
     </div>
 
-    <div class="row mb-3">
-        <!-- Filtro de puesto -->
-        <div class="col-md-6">
-            <div class="form-group">
-                <label for="role" class="form-label">Puesto</label>
-                <select id="role" name="role" class="form-control">
-                    <option value="">Seleccione un puesto</option>
-                    <!-- Los puestos se cargarán aquí dinámicamente con AJAX -->
-                </select>
-            </div>
-        </div>
-
-        <!-- Filtro de personal -->
-        <div class="col-md-6">
-            <div class="form-group">
-            <button type="button" id="applyFilters" class="btn btn-primary ">Aplicar Filtros</button>
-
-            </div>
-        </div>
+    <!-- Sección Encuesta 2 -->
+    <div id="encuesta2" class="section">
+        <h2 style="text-align: center;">Gráfica Encuesta 2</h2>
+        <canvas id="chartEncuesta2"></canvas>
     </div>
 
-    <!-- Botón para aplicar filtros -->
-    <div class="text-center">
-    </div>
-</form>
-
-
-    <!-- Contenedor para el gráfico -->
-    <div style="width: 80%; margin: 50px auto;">
-        <canvas id="filteredChart"></canvas>
-    </div>
-
+    
+   
+    
     <script>
- 
-$(document).ready(function () {
-        $('#department').change(function () {
-            var departmentId = $(this).val(); 
+        let chartInstances = {}; // Variable global para almacenar gráficos
+        let currentChartType = 'bar'; // Tipo de gráfico predeterminado
 
-            if (departmentId) {
-                $.ajax({
-                    url: './?action=puestos/get-by-department', 
-                    method: 'GET',
-                    data: { department_id: departmentId }, // Enviar el ID del departamento
-                    dataType: 'json',
-                    success: function (response) {
-                        // Limpiar el select de puestos antes de agregar nuevas opciones
-                        $('#role').empty();
-                        $('#role').append('<option value="">Seleccione un puesto</option>'); // Agregar la opción predeterminada
-
-                        // Verificar si hay puestos disponibles
-                        if (response.status === 'success') {
-                            // Iterar a través de los puestos y agregarlos al select de puestos
-                            response.data.forEach(function (puesto) {
-                                $('#role').append('<option value="' + puesto.id + '">' + puesto.nombre + '</option>');
-                            });
-                        } else {
-                            alert('No se encontraron puestos para este departamento.');
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error al cargar los puestos:', error);
-                    }
-                });
-            } else {
-                // Si no hay departamento seleccionado, limpiar el select de puestos
-                $('#role').empty();
-                $('#role').append('<option value="">Seleccione un puesto</option>');
-            }
-        });
-    });
         $(document).ready(function () {
-            $('#applyFilters').on('click', function () {
-                // Obtener valores del formulario
-                const filters = {
-                    survey: $('#survey').val(),
-                    department: $('#department').val(),
-                    position: $('#role').val(),
-                    
-                };
+            // Evento de navegación entre secciones
+            $('.nav-link').click(function (e) {
+                e.preventDefault();
+                const sectionId = $(this).data('section');
 
-                // Validar filtros (opcional)
-                if (!filters.survey) {
-                    alert('Por favor, selecciona una encuesta.');
-                    return;
-                }
+                // Mostrar la sección activa
+                $('.section').removeClass('active').hide();
+                $(`#${sectionId}`).addClass('active').fadeIn();
 
-                // Solicitud AJAX al servidor para obtener datos filtrados
+                // Cargar la gráfica correspondiente
+                loadChart(sectionId);
+            });
+
+            // Función para cargar datos y renderizar la gráfica
+            function loadChart(sectionId) {
+                let surveyId = sectionId === 'encuesta1' ? 1 : 2;
+
                 $.ajax({
-                    url: './?action=encuestas/assign-survey', // URL a tu archivo PHP
+                    url: './?action=encuestas/get-survey-data',
                     method: 'GET',
-                    data: filters,
+                    data: { survey_id: surveyId },
                     dataType: 'json',
                     success: function (response) {
+                        console.log('Datos recibidos:', response);
                         if (response.status === 'success') {
-                            renderChart(response.data.labels, response.data.counts);
+                            renderChart(sectionId, response.data.labels, response.data.counts, currentChartType);
                         } else {
                             alert('Error al cargar datos: ' + response.message);
                         }
@@ -154,32 +104,54 @@ $(document).ready(function () {
                         console.error('Error en la solicitud AJAX:', error);
                     }
                 });
-            });
+            }
 
-            // Función para renderizar el gráfico con Chart.js
-            function renderChart(labels, data) {
-                const ctx = document.getElementById('filteredChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar', // Cambiar a 'pie', 'line', etc., si prefieres
+            // Función para renderizar el gráfico
+            function renderChart(sectionId, labels, data, chartType) {
+                const ctx = document.getElementById(`chart${capitalize(sectionId)}`).getContext('2d');
+
+                // Destruir gráfico anterior si existe
+                if (chartInstances[sectionId]) {
+                    chartInstances[sectionId].destroy();
+                }
+
+                // Colores predefinidos
+                const colors = [
+                    'rgba(54, 162, 235, 0.6)',  // Azul
+                    'rgba(255, 99, 132, 0.6)',  // Rojo
+                    'rgba(255, 206, 86, 0.6)',  // Amarillo
+                    'rgba(75, 192, 192, 0.6)',  // Verde
+                    'rgba(153, 102, 255, 0.6)', // Morado
+                    'rgba(255, 159, 64, 0.6)',  // Naranja
+                    'rgba(199, 199, 199, 0.6)', // Gris claro
+                    'rgba(255, 140, 0, 0.6)'    // Ámbar
+                ];
+
+                const borderColors = [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(199, 199, 199, 1)',
+                    'rgba(255, 140, 0, 1)'
+                ];
+
+                // Generar colores dinámicos según la cantidad de datos
+                const backgroundColors = labels.map((_, index) => colors[index % colors.length]);
+                const borderColorSet = labels.map((_, index) => borderColors[index % borderColors.length]);
+
+                // Crear nuevo gráfico
+                chartInstances[sectionId] = new Chart(ctx, {
+                    type: chartType, // Usar el tipo de gráfico dinámico
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Respuestas',
+                            label: 'Número de respuestas',
                             data: data,
-                            backgroundColor: [
-                                'rgba(54, 162, 235, 0.6)',
-                                'rgba(255, 206, 86, 0.6)',
-                                'rgba(75, 192, 192, 0.6)',
-                                'rgba(153, 102, 255, 0.6)',
-                                'rgba(255, 99, 132, 0.6)'
-                            ],
-                            borderColor: [
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 99, 132, 1)'
-                            ],
+                            backgroundColor: backgroundColors, // Usar colores dinámicos
+                            borderColor: borderColorSet, // Bordes dinámicos
                             borderWidth: 1
                         }]
                     },
@@ -187,16 +159,29 @@ $(document).ready(function () {
                         responsive: true,
                         plugins: {
                             legend: { position: 'top' },
-                            title: { display: true, text: 'Resultados Filtrados' }
+                            title: { display: true, text: `Resultados ${capitalize(sectionId)}` }
                         },
                         scales: {
-                            y: {
-                                beginAtZero: true
-                            }
+                            y: { beginAtZero: true }
                         }
                     }
                 });
             }
+
+            // Función para capitalizar texto
+            function capitalize(text) {
+                return text.charAt(0).toUpperCase() + text.slice(1);
+            }
+
+            // Función para cambiar el tipo de gráfico
+            window.changeChartType = function(type) {
+                currentChartType = type; // Actualizamos el tipo de gráfico
+                const activeSection = $('.section.active').attr('id'); // Obtenemos la sección activa
+                loadChart(activeSection); // Recargamos el gráfico con el nuevo tipo
+            }
+
+            // Cargar la gráfica de la encuesta 1 al inicio
+            loadChart('encuesta1');
         });
     </script>
 </body>
