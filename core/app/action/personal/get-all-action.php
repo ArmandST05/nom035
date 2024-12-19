@@ -81,51 +81,63 @@ while ($row = mysqli_fetch_assoc($query)) {
     $nestedData[] = $row["telefono"];
     
     $buttons = '
-        <style>
-    #dropdownMenuButton' . $row["id"] . ' i {
-        background-color: grey; /* Fondo gris para el ícono */
-        color: black; /* Color negro para los puntos */
-        border-radius: 50%; /* Círculo */
-        padding: 8px; /* Ajusta el tamaño del círculo */
-        font-size: 18px; /* Tamaño de los puntos */
-        display: inline-block; /* Asegura que el icono se comporte como un bloque */
-        text-align: center; /* Centra el icono dentro del círculo */
-        line-height: 18px; /* Centra verticalmente el texto dentro del círculo */
-    }
+    <style>
+        #dropdownMenuButton' . $row["id"] . ' i {
+            background-color: grey;
+            color: black;
+            border-radius: 50%;
+            padding: 6px;
+            font-size: 18px;
+            display: inline-block;
+            text-align: center;
+            line-height: 18px;
+        }
 
-    .table .dropdown {
-        position: absolute; /* Asegura que el botón esté posicionado dentro de la celda */
-        text-align: center; /* Alinea el botón al centro */
-    }
+        .table .dropdown {
+            position: relative; /* Cambiar a relative si quieres que se posicione dentro de la celda */
+            text-align: center;
+        }
 
-    .dropdown-menu {
-        position: relative; /* Sale del flujo de la tabla */
-        z-index: 10000; /* Aparece por encima de otros elementos */
-        display: none; /* Oculto inicialmente */
-        width: 150px; /* Ancho del menú */
-        background-color: white;
-        border-radius: 4px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para el menú */
-        overflow: hidden;
-    }
-    .dropdown-toggle {
-        background-color: transparent;
-        border: none;
-    }
+        .dropdown-menu {
+            position: absolute;
+            z-index: 10000;
+            display: none;
+            width: 250px; /* Cambia este valor para ajustar el tamaño del menú */
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            left: auto;
+            right: 0; /* Esto hará que el menú se despliegue hacia la izquierda */
+        }
 
-        </style>
+        .dropdown-toggle {
+            background-color: transparent;
+            border: none;
+        }
+
+        td, th {
+            height: 60px;
+            border: 1px solid grey;
+        }
+    </style>
     <div class="dropdown">
-       <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $row["id"] . '">
-            <i class="fa-solid fa-ellipsis"  style="color: black;"></i>
+        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $row["id"] . '">
+            <i class="fa-solid fa-ellipsis" style="color: black;"></i>
         </button>
 
         <ul class="dropdown-menu" id="dropdownMenu' . $row["id"] . '" style="display: none; position: absolute;">
             <li><a class="dropdown-item" href="#" onclick="editPersonal(' . $row["id"] . ')">Editar</a></li>
             <li><a class="dropdown-item" href="#" onclick="deletePersonal(' . $row["id"] . ',`' . $row["nombre"] . '`)">Eliminar</a></li>
             <li><a class="dropdown-item" href="#" onclick="openAssignSurveyModal(' . $row["id"] . ')">Asignar Encuesta</a></li>
-            </ul>
+            <hr></hr>
+                        <li><a class="dropdown-item" href="#" onclick="editPersonal(' . $row["id"] . ')">Enviar credenciales por correo</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="editPersonal(' . $row["id"] . ')">Enviar credenciales por Whatsapp</a></li>
+
+        </ul>
     </div>
-    ';
+';
+
     $nestedData[] = $buttons;
     $data[] = $nestedData;
 }

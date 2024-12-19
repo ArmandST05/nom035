@@ -506,10 +506,7 @@ $('#assignSurveyForm').submit(function (e) {
             alert(response.message);
         }
     },
-    error: function (jqXHR, textStatus, errorThrown) {
-        console.error('Error:', jqXHR.responseText); // Muestra el contenido de la respuesta
-        alert('Error de conexión con el servidor. Revisa la consola para más detalles.');
-    }
+
 });
 
 });
