@@ -151,7 +151,9 @@ class EncuestaData{
     }
     
     public static function getPsychosocialRiskQuestions($survey_id) {
-        $sql = "SELECT * FROM psychosocial_risk_questions WHERE survey_id = $survey_id";
+        $sql = "SELECT * FROM psychosocial_risk_questions 
+            WHERE survey_id = $survey_id
+            and categoria = 1";
         $query = Executor::doit($sql);
         return Model::many($query[0], new EncuestaData());
     }
@@ -204,18 +206,48 @@ class EncuestaData{
         return $questions; // Retorna el resultado estructurado
     }
 
-    public static function getServiceClientQuestions(){
-        $sql = "SELECT * FROM psychosocial_risk_questions WHERE id IN (41, 42, 43)";
+
+    
+    public static function getServiceClientQuestions($survey_id) {
+        // Si el survey_id es 2
+        if ($survey_id == 2) {
+            $sql = "SELECT * FROM psychosocial_risk_questions WHERE id IN (41, 42, 43)";
+        } 
+        // Si el survey_id es 3
+        else if ($survey_id == 3) {
+            $sql = "SELECT * FROM psychosocial_risk_questions WHERE id IN (112, 113, 114, 115)";
+            
+        } 
+        // Si no es ni 2 ni 3, retornar un array vacío o lanzar un error.
+        else {
+            return [];
+        }
+    
         $query = Executor::doit($sql);
         return Model::many($query[0], new EncuestaData());
     }
     
-    public static function getBossQuestions(){
-        $sql = "SELECT * FROM psychosocial_risk_questions WHERE id IN (44, 45, 46)";
+    public static function getBossQuestions($survey_id) {
+        // Si el survey_id es 2
+        if ($survey_id == 2) {
+            $sql = "SELECT * FROM psychosocial_risk_questions WHERE id IN (44, 45, 46)";
+            //$sql = "SELECT * FROM psychosocial_risk_questions WHERE id IN (112, 113, 114, 115)";
+        } 
+        // Si el survey_id es 3
+        else if ($survey_id == 3) {
+            $sql = "SELECT * FROM psychosocial_risk_questions WHERE id IN (116, 117, 118, 119)";
+        } 
+        // Si no es ni 2 ni 3, retornar un array vacío o lanzar un error.
+        else {
+            return [];
+        }
+    
         $query = Executor::doit($sql);
         return Model::many($query[0], new EncuestaData());
     }
     
+    
+
     
 }
 
