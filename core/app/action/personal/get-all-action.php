@@ -130,10 +130,13 @@ while ($row = mysqli_fetch_assoc($query)) {
             <li><a class="dropdown-item" href="#" onclick="editPersonal(' . $row["id"] . ')">Editar</a></li>
             <li><a class="dropdown-item" href="#" onclick="deletePersonal(' . $row["id"] . ',`' . $row["nombre"] . '`)">Eliminar</a></li>
             <li><a class="dropdown-item" href="#" onclick="openAssignSurveyModal(' . $row["id"] . ')">Asignar Encuesta</a></li>
+<<<<<<< HEAD
             <hr></hr>
                         <li><a class="dropdown-item" href="#" onclick="sendMail(' . $row["id"] . ')">Enviar credenciales por correo</a></li>
                         <li><a class="dropdown-item" href="#" onclick="sendWhatsapp(' . $row["id"] . ')">Enviar credenciales por Whatsapp</a></li>
 
+=======
+>>>>>>> 665fa235bde515d8a57f32f92c25602e88778721
         </ul>
     </div>
 ';

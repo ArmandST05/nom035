@@ -12,7 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['survey_id'], $_POST['
 
     // Grupos para encuesta 2
     $group1_survey2 = [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33];
+<<<<<<< HEAD
     $group2_survey2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46];
+=======
+    $group2_survey2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 
+                        34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46];
+>>>>>>> 665fa235bde515d8a57f32f92c25602e88778721
 
     // Grupos para encuesta 3 (ajustados con IDs del 48 al 115)
     $group1_survey3 = [
@@ -73,6 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['survey_id'], $_POST['
                 VALUES ($personal_id, $survey_id, $question_id, '$answer', $value, NOW())";
         Executor::doit($sql);
     }
+
+    error_log(print_r($answers, true));
 
     // Marcar la encuesta como completada
     $sql = "UPDATE personal_surveys SET completed = 1 WHERE personal_id = $personal_id AND survey_id = $survey_id";
