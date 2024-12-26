@@ -510,6 +510,38 @@ $('#assignSurveyForm').submit(function (e) {
 });
 
 });
+function sendMail(userId) {
+    // Verifica que userId sea válido
+    if (!userId) {
+        console.error("ID de usuario no válido");
+        alert("Por favor, proporciona un ID de usuario válido.");
+        return;
+    }
+
+    $.ajax({
+        url: './?action=notifications/send-mail',  // Ruta al controlador
+        type: 'POST',
+        data: { id: userId },  // Enviando el ID del usuario
+        dataType: 'json',
+        success: function(response) {
+            console.log("Respuesta del servidor:", response);
+            // Verifica si la respuesta tiene un mensaje
+            if (response.message) {
+                alert(response.message);  // Muestra el mensaje de éxito o error
+            } else {
+                console.error("Respuesta inesperada:", response);
+                alert("Ha ocurrido un error inesperado.");
+            }
+        },
+        error: function(xhr, status, error) {
+            // Proporciona más información sobre el error
+            console.error("Error al enviar el correo:", error);
+            console.error("Estado:", status);
+            console.error("Detalles de la respuesta:", xhr.responseText);
+            alert("Error al enviar el correo. Por favor, intenta nuevamente.");
+        }
+    });
+}
 
 
 
