@@ -113,7 +113,18 @@ $encuestas = EncuestaData::getAll();
                         </div>
                         <div class="form-group">
                             <label for="employeeRole">Puesto</label>
-                            <input type="text" class="form-control" id="employeeRole" placeholder="Ingrese el puesto">
+                            <select class="form-control" id="employeeRole" name="role">
+                                <option value="">Seleccione un puesto</option>
+                                <?php
+                                    $puestos = PuestoData::getAll();
+                                    foreach ($puestos as $puesto) {
+                                        echo "<option value='{$puesto->id}'>{$puesto->nombre}</option>";
+
+                                    }
+
+
+                                ?>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="employeeDepartment">Departamento</label>
@@ -511,37 +522,68 @@ $('#assignSurveyForm').submit(function (e) {
 
 });
 function sendMail(userId) {
+    // Verifica que el userId sea válido antes de enviar la solicitud
+    if (!userId) {
+        alert("Por favor, proporciona un ID de usuario válido.");
+        return;
+    }
+
+    // Solicitud AJAX para enviar el correo
+    $.ajax({
+        url: './?action=notifications/send-mail', // Ruta al controlador en el backend
+        type: 'POST', // Método de la solicitud
+        data: { id: userId }, // Parámetro enviado al backend
+        dataType: 'json', // Espera una respuesta JSON
+        success: function(response) {
+            try {
+                console.log("Respuesta del servidor:", response);
+
+                // Verifica si hay un mensaje en la respuesta
+                if (response.message) {
+                    alert(response.message); // Mostrar el mensaje del servidor
+                } else {
+                    console.error("Respuesta inesperada del servidor:", response);
+                    alert("Ha ocurrido un error inesperado.");
+                }
+            } catch (error) {
+                console.error("Error al procesar la respuesta:", error);
+                alert("Error inesperado al procesar la respuesta del servidor.");
+            }
+        },
+        error: function(xhr, status, error) {
+            // Manejo de errores en la solicitud AJAX
+            console.error("Error en la solicitud AJAX:", xhr.responseText);
+            alert("Error al intentar enviar el correo. Por favor, intenta nuevamente.");
+        }
+    });
+}
+function sendWhatsapp(userId) {
     // Verifica que userId sea válido
     if (!userId) {
-        console.error("ID de usuario no válido");
         alert("Por favor, proporciona un ID de usuario válido.");
         return;
     }
 
     $.ajax({
-        url: './?action=notifications/send-mail',  // Ruta al controlador
+        url: './?action=notifications/send-whatsapp', // Ruta al controlador
         type: 'POST',
-        data: { id: userId },  // Enviando el ID del usuario
+        data: { id: userId }, // Envía el ID del usuario
         dataType: 'json',
         success: function(response) {
-            console.log("Respuesta del servidor:", response);
-            // Verifica si la respuesta tiene un mensaje
-            if (response.message) {
-                alert(response.message);  // Muestra el mensaje de éxito o error
+            if (response.success) {
+                // Abre el enlace de WhatsApp en una nueva pestaña
+                window.open(response.whatsappLink, '_blank');
             } else {
-                console.error("Respuesta inesperada:", response);
-                alert("Ha ocurrido un error inesperado.");
+                alert(response.message || "Error al generar el enlace de WhatsApp.");
             }
         },
         error: function(xhr, status, error) {
-            // Proporciona más información sobre el error
-            console.error("Error al enviar el correo:", error);
-            console.error("Estado:", status);
-            console.error("Detalles de la respuesta:", xhr.responseText);
-            alert("Error al enviar el correo. Por favor, intenta nuevamente.");
+            console.error("Error en la solicitud AJAX:", xhr.responseText);
+            alert("Ha ocurrido un error al intentar enviar el mensaje por WhatsApp.");
         }
     });
 }
+
 
 
 

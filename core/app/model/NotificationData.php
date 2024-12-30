@@ -9,18 +9,25 @@ class NotificationData {
         ];
     }
 
-    public static function getCredentials($clave, $correo, $usuario, $id) {
+    public static function getCredentials($id) {
+        // Escapar el ID manualmente para evitar problemas de inyección SQL
+        $id = intval($id); // Asegúrate de que sea un número entero
+    
         // Definir la consulta SQL
-        $sql = "SELECT clave, usuario, correo, id FROM personal WHERE id = '$id'";
-
+        $sql = "SELECT clave, usuario, correo, telefono FROM personal WHERE id = $id";
+    
         // Ejecutar la consulta
         $query = Executor::doit($sql);
-
+    
         // Verificar si hay resultados
-        if ($query[0] && count($query[0]) > 0) {
-            return Model::one($query[0], new PersonalData());
+        if ($query[0] && $query[0]->num_rows > 0) {
+            // Obtener el primer resultado como objeto
+            $data = $query[0]->fetch_object();
+            return $data;
         } else {
             return null; // No se encontraron resultados
         }
     }
+    
+    
 }

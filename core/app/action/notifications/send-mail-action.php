@@ -1,56 +1,63 @@
 <?php
+require_once 'vendor/autoload.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = $_POST['id'] ?? null;
 
-// Verificar si el usuario está autenticado
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401); // No autorizado
-    echo json_encode(['message' => 'No autenticado']);
-    exit;
-}
-
-// Obtener el ID del personal al que se le enviarán las credenciales
-$id = $_POST['id'] ?? null; // Suponiendo que el ID se pasa por POST
-
-if ($id === null) {
-    echo json_encode(['message' => 'ID de personal no proporcionado']);
-    exit;
-}
-
-// Obtener las credenciales del personal
-$credentials = NotificationData::getCredentials($clave, $correo, $usuario, $id);
-
-if ($credentials) {
-    $clave = $credentials->clave; // Asumiendo que el objeto tiene estas propiedades
-    $usuario = $credentials->usuario;
-    $correo = $credentials->correo;
-
-    $mail = new PHPMailer(true);
-
-    try {
-        // Configuración del servidor SMTP
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com'; // Servidor SMTP
-        $mail->SMTPAuth = true;
-        $mail->Username = 'armandsuarez064@gmail.com'; // Tu correo
-        $mail->Password = 'chipitin05'; // Tu contraseña o app password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-
-        // Configuración del correo
-        $mail->setFrom('armandsuarez064@gmail.com', 'Prueba'); // Correo y nombre del remitente
-        $mail->addAddress($correo); // Correo del destinatario
-        $mail->isHTML(true); // Habilitar contenido HTML
-        $mail->Subject = 'Tus credenciales';
-        $mail->Body = "Usuario: <b>$usuario</b><br>Contraseña: <b>$clave</b>";
-
-        // Enviar correo
-        $mail->send();
-        echo json_encode(['message' => "Correo enviado a $correo"]);
-    } catch (Exception $e) {
-        echo json_encode(['message' => "Error al enviar correo: {$mail->ErrorInfo}"]);
+    if (!$id) {
+        echo json_encode(['message' => 'ID de usuario no proporcionado']);
+        exit;
     }
-} else {
-    echo json_encode(['message' => 'No se encontraron credenciales']);
+    if (!$id || !is_numeric($id)) {
+        echo json_encode(['message' => 'ID de usuario no válida.']);
+        exit;
+    }
+
+    // Obtener las credenciales del usuario desde la base de datos
+    try {
+        // Asegúrate de que NotificationData::getCredentials esté definido correctamente
+        $credentials = NotificationData::getCredentials($id);
+
+        if ($credentials) {
+            $correo = $credentials->correo; // Correo del usuario
+            $usuario = $credentials->usuario; // Usuario
+            $clave = $credentials->clave; // Contraseña
+
+            // Enviar correo con PHPMailer
+            $mail = new PHPMailer(true);
+
+            try {
+                // Configuración del servidor SMTP
+                $mail->isSMTP();
+                $mail->Host = 'smtp.office365.com'; // Cambia según tu proveedor
+                $mail->SMTPAuth = true;
+                $mail->Username = 'armandst05@outlook.com'; // Tu correo electrónico
+                $mail->Password = 'TtraXx64?'; // Contraseña o App Password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                $mail->Port = 587;
+
+                // Configuración del correo
+                $mail->setFrom('armandst05@outlook.com', 'Sistema de Notificaciones');
+                $mail->addAddress($correo); // Correo del destinatario
+                $mail->isHTML(true);
+                $mail->Subject = 'Tus credenciales';
+                $mail->Body = "Usuario: <b>$usuario</b><br>Contraseña: <b>$clave</b>";
+
+                // Enviar correo
+                $mail->send();
+
+                // Responder al frontend con un mensaje de éxito
+                echo json_encode(['message' => "Correo enviado exitosamente a $correo."]);
+            } catch (Exception $e) {
+                echo json_encode(['message' => "Error al enviar el correo: {$mail->ErrorInfo}"]);
+            }
+        } else {
+            echo json_encode(['message' => 'No se encontraron credenciales para este usuario.']);
+        }
+    } catch (Exception $e) {
+        echo json_encode(['message' => "Error al procesar la solicitud: {$e->getMessage()}"]);
+    }
 }
-?>
