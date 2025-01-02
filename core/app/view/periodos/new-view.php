@@ -1,5 +1,6 @@
 <?php
-$encuestas = EncuestaData::getAll();
+
+$periodos = PeriodoData::getAll(); 
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -8,78 +9,342 @@ $encuestas = EncuestaData::getAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Periodos</title>
 </head>
+
+<style>
+    /* Estilo del botón de los tres puntos */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-toggle {
+        background: none;
+        border: none;
+        
+        cursor: pointer;
+        padding: 0;
+        
+    }
+
+    .dots {
+        font-size: 24px;
+    }
+
+    /* Estilo del menú desplegable */
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        padding: 10px 0;
+        border-radius: 5px;
+    }
+
+    .dropdown-item {
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #333;
+        display: block;
+        font-size: 14px;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Mostrar el menú cuando el botón es clickeado */
+    .dropdown.show .dropdown-menu {
+        display: block;
+    }
+    thead{
+        background-color: black;
+        color: white;
+    }
+</style>
 <body>
-    <div class="container mt-5">
-        <h1>Gestión de Periodos</h1>
-        <form id="period-form" method="POST" action="assign_periods.php">
-            <div class="row mb-3">
-                <!-- Nombre del periodo -->
-                <div class="col-md-4">
-                    <label for="period-name" class="form-label">Nombre del Periodo</label>
-                    <input type="text" id="period-name" name="period_name" class="form-control" required>
-                </div>
+ <!-- Botón para abrir el modal -->
+<button type="button" class="btn btn-primary" onclick="openModalNuevoPeriodo()">Nuevo Periodo</button>
 
-                <!-- Fechas del periodo -->
-                <div class="col-md-3">
-                    <label for="start-date" class="form-label">Fecha de Inicio</label>
-                    <input type="date" id="start-date" name="start_date" class="form-control" required>
-                </div>
-                <div class="col-md-3">
-                    <label for="end-date" class="form-label">Fecha de Fin</label>
-                    <input type="date" id="end-date" name="end_date" class="form-control" required>
-                </div>
-            </div>
-
-            <!-- Encuestas con Checkbox -->
-            <div class="mb-3">
-                <label class="form-label">Encuestas a Asignar</label>
-                <div>
-                    <?php foreach ($encuestas as $encuesta): ?>
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="survey<?php echo $encuesta->id; ?>" name="survey_ids[]" value="<?php echo $encuesta->id; ?>">
-                            <label class="form-check-label" for="survey<?php echo $encuesta->id; ?>"><?php echo htmlspecialchars($encuesta->title); ?></label>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <small class="text-muted">Selecciona las encuestas que deseas asignar.</small>
-            </div>
-              <!-- Filtrar por departamento y puesto (en 2 columnas) -->
-              <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="department" class="form-label">Departamento</label>
-                    <select id="department" name="department_id"class="form-control">
-                        <option value="">Todos los departamentos</option>
-                        <?php
-                        $departamentos = DepartamentoData::getAll();
-                        foreach ($departamentos as $departamento) {
-                            echo "<option value='{$departamento->idDepartamento}'>{$departamento->nombre}</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <div class="col-md-4">
-                        <label for="employeeRole" class="form-label">Puesto</label>
-                        <select class="form-control" id="employeeRole" name="role">
-                            <option value="">Seleccione un puesto</option>
-                            <?php
-                            $puestos = PuestoData::getAll();
-                            foreach ($puestos as $puesto) {
-                                echo "<option value='{$puesto->id}'>{$puesto->nombre}</option>";
-                            }
-                            ?>
-                        </select>
-                            </div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre del Periodo</th>
+            <th>Fecha de Inicio</th>
+            <th>Fecha de Fin</th>
+            <th>Status</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($periodos as $periodo): ?>
+            <tr>
+                <td><?php echo htmlspecialchars($periodo->id); ?></td>
+                <td><?php echo htmlspecialchars($periodo->name); ?></td>
+                <td><?php echo htmlspecialchars($periodo->start_date); ?></td>
+                <td><?php echo htmlspecialchars($periodo->end_date); ?></td>
+                <td><?php echo htmlspecialchars($periodo->status); ?></td>
+                <!-- Aquí, dentro de la tabla, agregamos el botón de editar -->
+                <td>
+                    <div class="dropdown">
+                        <button class="dropdown-toggle">
+                            <span class="dots">...</span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a href="javascript:void(0)" onclick="editPeriod(<?php echo $periodo->id; ?>)" class="dropdown-item">
+                                Editar
+                            </a>
+                            <a href="javascript:void(0)" onclick="deletePeriod(<?php echo $periodo->id; ?>)" class="dropdown-item">
+                                Eliminar
+                            </a>
                         </div>
                     </div>
-                </div>                   
-            
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
 
-            <!-- Botón de enviar -->
-            <button type="submit" class="btn btn-primary" style="margin-top: 15px;">Asignar Encuestas</button>
-        </form>
+
+<!-- Modal Nuevo Periodo -->
+<div class="modal fade" id="NuevoPeriodoModal" tabindex="-1" role="dialog" aria-labelledby="NuevoPeriodoModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="NuevoPeriodoModalTitle">Nuevo Periodo</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="nuevoPeriodoForm" action="index.php?action=periodos/add-period" method="POST">
+                    <div class="form-group">
+                        <label for="period-name">Nombre del Periodo</label>
+                        <input type="text" class="form-control" id="period-name" name="period_name" placeholder="Ingrese el nombre del periodo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="start-date">Fecha de Inicio</label>
+                        <input type="date" id="start-date" name="start_date" class="form-control" required>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="end-date">Fecha de Fin</label>
+                        <input type="date" class="form-control" id="end-date" name="end_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Estado</label>
+                        <select class="form-control" id="status" name="status" required>
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitNuevoPeriodoForm()">Guardar Periodo</button>
+            </div>
+        </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Modal Editar Periodo -->
+<div class="modal fade" id="EditPeriodModal" tabindex="-1" role="dialog" aria-labelledby="EditPeriodModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="EditPeriodModalTitle">Editar Periodo</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editPeriodForm" action="index.php?action=periodos/update" method="POST">
+                    <input type="hidden" id="period-id">
+                    <div class="form-group">
+                        <label for="edit-period-name">Nombre del Periodo</label>
+                        <input type="text" class="form-control" id="edit-period-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-start-date">Fecha de Inicio</label>
+                        <input type="date" class="form-control" id="edit-start-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-end-date">Fecha de Fin</label>
+                        <input type="date" class="form-control" id="edit-end-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-status">Estado</label>
+                        <select class="form-control" id="edit-status">
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </form>
+            </div>
+        </div>v
+    </div>
+</div>
+
+<script>
+  // Función para manejar la apertura del menú
+  document.querySelectorAll('.dropdown-toggle').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var dropdown = button.parentElement;
+            dropdown.classList.toggle('show'); // Alternar el estado del dropdown
+        });
+    });
+
+    // Cerrar el menú si se hace clic fuera de él
+    window.addEventListener('click', function(event) {
+        document.querySelectorAll('.dropdown').forEach(function(dropdown) {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    });
+
+    window.onload = function() {
+        // Crear un objeto Date para obtener la fecha actual
+        var today = new Date();
+
+        // Formatear la fecha a YYYY-MM-DD
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); // Enero es 0
+        var yyyy = today.getFullYear();
+
+        today = yyyy + '-' + mm + '-' + dd;  // Formato YYYY-MM-DD
+
+        // Asignar la fecha de hoy al campo de fecha
+        document.getElementById("start-date").value = today;
+    };
+
+    function openModalNuevoPeriodo() {
+    // Muestra el modal de nuevo periodo
+    $('#NuevoPeriodoModal').modal('show');
+}
+function openModalEditarPeriodo() {
+    // Muestra el modal de nuevo periodo
+    $('#EditPeriodModal').modal('show');
+}
+
+// Función para enviar el formulario usando AJAX
+function submitNuevoPeriodoForm() {
+    // Recoger los datos del formulario
+    var formData = $('#nuevoPeriodoForm').serialize();
+
+    // Enviar los datos con AJAX
+    $.ajax({
+        url: 'index.php?action=periodos/add-period', // Ruta del backend
+        type: 'POST', // Método de envío
+        data: formData, // Los datos del formulario
+        dataType: 'json', // Esperamos una respuesta JSON
+        success: function(response) {
+            // Comprobar si la respuesta es exitosa
+            if (response.status == 'success') {
+                alert('Periodo creado exitosamente');
+                $('#NuevoPeriodoModal').modal('hide'); // Cerrar el modal
+                // Aquí puedes agregar código para refrescar la lista de periodos si es necesario
+            } else {
+                alert('Error: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            // Mostrar un mensaje de error en caso de fallar la solicitud
+            alert('Hubo un error al crear el periodo. Intenta de nuevo.');
+        }
+    });
+}
+// Escuchar eventos para la edición y eliminación de periodos
+$(document).ready(function () {
+    // Manejar clic en los botones del menú desplegable
+    $('.dropdown-menu a').on('click', function (e) {
+        e.preventDefault(); // Prevenir la acción por defecto del enlace
+
+        // Extraer el atributo 'onclick' del enlace
+        const action = $(this).attr('onclick');
+
+        // Evaluar la función correspondiente
+        eval(action);
+    });
+});
+
+// Función para abrir el modal y cargar los datos del periodo
+function editPeriod(periodId) {
+    
+    $.ajax({
+        url: './?action=periodos/get-period-data', // Archivo que obtiene los datos del periodo
+        type: 'GET',
+        data: { id: periodId },
+        success: function(response) {
+            // Asumimos que la respuesta es un JSON con los datos del periodo
+            const data = JSON.parse(response);
+            
+            // Llenamos el modal con los datos del periodo
+            $('#period-id').val(data.id);
+            $('#edit-period-name').val(data.name);
+            $('#edit-start-date').val(data.start_date);
+            $('#edit-end-date').val(data.end_date);
+            $('#edit-status').val(data.status);
+
+            // Mostramos el modal
+            $('#EditPeriodModal').modal('show');
+        },
+        error: function() {
+            
+            alert('Error al obtener los datos del periodo.');
+        }
+    });
+}
+
+$('#editPeriodForm').on('submit', function(e) {
+    e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+
+    const periodId = $('#period-id').val();
+    const name = $('#edit-period-name').val();
+    const startDate = $('#edit-start-date').val();
+    const endDate = $('#edit-end-date').val();
+    const status = $('#edit-status').val();
+
+
+    // Enviar los datos actualizados al backend usando AJAX
+    $.ajax({
+        url: './?action=periodos/update', // Archivo que maneja la actualización del periodo
+        type: 'POST',
+        data: {
+            id: periodId,
+            name: name,
+            start_date: startDate,
+            end_date: endDate,
+            status: status
+        },
+        success: function(response) {
+            try {
+                const data = JSON.parse(response); // Parsear la respuesta JSON
+                if (data.status === 'success') {
+                    alert('Periodo actualizado correctamente.');
+                    location.reload(); // Recargar la página para ver los cambios
+                } else {
+                    alert(data.message); // Mostrar el mensaje de error recibido desde el backend
+                }
+            } catch (error) {
+                alert('Error al procesar la respuesta del servidor.');
+            }
+        },
+        error: function() {
+            alert('Error al enviar los datos.');
+        }
+    });
+});
+
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

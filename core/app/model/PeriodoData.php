@@ -1,43 +1,53 @@
 <?php
-class PeriodoData{
+class PeriodoData {
 
-    public static function createPeriod($name, $startDate, $endDate, $companyId) {
-        $sql = "INSERT INTO periods (name, start_date, end_date, company_id) 
-                VALUES ('$name', '$startDate', '$endDate', $companyId)";
-        return Executor::doit($sql);
+    public static $tablename = "periods";
+    // Constructor para el modelo
+    public function __construct()
+    {
+        $this->name = "";
+        $this->start_date = "";
+        $this->end_date = "";
+        $this->status = ""; // Puedes agregar un campo de estado (activo o inactivo)
     }
-    public static function assignSurveysToPeriod($periodId, $surveyIds) {
-        foreach ($surveyIds as $surveyId) {
-            $sql = "INSERT INTO period_surveys (period_id, survey_id) 
-                    VALUES ($periodId, $surveyId)";
+
+   
+    // Obtener un periodo por ID
+    public static function getById($id) {
+        $sql = "SELECT * FROM ".self::$tablename." WHERE id = '$id'";
+        $query = Executor::doit($sql);
+        return Model::one($query[0], new PeriodoData());
+    }
+
+    // Actualizar los datos de un periodo
+    public function update() {
+        try {
+            $sql = "UPDATE " . self::$tablename . " 
+                    SET 
+                        name = \"$this->name\",
+                        start_date = \"$this->start_date\",
+                        end_date = \"$this->end_date\",
+                        status = \"$this->status\"
+                    WHERE id = $this->id";
             Executor::doit($sql);
+            return true; // Si se actualiza correctamente
+        } catch (Exception $e) {
+            return false; // En caso de error
         }
-        return true;
     }
-    public static function assignPeriodToUsers($periodId, $companyId, $departmentId = null, $positionId = null) {
-        // Obtener encuestas del periodo
-        $surveys = "SELECT survey_id FROM period_surveys WHERE period_id = $periodId";
-        $surveyQuery = Executor::doit($surveys);
-        $surveyIds = mysqli_fetch_all($surveyQuery[0], MYSQLI_ASSOC);
-    
-        // Filtrar empleados
-        $sql = "SELECT id FROM personal WHERE company_id = $companyId";
-        if ($departmentId) {
-            $sql .= " AND department_id = $departmentId";
-        }
-        if ($positionId) {
-            $sql .= " AND position_id = $positionId";
-        }
-        $employeeQuery = Executor::doit($sql);
-        $employeeIds = mysqli_fetch_all($employeeQuery[0], MYSQLI_ASSOC);
-    
-        // Asignar encuestas a empleados
-        foreach ($employeeIds as $employee) {
-            foreach ($surveyIds as $survey) {
-                EncuestaData::assignToPersonal($employee['id'], [$survey['survey_id']]);
-            }
-        }
-        return true;
+
+    // Obtener todos los periodos
+    public static function getAll() {
+        $sql = "SELECT * FROM ".self::$tablename;
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new PeriodoData());
     }
-            
-}
+
+    // Eliminar un periodo por ID
+    public static function delete($id) {
+        $sql = "DELETE FROM periodos WHERE id = $id";
+        Executor::doit($sql);
+    }
+    
+
+}  

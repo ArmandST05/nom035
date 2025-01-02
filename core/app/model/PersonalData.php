@@ -64,6 +64,11 @@ class PersonalData{
     }
     
 
+    public static function getPersonalByPuesto($puestoId) {
+        $sql = "SELECT id FROM personal WHERE id_puesto = " . intval($puestoId);
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new PersonalData()); // Suponiendo que PersonalData es el modelo para los empleados
+    }
 
 }
 

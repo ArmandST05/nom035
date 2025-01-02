@@ -246,7 +246,34 @@ class EncuestaData{
         return Model::many($query[0], new EncuestaData());
     }
     
-    
+    public static function getPersonalByPuesto($puestoId) {
+        $sql = "SELECT id FROM personal WHERE puesto_id = " . intval($puestoId);
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new PersonalData()); // Suponiendo que PersonalData es el modelo para los empleados
+    }
+
+// Método para asignar encuestas a todo el personal de un puesto
+public static function assignSurveysToRole($puestoId, $surveyIds) {
+    // Verificamos que las encuestas no estén vacías
+    if (empty($surveyIds)) {
+        throw new Exception("No se proporcionaron encuestas para asignar.");
+    }
+
+    // Obtener todo el personal del puesto
+    $personalList = self::getPersonalByPuesto($puestoId);
+
+    // Asignar la encuesta a cada empleado del puesto
+    foreach ($personalList as $personal) {
+        foreach ($surveyIds as $surveyId) {
+            $surveyId = intval($surveyId); // Asegúrate de que sea un número
+            $sql = "INSERT INTO personal_surveys (personal_id, survey_id, completed, assigned_at)
+                    VALUES ({$personal->id}, {$surveyId}, 0, NOW())";
+            Executor::doit($sql);
+        }
+    }
+
+    return true;
+}    
 
     
 }

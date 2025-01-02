@@ -18,10 +18,19 @@ class PuestoData{
     }
 
 
-    public static function getAll(){
-        $sql = "SELECT * FROM ".self::$tablename;
+    public static function getAll() {
+        $sql = "
+            SELECT 
+                puestos.*, 
+                departamentos.nombre AS nombre_departamento 
+            FROM 
+                puestos
+            INNER JOIN 
+                departamentos 
+            ON 
+                puestos.id_departamento = departamentos.idDepartamento";
         $query = Executor::doit($sql);
-        return Model::many($query[0], new PuestoData());
+        return Model::many($query[0], new DepartamentoData());
     }
     public static function getById($id){
         $sql = "SELECT * FROM " . self::$tablename . " WHERE id = '$id'";

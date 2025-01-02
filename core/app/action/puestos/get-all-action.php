@@ -48,10 +48,9 @@ while ($row = mysqli_fetch_assoc($query)) {
     $nestedData[] = $row['nombre'];
     $nestedData[] = $row['departamento'];
 
-    // Generación de menú desplegable
     $buttons = '
     <div class="dropdown">
-        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $row["id"] . '">
+        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton' . $row["id"] . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="bi bi-three-dots"></i>
         </button>
         <ul class="dropdown-menu" id="dropdownMenu' . $row["id"] . '" style="display: none; position: absolute;">
@@ -59,7 +58,7 @@ while ($row = mysqli_fetch_assoc($query)) {
             <li><a class="dropdown-item" href="#" onclick="deletePuesto(' . $row["id"] . ', \'' . $row["nombre"] . '\')">Eliminar</a></li>
         </ul>
     </div>';
-    
+
     $nestedData[] = $buttons;
 
     $data[] = $nestedData;
