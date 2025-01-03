@@ -275,7 +275,15 @@ public static function assignSurveysToRole($puestoId, $surveyIds) {
     return true;
 }    
 
+public static function getAnswersByEmployeeAndSurvey($personal_id, $survey_id) {
+    $sql = "SELECT survey_answers.*
+            FROM survey_answers
+            JOIN personal_surveys ON survey_answers.personal_id = personal_surveys.personal_id AND survey_answers.survey_id = personal_surveys.survey_id
+            WHERE personal_surveys.completed = 1 AND survey_answers.survey_id = $survey_id AND survey_answers.personal_id = $personal_id";
     
+    return Executor::doit($sql);
+}
+
 }
 
 ?>

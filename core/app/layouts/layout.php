@@ -181,6 +181,13 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                   <li><a href="./?view=periodos/new">Nuevo periodo</a></li>
                 </ul>
                 </li>
+                <li class="treeview">
+                <a href="#"><i class="fa-solid fa-user-nurse"></i>  <span>Reportes</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <ul class="treeview-menu">  
+                <li><a href="./?view=reportes/index">Ver reportes</a></li>
+                  <li><a href="./?view=reportes/new">Nuevo reporte</a></li>
+                </ul>
+                </li>
                 <!-- <li class="treeview">
                   <a href="#"><i class='fa fa-th-list'></i> <span>Catálogos</span> <i class="fa fa-angle-left pull-right"></i></a>
                   <ul class="treeview-menu">
