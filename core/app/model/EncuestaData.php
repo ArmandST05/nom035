@@ -1,7 +1,7 @@
 <?php 
 
 class EncuestaData{
-
+    
     public static $tablename = "surveys";
     public function __construct() {
         $this->id = "";
@@ -9,7 +9,7 @@ class EncuestaData{
         $this->description = "";
         $this->created_at = "";
     }
-
+    
     public static function getAll(){
         $sql = "SELECT * FROM ".self::$tablename;
         $query = Executor::doit($sql);
@@ -24,7 +24,7 @@ class EncuestaData{
         $query = Executor::doit($sql);
         return Model::many($query[0], new EncuestaData());
     }
-
+    
     // Obtener preguntas de una encuesta específica
     public static function getQuestions($survey_id) {
         $sql = "SELECT * FROM survey_questions WHERE survey_id = $survey_id";
@@ -40,12 +40,12 @@ class EncuestaData{
         return true;
     }
     
-     // Método para asignar encuestas a un empleado
-     public static function assignSurveysToEmployee($personalId, $surveyIds) {
+    // Método para asignar encuestas a un empleado
+    public static function assignSurveysToEmployee($personalId, $surveyIds) {
         if (empty($surveyIds)) {
             throw new Exception("No se proporcionaron encuestas para asignar.");
         }
-
+        
         foreach ($surveyIds as $surveyId) {
             $surveyId = intval($surveyId); // Asegúrate de que sea un número
             $sql = "INSERT INTO personal_surveys (personal_id, survey_id, completed, assigned_at)
@@ -53,8 +53,8 @@ class EncuestaData{
             Executor::doit($sql);
         }
         return true;
-
-
+        
+        
     }
     public static function getAssignedSurveyById($personal_id, $survey_id) {
         $sql = "SELECT s.* 
@@ -62,10 +62,10 @@ class EncuestaData{
                 INNER JOIN " . self::$tablename . " s ON ps.survey_id = s.id
                 WHERE ps.personal_id = $personal_id AND ps.survey_id = $survey_id";
         $query = Executor::doit($sql);
-    
+        
         // Convertimos el resultado en un array
         $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC); // Usamos MYSQLI_ASSOC para obtener un array asociativo
-    
+        
         // Si hay resultados, retornamos el primero, mapeado al objeto EncuestaData
         if (count($result) > 0) {
             $encuesta = new EncuestaData();
@@ -75,7 +75,7 @@ class EncuestaData{
             $encuesta->created_at = $result[0]['created_at'] ?? ""; // Asignamos la fecha de creación (si está presente)
             return $encuesta;
         }
-    
+        
         // Si no se encuentra la encuesta asignada, retornamos null
         return null;
     }
@@ -87,10 +87,10 @@ class EncuestaData{
                 WHERE s.survey_id = $survey_id
                 ORDER BY s.id, q.id";
         $query = Executor::doit($sql);
-    
+        
         // Convertimos el resultado en un array asociativo
         $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC);
-    
+        
         // Estructuramos los datos en un formato por secciones
         $sections = [];
         foreach ($result as $row) {
@@ -106,7 +106,7 @@ class EncuestaData{
                 'text' => $row['question_text']
             ];
         }
-    
+        
         return $sections; // Retornamos las secciones con sus preguntas agrupadas
     }
     public static function getSurveyResponses($survey_id, $personal_id) {
@@ -167,7 +167,7 @@ class EncuestaData{
                 VALUES ($survey_id, $user_id, $question_id, '$answer')";
         Executor::doit($sql);
     }
-            
+    
     public static function getSurveyResults($survey_id) {
         $sql = "SELECT q.id AS question_id, q.question_text, a.response, COUNT(a.response) AS total_respuestas
                 FROM survey_questions q
@@ -175,17 +175,17 @@ class EncuestaData{
                 WHERE q.survey_id = $survey_id
                 GROUP BY q.id, a.response
                 ORDER BY q.id";
-    
-    $query = Executor::doit($sql);
-    if ($query[0] === false) {
-        // Loguear el error de la consulta
-        error_log("Error en la consulta SQL: " . mysqli_error($query[0]));
-        throw new Exception("Error en la consulta SQL");
-    }
-    
-    $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC);
+        
+        $query = Executor::doit($sql);
+        if ($query[0] === false) {
+            // Loguear el error de la consulta
+            error_log("Error en la consulta SQL: " . mysqli_error($query[0]));
+            throw new Exception("Error en la consulta SQL");
+        }
+        
         $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC);
-    
+        $result = mysqli_fetch_all($query[0], MYSQLI_ASSOC);
+        
         // Estructuramos los resultados agrupados por preguntas
         $questions = [];
         foreach ($result as $row) {
@@ -196,17 +196,17 @@ class EncuestaData{
                     'answers' => []
                 ];
             }
-    
+            
             $questions[$question_id]['answers'][] = [
                 'answer' => $row['answer'] ?? 'Sin respuesta', // Maneja respuestas nulas
                 'count' => $row['total_respuestas']
             ];
         }
-    
+        
         return $questions; // Retorna el resultado estructurado
     }
-
-
+    
+    
     
     public static function getServiceClientQuestions($survey_id) {
         // Si el survey_id es 2
@@ -222,7 +222,7 @@ class EncuestaData{
         else {
             return [];
         }
-    
+        
         $query = Executor::doit($sql);
         return Model::many($query[0], new EncuestaData());
     }
@@ -241,7 +241,7 @@ class EncuestaData{
         else {
             return [];
         }
-    
+        
         $query = Executor::doit($sql);
         return Model::many($query[0], new EncuestaData());
     }
@@ -251,39 +251,57 @@ class EncuestaData{
         $query = Executor::doit($sql);
         return Model::many($query[0], new PersonalData()); // Suponiendo que PersonalData es el modelo para los empleados
     }
-
-// Método para asignar encuestas a todo el personal de un puesto
-public static function assignSurveysToRole($puestoId, $surveyIds) {
-    // Verificamos que las encuestas no estén vacías
-    if (empty($surveyIds)) {
-        throw new Exception("No se proporcionaron encuestas para asignar.");
-    }
-
-    // Obtener todo el personal del puesto
-    $personalList = self::getPersonalByPuesto($puestoId);
-
-    // Asignar la encuesta a cada empleado del puesto
-    foreach ($personalList as $personal) {
-        foreach ($surveyIds as $surveyId) {
-            $surveyId = intval($surveyId); // Asegúrate de que sea un número
-            $sql = "INSERT INTO personal_surveys (personal_id, survey_id, completed, assigned_at)
-                    VALUES ({$personal->id}, {$surveyId}, 0, NOW())";
-            Executor::doit($sql);
+    
+    // Método para asignar encuestas a todo el personal de un puesto
+    public static function assignSurveysToRole($puestoId, $surveyIds) {
+        // Verificamos que las encuestas no estén vacías
+        if (empty($surveyIds)) {
+            throw new Exception("No se proporcionaron encuestas para asignar.");
         }
-    }
-
-    return true;
-}    
-
-public static function getAnswersByEmployeeAndSurvey($personal_id, $survey_id) {
-    $sql = "SELECT survey_answers.*
+        
+        // Obtener todo el personal del puesto
+        $personalList = self::getPersonalByPuesto($puestoId);
+        
+        // Asignar la encuesta a cada empleado del puesto
+        foreach ($personalList as $personal) {
+            foreach ($surveyIds as $surveyId) {
+                $surveyId = intval($surveyId); // Asegúrate de que sea un número
+                $sql = "INSERT INTO personal_surveys (personal_id, survey_id, completed, assigned_at)
+                    VALUES ({$personal->id}, {$surveyId}, 0, NOW())";
+                Executor::doit($sql);
+            }
+        }
+        
+        return true;
+    }    
+    
+    public static function getAnswersByEmployeeAndSurvey($personal_id, $survey_id) {
+        $sql = "SELECT survey_answers.*
             FROM survey_answers
             JOIN personal_surveys ON survey_answers.personal_id = personal_surveys.personal_id AND survey_answers.survey_id = personal_surveys.survey_id
             WHERE personal_surveys.completed = 1 AND survey_answers.survey_id = $survey_id AND survey_answers.personal_id = $personal_id";
-    
-    return Executor::doit($sql);
-}
+        
+        return Executor::doit($sql);
+    }
 
+    /*
+    public static function getResults($personal_id, $survey_id){
+        $sql = "SELECT * FROM survey_answers 
+                INNER JOIN personal_surveys 
+                ON survey_answers.personal_id = personal_surveys.personal_id 
+                WHERE personal_surveys.completed = 1
+                AND survey_answers.personal_id = $personal_id
+                AND survey_answers.survey_id = $survey_id";
+    }
+    public static function getValueResults($personal_id, $survey_id){
+        $sql = "SELECT COUNT(*) FROM survey_answers 
+                INNER JOIN personal_surveys 
+                ON survey_answers.personal_id = personal_surveys.personal_id 
+                WHERE personal_surveys.completed = 1
+                AND survey_answers.personal_id = $personal_id
+                AND survey_answers.survey_id = $survey_id";
+    }
+                */
 }
 
 ?>
