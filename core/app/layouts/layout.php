@@ -185,7 +185,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                 <a href="#"><i class="fa-solid fa-user-nurse"></i>  <span>Reportes</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">  
                 <li><a href="./?view=reportes/index">Ver reportes</a></li>
-                  <li><a href="./?view=reportes/new">Nuevo reporte</a></li>
+                  <li><a href="./?view=resultados/index">Ver resultados</a></li>
                 </ul>
                 </li>
                 <!-- <li class="treeview">
