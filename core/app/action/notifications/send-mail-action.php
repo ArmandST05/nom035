@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 // Configuración del servidor SMTP
                 $mail->isSMTP();
-                $mail->Host = 'smtp.office365.com'; // Cambia según tu proveedor
+                $mail->Host = 'https://6680500.v2powerdr.com:2096/'; // Cambia según tu proveedor
                 $mail->SMTPAuth = true;
                 $mail->Username = 'armandst05@outlook.com'; // Tu correo electrónico
                 $mail->Password = 'TtraXx64?'; // Contraseña o App Password

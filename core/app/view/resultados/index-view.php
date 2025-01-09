@@ -6,11 +6,7 @@
     <title>Resultados de Encuestas por Empleado</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
+       
         h1 {
             text-align: center;
             color: #333;
@@ -99,8 +95,20 @@
                     </select>
                 </div>
             </div>
+             <!-- Selección de vista por categoría o dominio -->
+             <div class="col-md-5">
+                <label for="view_mode">Ver resultados por:</label>
+                <div class="form-group">
+                    <select class="form-control" id="view_mode" name="view_mode" onchange="cargarResultados()">
+                        <option value="dominio">Dominio</option>
+                        <option value="categoria">Categoría</option>
+                    </select>
+                </div>
+            </div>
         </div>
-
+        <div class="row">
+           
+        </div>             
         <table id="tabla_resultados" class="table table-bordered">
             <thead>
                 <tr>
@@ -128,11 +136,10 @@
         });
 
 
-
-
-function cargarResultados() {
+        function cargarResultados() {
     var encuesta_id = $("#survey_id").val();
     var personal_id = $("#personal_id").val();
+    var view_mode = $("#view_mode").val(); // Ver si es categoría o dominio
 
     if (encuesta_id && personal_id) {
         $.ajax({
@@ -140,42 +147,57 @@ function cargarResultados() {
             type: 'GET',
             data: {
                 encuesta_id: encuesta_id,
-                personal_id: personal_id
+                personal_id: personal_id,
+                view_mode: view_mode
             },
             success: function(response) {
-                var data = JSON.parse(response);
-                var dominios = [];
-                var valores = [];
-                var colores = [];
+                try {
+                    var data = JSON.parse(response);
+                    
 
-                if (data.dominios) {
-                    Object.keys(data.dominios).forEach(function(dominioKey) {
-                        var dominio = data.dominios[dominioKey];
-                        dominios.push(dominio.dominio_nombre);
-                        valores.push(dominio.total_valor);
+                    var labels = [];
+                    var valores = [];
+                    var colores = [];
+                    var agrupacion = view_mode === "categoria" ? data.categorias : data.dominios;
+                    console.log(data);
+                    if (agrupacion) {
+                        Object.keys(agrupacion).forEach(function(key) {
+                            var item = agrupacion[key];
+                            console.log('Item:', item);
 
-                        // Asignar colores según el nivel
-                        switch (dominio.nivel) {
-                            case "Muy Alto":
-                                colores.push("rgba(255, 99, 132, 0.8)"); // Rojo
-                                break;
-                            case "Alto":
-                                colores.push("rgba(255, 159, 64, 0.8)"); // Naranja
-                                break;
-                            case "Medio":
-                                colores.push("rgba(255, 205, 86, 0.8)"); // Amarillo
-                                break;
-                            case "Bajo":
-                                colores.push("rgba(75, 192, 192, 0.8)"); // Verde agua
-                                break;
-                            default: // Nulo
-                                colores.push("rgba(54, 162, 235, 0.8)"); // Azul
-                        }
-                    });
+                            // Ajusta según las claves del JSON
+                            labels.push(item.dominio_nombre || item.categoria_nombre);
+                            valores.push(item.total_valor);
+
+                            // Asignar colores según el nivel
+                            switch (item.nivel) {
+                                case "Muy Alto":
+                                    colores.push("rgba(255, 0, 55, 0.8)");
+                                    break;
+                                case "Alto":
+                                    colores.push("rgba(255, 128, 0, 0.8)");
+                                    break;
+                                case "Medio":
+                                    colores.push("rgba(255, 221, 0, 0.8)");
+                                    break;
+                                case "Bajo":
+                                    colores.push("rgb(0, 255, 255)");
+                                    break;
+                                default:
+                                    colores.push("rgba(0, 149, 255, 0.8)");
+                            }
+                        });
+                    } else {
+                        labels.push("Sin resultados");
+                        valores.push(0);
+                        colores.push("rgba(200, 200, 200, 0.8)");
+                    }
+
+                    // Generar o actualizar gráfico
+                    generarGrafico(labels, valores, colores);
+                } catch (error) {
+                    console.error('Error al procesar la respuesta:', error);
                 }
-
-                // Generar el gráfico con los datos
-                generarGrafico(dominios, valores, colores);
             },
             error: function() {
                 alert('Ocurrió un error al cargar los resultados.');
@@ -184,7 +206,7 @@ function cargarResultados() {
     }
 }
 
-// Función para generar el gráfico
+// Función para generar o actualizar el gráfico
 function generarGrafico(labels, data, colors) {
     var ctx = document.getElementById('graficoDominios').getContext('2d');
 
@@ -199,10 +221,10 @@ function generarGrafico(labels, data, colors) {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Valor Total por Dominio',
+                label: 'Valor Total',
                 data: data,
                 backgroundColor: colors,
-                borderColor: colors.map(color => color.replace('0.8', '1')), // Bordes más oscuros
+                borderColor: colors.map(color => color.replace('0.8', '1')),
                 borderWidth: 1
             }]
         },
@@ -215,7 +237,7 @@ function generarGrafico(labels, data, colors) {
             },
             plugins: {
                 legend: {
-                    display: false // Ocultar la leyenda
+                    display: false
                 },
                 tooltip: {
                     callbacks: {
@@ -228,6 +250,7 @@ function generarGrafico(labels, data, colors) {
         }
     });
 }
+
 
 /*
 
