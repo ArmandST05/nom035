@@ -134,43 +134,123 @@
                 cargarResultados();
             });
         });
-
-
         function cargarResultados() {
     var encuesta_id = $("#survey_id").val();
     var personal_id = $("#personal_id").val();
+    console.log("personal_id:", personal_id);
     var view_mode = $("#view_mode").val(); // Ver si es categoría o dominio
+    console.log("view_mode:", view_mode); // Verifica el valor de view_mode
 
     if (encuesta_id && personal_id) {
         $.ajax({
             url: './?action=resultados/get-domain-results',
             type: 'GET',
             data: {
-                encuesta_id: encuesta_id,
+                survey_id: encuesta_id,
                 personal_id: personal_id,
                 view_mode: view_mode
             },
             success: function(response) {
                 try {
-                    var data = JSON.parse(response);
-                    
+                    var data = JSON.parse(response);  // Intentar analizarlo
+                    console.log("Respuesta completa del servidor:", data);
 
                     var labels = [];
                     var valores = [];
                     var colores = [];
-                    var agrupacion = view_mode === "categoria" ? data.categorias : data.dominios;
-                    console.log(data);
+                    var agrupacion = {};
+
+                    // Verifica si 'view_mode' es 'categoria'
+                    if (view_mode === "categoria") {
+                        console.log("Verificando si data.categorias existe...");
+                        if (data.categorias) {
+                            agrupacion = data.categorias;
+                        } else {
+                            console.warn("No se encontró 'data.categorias' en la respuesta.");
+                        }
+                    } else if (view_mode === "dominio") {
+                        console.log("Verificando si data.dominios existe...");
+                        if (data.dominios) {
+                            agrupacion = data.dominios;
+                        } else {
+                            console.warn("No se encontró 'data.dominios' en la respuesta.");
+                        }
+                    } else {
+                        console.warn("view_mode no es válido:", view_mode);
+                    }
+
+                    console.log("Agrupación seleccionada:", agrupacion); // Ver la agrupación obtenida
+
+                    if (Object.keys(agrupacion).length === 0) {
+                        console.warn("No se encontraron categorías o dominios válidos.");
+                    }
+
                     if (agrupacion) {
                         Object.keys(agrupacion).forEach(function(key) {
                             var item = agrupacion[key];
-                            console.log('Item:', item);
-
                             // Ajusta según las claves del JSON
-                            labels.push(item.dominio_nombre || item.categoria_nombre);
+                            labels.push(item.categoria_nombre || item.dominio_nombre);
                             valores.push(item.total_valor);
 
+                            // Asignar el nivel según el valor de total_valor
+                            var nivel = "";
+                            if (item.categoria_id == 1) { // Ambiente de trabajo
+                                if (item.total_valor < 3) {
+                                    nivel = "Nulo";
+                                } else if (item.total_valor < 5) {
+                                    nivel = "Bajo";
+                                } else if (item.total_valor < 7) {
+                                    nivel = "Medio";
+                                } else if (item.total_valor < 9) {
+                                    nivel = "Alto";
+                                } else {
+                                    nivel = "Muy Alto";
+                                }
+                            } else if (item.categoria_id == 3) { // Factores propios de la actividad
+                                if (item.total_valor < 10) {
+                                    nivel = "Nulo";
+                                } else if (item.total_valor < 20) {
+                                    nivel = "Bajo";
+                                } else if (item.total_valor < 30) {
+                                    nivel = "Medio";
+                                } else if (item.total_valor < 40) {
+                                    nivel = "Alto";
+                                } else {
+                                    nivel = "Muy Alto";
+                                }
+                            } else if (item.categoria_id == 4) { // Organización del tiempo de trabajo
+                                if (item.total_valor < 4) {
+                                    nivel = "Nulo";
+                                } else if (item.total_valor < 6) {
+                                    nivel = "Bajo";
+                                } else if (item.total_valor < 9) {
+                                    nivel = "Medio";
+                                } else if (item.total_valor < 12) {
+                                    nivel = "Alto";
+                                } else {
+                                    nivel = "Muy Alto";
+                                }
+                            } else if (item.categoria_id == 5) { // Liderazgo y relaciones en el trabajo
+                                if (item.total_valor < 10) {
+                                    nivel = "Nulo";
+                                } else if (item.total_valor < 18) {
+                                    nivel = "Bajo";
+                                } else if (item.total_valor < 28) {
+                                    nivel = "Medio";
+                                } else if (item.total_valor < 38) {
+                                    nivel = "Alto";
+                                } else {
+                                    nivel = "Muy Alto";
+                                }
+                            } else {
+                                nivel = "Sin Nivel";
+                            }
+
+                            // Asignar el nivel calculado al objeto
+                            item.nivel = nivel;
+
                             // Asignar colores según el nivel
-                            switch (item.nivel) {
+                            switch (nivel) {
                                 case "Muy Alto":
                                     colores.push("rgba(255, 0, 55, 0.8)");
                                     break;
@@ -186,8 +266,11 @@
                                 default:
                                     colores.push("rgba(0, 149, 255, 0.8)");
                             }
+
+                            console.log("Nivel calculado para", item.categoria_nombre || item.dominio_nombre, ":", nivel);
                         });
                     } else {
+                        // Si no hay agrupación, mostrar resultados vacíos
                         labels.push("Sin resultados");
                         valores.push(0);
                         colores.push("rgba(200, 200, 200, 0.8)");
@@ -197,14 +280,24 @@
                     generarGrafico(labels, valores, colores);
                 } catch (error) {
                     console.error('Error al procesar la respuesta:', error);
+                    alert('Error al procesar los datos recibidos del servidor. Revisa la consola para más detalles.');
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error("Error en la petición AJAX:");
+                console.error("Status:", status);
+                console.error("Error:", error);
+                console.error("Detalles de la respuesta:", xhr.responseText);
                 alert('Ocurrió un error al cargar los resultados.');
             }
         });
+    } else {
+        console.error("Parámetros inválidos: encuesta_id y personal_id son requeridos.");
+        alert("Por favor, asegúrate de seleccionar una encuesta y un empleado.");
     }
 }
+
+
 
 // Función para generar o actualizar el gráfico
 function generarGrafico(labels, data, colors) {
