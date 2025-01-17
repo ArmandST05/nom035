@@ -61,7 +61,9 @@
                 <label for="personal_id">Seleccionar Empleado:</label>
                 <div class="form-group">
                     <select class="form-control" id="personal_id" name="personal_id" required>
+                        
                         <option value="">Selecciona un empleado</option>
+                        <option value="todos">Todos los empledos</option>
                         <?php
                         $empleados = ReporteData::getCompletedEmployees();
                         if (!empty($empleados)) {
@@ -100,19 +102,7 @@
         <div class="row">
            
         </div>             
-        <table id="tabla_resultados" class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Dominio</th>
-                    
-                    <th>Total</th>
-                    <th>Nivel</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Los resultados se cargarán aquí con AJAX -->
-            </tbody>
-        </table>
+        
     </form>
             <!-- Agregar la librería Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -136,60 +126,57 @@
         return;
     }
 
-    // Selección de la URL según el ID de la encuesta
+    // Selección de la URL según el ID de la encuesta y si es un cálculo general o por empleado
     var url = '';
     if (encuesta_id == 2) {
-        url = './?action=resultados/get-category-results-survey2'; // URL para resultados por categoría en encuesta 2
+        url = (personal_id === 'todos') 
+            ? './?action=resultados/get-general-category-results2' 
+            : './?action=resultados/get-category-results-survey2';
     } else if (encuesta_id == 3) {
-        url = './?action=resultados/get-category-results-survey3'; // URL para resultados por categoría en encuesta 3
+        url = (personal_id === 'todos') 
+            ? './?action=resultados/get-general-category-results3' 
+            : './?action=resultados/get-category-results-survey3';
     } else {
         console.error("Encuesta no válida.");
         alert("Por favor, selecciona una encuesta válida.");
         return;
     }
 
-    // Realizar la petición AJAX con la URL seleccionada
+    // Realizar la petición AJAX
     $.ajax({
         url: url,
         type: 'GET',
         data: {
             survey_id: encuesta_id,
-            personal_id: personal_id
+            personal_id: personal_id === 'todos' ? null : personal_id // Enviar null si es "todos"
         },
         success: function (response) {
-            console.log("Raw response from server:", response);
+            console.log("Respuesta cruda del servidor:", response);
 
             try {
-                var jsonResponse = response.trim();
-                var firstValidJson = jsonResponse.match(/^\{.+\}$/);
-                
-                if (!firstValidJson) {
-                    throw new Error("Respuesta no contiene un JSON válido.");
-                }
-
-                var data = JSON.parse(firstValidJson[0]);
-                console.log("Parsed response:", data);
+                // Intentar parsear la respuesta JSON
+                var data = JSON.parse(response);
+                console.log("Respuesta procesada:", data);
 
                 // Procesar los resultados por categoría
                 var categorias = data.categorias;
 
                 if (categorias && Object.keys(categorias).length > 0) {
-                    // Aquí procesamos las categorías recibidas
                     var categoriasLabels = [];
                     var categoriasValores = [];
                     var categoriasNiveles = [];
 
-                    // Extraemos las categorías, valores y niveles
+                    // Extraer etiquetas, valores y niveles de cada categoría
                     for (var categoriaId in categorias) {
                         if (categorias.hasOwnProperty(categoriaId)) {
                             var categoria = categorias[categoriaId];
                             categoriasLabels.push(categoria.categoria_nombre);
                             categoriasValores.push(categoria.total_valor);
-                            categoriasNiveles.push(categoria.nivel); // Se toma el nivel directamente
+                            categoriasNiveles.push(categoria.nivel);
                         }
                     }
 
-                    // Llamar a la función para generar el gráfico de categorías
+                    // Generar el gráfico con los datos procesados
                     generarGrafico(categoriasLabels, categoriasValores, categoriasNiveles);
                 } else {
                     console.warn("No se encontraron categorías válidas.");
@@ -202,10 +189,10 @@
         },
         error: function (xhr, status, error) {
             console.error("Error en la petición AJAX:");
-            console.error("Status:", status);
+            console.error("Estado:", status);
             console.error("Error:", error);
             console.error("Detalles de la respuesta:", xhr.responseText);
-            alert("Ocurrió un error al cargar los resultados.");
+            alert("Ocurrió un error al cargar los resultados. Por favor, intenta de nuevo más tarde.");
         }
     });
 }

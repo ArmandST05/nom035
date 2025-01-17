@@ -62,6 +62,7 @@
                 <div class="form-group">
                     <select class="form-control" id="personal_id" name="personal_id" required>
                         <option value="">Selecciona un empleado</option>
+                        <option value="todos">Todos los empleados</option>
                         <?php
                         $empleados = ReporteData::getCompletedEmployees();
                         if (!empty($empleados)) {
@@ -117,22 +118,31 @@ function cargarResultados() {
     var encuesta_id = $("#survey_id").val();
     var personal_id = $("#personal_id").val();
 
-    if (!encuesta_id || !personal_id) {
-        console.error("Parámetros inválidos: encuesta_id y personal_id son requeridos.");
-        alert("Por favor, asegúrate de seleccionar una encuesta y un empleado.");
-        return;
-    }
 
-    // Selección de la URL según el ID de la encuesta
+    // Seleccionar la URL según la opción seleccionada
     var url = '';
-    if (encuesta_id == 2) {
-        url = './?action=resultados/get-domain-results-survey2'; // URL para resultados por dominio en encuesta 2
-    } else if (encuesta_id == 3) {
-        url = './?action=resultados/get-domain-results-survey3'; // URL para resultados por dominio en encuesta 3
+    if (personal_id === "todos") {
+        // Si se seleccionan todos los empleados
+        if (encuesta_id == 2) {
+            url = './?action=resultados/get-general-domains-results2'; // URL para resultados generales de encuesta 2
+        } else if (encuesta_id == 3) {
+            url = './?action=resultados/get-general-domains-results3'; // URL para resultados generales de encuesta 3
+        } else {
+            console.error("Encuesta no válida.");
+            alert("Por favor, selecciona una encuesta válida.");
+            return;
+        }
     } else {
-        console.error("Encuesta no válida.");
-        alert("Por favor, selecciona una encuesta válida.");
-        return;
+        // Si se selecciona un empleado específico
+        if (encuesta_id == 2) {
+            url = './?action=resultados/get-domain-results-survey2'; // URL para resultados por empleado en encuesta 2
+        } else if (encuesta_id == 3) {
+            url = './?action/resultados/get-domain-results-survey3'; // URL para resultados por empleado en encuesta 3
+        } else {
+            console.error("Encuesta no válida.");
+            alert("Por favor, selecciona una encuesta válida.");
+            return;
+        }
     }
     $.ajax({
     url: url,
@@ -203,11 +213,11 @@ function generarGrafico(labels, data, niveles) {
             case "Muy Alto":
                 return "rgba(255, 0, 0, 0.8)"; // Rojo
             case "Alto":
-                return "rgba(255, 159, 64, 0.8)"; // Naranja
+                return "rgba(255, 128, 0, 0.8)"; // Naranja
             case "Medio":
                 return "rgb(251, 255, 0)"; // Amarillo
             case "Bajo":
-                return "rgba(75, 192, 192, 0.8)"; // Verde claro
+                return "rgb(0, 255, 115)"; // Verde claro
             case "Nulo":
                 return "rgba(0, 225, 255, 0.8)"; // Gris
             default:
