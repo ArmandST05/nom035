@@ -6,7 +6,9 @@ function calcularCategoriasEncuesta2() {
     category.id AS categoria_id, 
     category.name AS categoria_nombre, 
     dominio.id AS dominio_id, 
-    SUM(survey_answers.valor) AS total_valor
+    dimensiones.id AS dimension_id, 
+    survey_answers.personal_id AS persona_id,
+    survey_answers.valor AS total_valor 
 FROM survey_answers 
 INNER JOIN psychosocial_risk_questions 
     ON survey_answers.question_id = psychosocial_risk_questions.id 
@@ -16,8 +18,8 @@ INNER JOIN dominio
     ON dimensiones.dominio_id = dominio.id 
 INNER JOIN category 
     ON dominio.category_id = category.id 
-WHERE survey_answers.survey_id = 2 
-GROUP BY category.id, category.name, dominio.id;
+WHERE survey_answers.survey_id = 2
+
 ";
 
     $result = Executor::doit($sql);
@@ -78,13 +80,9 @@ GROUP BY category.id, category.name, dominio.id;
 }
 
 // Validación de parámetros GET
-if (isset($_GET['personal_id']) && 
-    is_numeric($_GET['personal_id']) && 
-    isset($_GET['survey_id']) && 
-    $_GET['survey_id'] == 2) { // Solo encuesta 2
+if (isset($_GET['survey_id']) &&  $_GET['survey_id'] == 2) { // Solo encuesta 2
 
-    $personal_id = intval($_GET['personal_id']);
-    $response = calcularCategoriasEncuesta2($personal_id);
+    $response = calcularCategoriasEncuesta2();
 
     echo json_encode($response);
 } else {

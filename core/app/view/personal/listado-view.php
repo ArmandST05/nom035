@@ -30,7 +30,7 @@ $encuestas = EncuestaData::getAll();
                 </div>
             </div>
         </div>
-    </div>
+</div>
     <div class="row mb-4">
     <!-- Filtro por Departamento -->
     <div class="col-md-4">

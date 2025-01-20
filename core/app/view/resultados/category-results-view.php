@@ -116,31 +116,37 @@
             });
         });
         
-        function cargarResultados() {
+function cargarResultados() {
     var encuesta_id = $("#survey_id").val();
     var personal_id = $("#personal_id").val();
 
-    if (!encuesta_id || !personal_id) {
-        console.error("Parámetros inválidos: encuesta_id y personal_id son requeridos.");
-        alert("Por favor, asegúrate de seleccionar una encuesta y un empleado.");
-        return;
-    }
 
     // Selección de la URL según el ID de la encuesta y si es un cálculo general o por empleado
-    var url = '';
+   // Seleccionar la URL según la opción seleccionada
+var url = '';
+if (personal_id === "todos") {
+    // Si se seleccionan todos los empleados
     if (encuesta_id == 2) {
-        url = (personal_id === 'todos') 
-            ? './?action=resultados/get-general-category-results2' 
-            : './?action=resultados/get-category-results-survey2';
+        url = './?action=resultados/get-general-category-results2'; // URL para resultados generales de encuesta 2
     } else if (encuesta_id == 3) {
-        url = (personal_id === 'todos') 
-            ? './?action=resultados/get-general-category-results3' 
-            : './?action=resultados/get-category-results-survey3';
+        url = './?action=resultados/get-general-category-results3'; // URL para resultados generales de encuesta 3
     } else {
         console.error("Encuesta no válida.");
         alert("Por favor, selecciona una encuesta válida.");
         return;
     }
+} else {
+    // Si se selecciona un empleado específico
+    if (encuesta_id == 2) {
+        url = './?action=resultados/get-category-results-survey2'; // URL para resultados por empleado en encuesta 2
+    } else if (encuesta_id == 3) {
+        url = './?action/resultados/get-category-results-survey3'; // URL para resultados por empleado en encuesta 3
+    } else {
+        console.error("Encuesta no válida.");
+        alert("Por favor, selecciona una encuesta válida.");
+        return;
+    }
+}
 
     // Realizar la petición AJAX
     $.ajax({
