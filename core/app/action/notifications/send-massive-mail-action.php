@@ -1,47 +1,58 @@
 <?php
+require_once 'vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Obtener los valores de los filtros
-    $departamento = $_POST['departamento'] ?? 'todos';
-    $role = $_POST['role'] ?? 'allRole';
+    $users = $_POST['users']; // Recibimos un array con la lista de usuarios
 
-    // Construir la consulta dinámica
-    $sql = "SELECT 
-                nombre, 
-                usuario, 
-                clave, 
-                correo, 
-                telefono 
-            FROM personal 
-            WHERE 1=1";
-
-    // Filtro por departamento
-    if ($departamento !== 'todos') {
-        $sql .= " AND departamento_id = $departamento";
+    if (!isset($users) || count($users) === 0) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'No se enviaron datos de usuarios.']);
+        exit;
     }
 
-    // Filtro por rol
-    if ($role !== 'allRole') {
-        $sql .= " AND role_id = $role";
+    $errors = []; // Para almacenar errores
+    foreach ($users as $user) {
+        try {
+            $mailReservation = new PHPMailer();
+            $mailReservation->Host = $configuration['name']->value;
+            $mailReservation->From = $configuration['email']->value;
+            $mailReservation->FromName = $configuration['name']->value;
+            $mailReservation->Subject = "Tus credenciales de acceso";
+            $mailReservation->AddAddress($user['email']); // Destinatario
+
+            // Contenido del correo
+            $body = "
+                <p>Hola <b>{$user['name']}</b>,</p>
+                <p>Estas son tus credenciales de acceso:</p>
+                <ul>
+                    <li><b>Usuario:</b> {$user['username']}</li>
+                    <li><b>Clave:</b> {$user['password']}</li>
+                </ul>
+                <p>Por favor, guarda esta información de manera segura.</p>
+                <p>Saludos cordiales,<br>Equipo de {$configuration['name']->value}</p>
+            ";
+            $mailReservation->Body = $body;
+            $mailReservation->IsHTML(true);
+
+            // Enviar el correo
+            if (!$mailReservation->send()) {
+                $errors[] = "Error al enviar a {$user['email']}: {$mailReservation->ErrorInfo}";
+            }
+        } catch (Exception $e) {
+            $errors[] = "Error al procesar el usuario {$user['email']}: {$e->getMessage()}";
+        }
     }
 
-    // Ejecutar consulta
-    $query = Executor::doit($sql);
-    $data = Model::many($query[0], new UserData());
-
-    // Preparar los datos para DataTables
-    $response = [];
-    foreach ($data as $row) {
-        $response[] = [
-            'nombre' => $row->nombre,
-            'usuario' => $row->usuario,
-            'clave' => $row->clave,
-            'correo' => $row->correo,
-            'telefono' => $row->telefono
-        ];
+    // Respuesta al cliente
+    if (empty($errors)) {
+        echo json_encode(['success' => true, 'message' => 'Correos enviados exitosamente.']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Algunos correos no se pudieron enviar.', 'errors' => $errors]);
     }
-
-    // Devolver en formato JSON
-    header('Content-Type: application/json');
-    echo json_encode($response);
-    exit();
+} else {
+    http_response_code(405); // Método no permitido
+    echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
 }
+?>

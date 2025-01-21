@@ -31,7 +31,7 @@ $departamentos = DepartamentoData::getAll();
             </div>
         </div>
     <br>
-    <button type="button" class="btn btn-primary" id="btncorreo">Enviar credenciales por correo</button>
+    <button type="button" class="btn btn-primary" id="btncorreo" onclick="sendMail()">Enviar credenciales por correo</button>
     <button type="button" class="btn btn-primary" id="btnWhatsapp">Enviar credenciales por Whatsapp</button>
 
     <br>
@@ -118,5 +118,34 @@ $(document).ready(function() {
         }
     });
 });
+function sendMail() {
+    var users = dataTable.rows({ search: 'applied' }).data().toArray();
+
+    if (users.length === 0) {
+        alert('No hay usuarios para enviar correos.');
+        return;
+    }
+
+    $.ajax({
+        url: './?action=notifications/send-massive-mail',
+        method: 'POST',
+        data: {
+            users: users
+        },
+        success: function(response) {
+            var res = JSON.parse(response);
+            if (res.success) {
+                alert('Correos enviados exitosamente.');
+            } else {
+                alert('Ocurrieron errores al enviar algunos correos:\n' + res.errors.join('\n'));
+            }
+        },
+        error: function(xhr, error, code) {
+            console.error('Error al enviar correos:', error, code);
+            alert('Ocurrió un error al intentar enviar los correos.');
+        }
+    });
+}
+
 
 </script>

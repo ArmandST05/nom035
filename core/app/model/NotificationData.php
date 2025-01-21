@@ -1,33 +1,55 @@
-<?php 
-class NotificationData {
+<?php
+class NotificationData
+{
+	public static $tablename = "notifications";
+	public static $tablenameModules = "notification_modules";
+	public static $tablenameStatus = "notification_status";
+	public static $tablenameDirections = "notification_directions";
+	public static $tablenameTypes = "notification_types";
+	public static $tablenameSmsPurchases = "sms_purchases";
+	public static $tablenameDefaultMessages = "default_messages";
 
-    public static function sendEmail($email, $username, $password) {
-        return [
-            'email' => $email,
-            'username' => $username,
-            'password' => $password
-        ];
-    }
+	public $patient_id;
+	public $reservation_id;
+	public $type_id;
+	public $direction_id;
+	public $status_id;
+	public $module_id;
+	public $receptor;
+	public $message;
 
-    public static function getCredentials($id) {
-        // Escapar el ID manualmente para evitar problemas de inyección SQL
-        $id = intval($id); // Asegúrate de que sea un número entero
-    
-        // Definir la consulta SQL
-        $sql = "SELECT clave, usuario, correo, telefono FROM personal WHERE id = $id";
-    
-        // Ejecutar la consulta
-        $query = Executor::doit($sql);
-    
-        // Verificar si hay resultados
-        if ($query[0] && $query[0]->num_rows > 0) {
-            // Obtener el primer resultado como objeto
-            $data = $query[0]->fetch_object();
-            return $data;
-        } else {
-            return null; // No se encontraron resultados
-        }
-    }
-    
-    
+	//Tipos de notificaciones: CORREO ELECTRÓNICO (1), SMS (2)
+	public function __construct()
+	{
+		$this->patient_id = "";
+		$this->reservation_id = "";
+		$this->type_id = "";
+		$this->direction_id = "";
+		$this->status_id = "";
+		$this->module_id = "";
+		$this->receptor = "";
+		$this->message = "";
+	}
+
+	public function add()
+	{
+		$sql = "INSERT INTO " . self::$tablename . " (patient_id,reservation_id,type_id,direction_id,status_id,module_id,receptor,message) ";
+		$sql .= "value (\"$this->patient_id\",\"$this->reservation_id\",\"$this->type_id\",\"$this->direction_id\",$this->status_id,\"$this->module_id\",\"$this->receptor\",\"$this->message\")";
+		Executor::doit($sql);
+	}
+
+	public static function getById($id)
+	{
+		$sql = "SELECT * FROM " . self::$tablename . " WHERE id = '$id'";
+		$query = Executor::doit($sql);
+		return Model::one($query[0], new NotificationData());
+	}
+
+	public static function getAllByType($typeId)
+	{
+		$sql = "SELECT * FROM " . self::$tablename . " WHERE type_id = '$typeId' ORDER BY date_at ASC";
+		$query = Executor::doit($sql);
+		return Model::many($query[0], new NotificationData());
+	}
+	
 }
