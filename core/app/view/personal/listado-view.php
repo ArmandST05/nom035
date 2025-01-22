@@ -522,11 +522,6 @@ $('#assignSurveyForm').submit(function (e) {
 
 });
 function sendMail(userId) {
-    // Verifica que el userId sea válido antes de enviar la solicitud
-    if (!userId) {
-        alert("Por favor, proporciona un ID de usuario válido.");
-        return;
-    }
 
     // Solicitud AJAX para enviar el correo
     $.ajax({

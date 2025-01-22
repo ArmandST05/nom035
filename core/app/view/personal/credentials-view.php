@@ -39,14 +39,14 @@ $departamentos = DepartamentoData::getAll();
         <table id="lookup" class="table table-striped table-hover">
             <thead style="background-color: #484848; color: white; border-radius: 5px;">
                 <tr>
-                    <th>#</th>
-                    <th>Nombre</th>
-                    <th>Departamento / Puesto</th>
-                    <th>Usuario</th>
-                    <th>Clave</th>
-                    <th>Correo</th>
-                    <th>Teléfono</th>
-                    
+                <th><input type="checkbox" id="select-all"></th> <!-- Checkbox para seleccionar todos -->
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Departamento / Puesto</th>
+                <th>Usuario</th>
+                <th>Clave</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
                 </tr>
             </thead>
             <tbody>
@@ -119,19 +119,29 @@ $(document).ready(function() {
     });
 });
 function sendMail() {
-    var users = dataTable.rows({ search: 'applied' }).data().toArray();
+    var selectedUsers = [];
+    $('#lookup tbody input[type="checkbox"]:checked').each(function() {
+        var rowData = dataTable.row($(this).closest('tr')).data();
+        selectedUsers.push({
+            name: rowData[1], // Nombre
+            department: rowData[2], // Departamento / Puesto
+            username: rowData[3], // Usuario
+            password: rowData[4], // Clave
+            email: rowData[5], // Correo
+            phone: rowData[6], // Teléfono
+        });
+    });
 
-    if (users.length === 0) {
-        alert('No hay usuarios para enviar correos.');
+    if (selectedUsers.length === 0) {
+        alert('No hay usuarios seleccionados.');
         return;
     }
 
     $.ajax({
         url: './?action=notifications/send-massive-mail',
         method: 'POST',
-        data: {
-            users: users
-        },
+        contentType: 'application/json',
+        data: JSON.stringify({ users: selectedUsers }),
         success: function(response) {
             var res = JSON.parse(response);
             if (res.success) {
