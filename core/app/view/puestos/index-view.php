@@ -67,7 +67,14 @@ $allPuestos = PuestoData::getAll();
         <div class="col-md-8">
             <h4>Puestos</h4>
             <p>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Suscipit, aliquam? In consequuntur fugiat perspiciatis cum? Beatae, iure minima cumque velit soluta nisi tenetur, quis repellendus culpa accusamus ab eius necessitatibus est veritatis reiciendis debitis fugit quibusdam et quo doloribus ut expedita illum! Amet aut corporis harum eum, iste excepturi ipsa.
+            Indicaciones: En este módulo podrá agregar, editar y eliminar puestos.
+             Al añadir un puesto nuevo el sistema asignará en automático las encuestas
+              que correspondan al cumplimiento de la Norma en base a la cantidad de
+               empleados asignada a la razón social seleccionada. Usted podrá editar 
+               las encuestas del puesto, considerando que cada vez que registre un 
+               personal nuevo y seleccione su puesto se le añadirán las encuestas que 
+               tenga seleccionadas el puesto, esto únicamente dentro de la razón social
+                que se tenga seleccionada al momento.
             </p>
         </div>
         <div class="col-md-4">

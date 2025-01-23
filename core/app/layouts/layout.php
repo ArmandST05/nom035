@@ -23,9 +23,9 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
 
 <head>
   <meta charset="UTF-8">
-  <title>INTELI035</title>
+  <title>INTELLI035</title>
   <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-  <link rel="icon" href="assets/powerdr-icon.png">
+  <link rel="icon" href="assets/icon-intelli.png">
 
   <!-- Jquery -->
   <script src="assets/jquery-2.1.1.min.js" type="text/javascript"></script>
@@ -152,8 +152,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
               <?php if ((isset($_SESSION["user_id"])) && ($_SESSION['typeUser'] == "su")) : ?>
                 <meta charset="UTF-8">
                 <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
-                <li><a href="./index.php?view=puestos/index"><i class='fa fa-home'></i>  <span>Puestos</span></a></li>
-                <li><a href="./?view=encuestas/graficacion"><i class='fa fa-home'></i> <span>Graficación</span></a></li>
+                <li><a href="./index.php?view=puestos/index"><i class="fa-solid fa-user-tie"></i>  <span>Puestos</span></a></li>
 
                 <li class="treeview">
                   
@@ -175,18 +174,18 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                 </li>
                 <li class="treeview">
                   
-                <a href="#"><i class="fa-solid fa-user-nurse"></i>  <span>Periodos</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <a href="#"><i class="fa-solid fa-calendar"></i>  <span>Periodos</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">  
                 <li><a href="./?view=periodos/index">Ver periodos</a></li>
                   <li><a href="./?view=periodos/new">Nuevo periodo</a></li>
                 </ul>
                 </li>
                 <li class="treeview">
-                <a href="#"><i class="fa-solid fa-user-nurse"></i>  <span>Resultados</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <a href="#"><i class="fa-solid fa-timeline"></i>  <span>Reportes</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">  
-                <li><a href="./?view=reportes/index">Ver reportes</a></li>
-                  <li><a href="./?view=resultados/category-results">Resultados por categoria</a></li>
-                  <li><a href="./?view=resultados/domain-results">Resultados por dominio</a></li>
+                <li><a href="./?view=reportes/index">Reportes por empleado</a></li>
+                  <li><a href="./?view=resultados/category-results">Reportes por categoria</a></li>
+                  <li><a href="./?view=resultados/domain-results">Reportes por dominio</a></li>
 
                 </ul>
                 </li>
@@ -312,7 +311,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
         <style>
           body::after {
             content: "";
-            background-image: url("assets/background.jpeg") !important;
+            background-image: url("assets/backgroundLogin.jpeg") !important;
             background-size:  100%!important;
             background-repeat: no-repeat;
             opacity: 0.2;

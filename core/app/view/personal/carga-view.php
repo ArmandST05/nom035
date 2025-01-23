@@ -51,11 +51,12 @@
 
 <div class="card">
     <table class="table">
-        <tr><td>Fila 1</td></tr>
-        <tr><td>2. El archivo debe de pesar menos de 2 MB.</td></tr>
+        <tr><td>1.- Crear archivo .XLSX o convertir archivo en excel a .XLSX .</td></tr>
+        <tr><td>2.- El archivo debe de pesar menos de 2 MB.</td></tr>
         <tr><td>3.- Deben ser 5 encabezados y llamarse tal cual: <br> <strong>nombre</strong>, <strong>puesto</strong>,
         <strong>departamento</strong>, <strong>correo</strong>, <strong>tlefono</strong></td></tr>
-        <tr><td>Fila 4</td></tr>
+        <tr><td>4.- Enseguida podrá descargar un ejemplo del formato de carga masiva. Sustituya los campos por los datos que desea cargar, 
+                asegurese de no dejar campos en blanco y que no estén duplicados. Descargar ejemplo</td></tr>
     </table>
 
     <form id="uploadForm" enctype="multipart/form-data">

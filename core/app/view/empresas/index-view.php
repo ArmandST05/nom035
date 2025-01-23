@@ -19,8 +19,9 @@ $empresas = EmpresaData::getAll();
             <div class="col-md-8">
                 <h4>Empresas</h4>
                 <p>
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Suscipit, aliquam? In consequuntur fugiat perspiciatis cum? Beatae, iure minima cumque velit soluta nisi tenetur, quis repellendus culpa accusamus ab eius necessitatibus est veritatis reiciendis debitis fugit quibusdam et quo doloribus ut expedita illum! Amet aut corporis harum eum, iste excepturi ipsa.
-                </p>
+                Indicaciones: En este módulo podrá agregar, editar y eliminar razones sociales. Y podrá administrar a sus empleados depende a la razón social que seleccione.
+
+            </p>
             </div>
             <div class="col-md-4">
                 <div class="d-flex flex-column gap-2">
