@@ -50,6 +50,21 @@
 <body>
 
 <div class="card">
+    <div class="form-group">
+        <select name="empresa_id" id="empresa_id" class="form-control">
+            <option value="">Seleccione una empresa</option>
+            <?php 
+                $empresas = EmpresaData::getAll();
+                foreach ($empresas as $empresa) {
+                    echo '<option value="' . $empresa->id . '">' . $empresa->nombre . '</option>';
+                }
+            ?>
+        </select>
+    </div> 
+    
+    <p>
+        Si tu empresa no aparece, favor de agregarla en el apartado de <a href="index.php?view=empresas/index">empresas</a>
+    </p>
     <table class="table">
         <tr><td>1.- Crear archivo .XLSX o convertir archivo en excel a .XLSX .</td></tr>
         <tr><td>2.- El archivo debe de pesar menos de 2 MB.</td></tr>

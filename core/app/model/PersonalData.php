@@ -1,7 +1,7 @@
 <?php
 class PersonalData{
 
-    public static $tablename = "personal";
+    public static $tablename = "personaler";
     public function __construct()
     {
         $this -> name = "";
