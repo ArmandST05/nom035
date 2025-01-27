@@ -176,8 +176,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                   
                 <a href="#"><i class="fa-solid fa-calendar"></i>  <span>Periodos</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">  
-                <li><a href="./?view=periodos/index">Ver periodos</a></li>
-                  <li><a href="./?view=periodos/new">Nuevo periodo</a></li>
+                  <li><a href="./?view=periodos/index">Nuevo periodo</a></li>
                 </ul>
                 </li>
                 <li class="treeview">

@@ -1,32 +1,31 @@
 <?php
-// Comprobar si la solicitud es una petición AJAX
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Obtener los datos del formulario
-    $periodName = isset($_POST['period_name']) ? $_POST['period_name'] : '';
-    $startDate = isset($_POST['start_date']) ? $_POST['start_date'] : '';
-    $endDate = isset($_POST['end_date']) ? $_POST['end_date'] : '';
-    $status = isset($_POST['status']) ? $_POST['status'] : '';  // Agregamos el status
+// Depuración: Ver los datos recibidos
+error_log('Datos recibidos: ' . print_r($_POST, true));
 
-    // Validación básica de los datos
-    if (empty($periodName) || empty($startDate) || empty($endDate) || empty($status)) {
-        // Responder con un mensaje de error en formato JSON
-        echo json_encode(['status' => 'error', 'message' => 'Todos los campos son obligatorios.']);
-        exit;
-    }
+// Verificar si los datos necesarios están presentes en la solicitud
+if (
+    !empty($_POST['name']) &&
+    !empty($_POST['start_date']) &&
+    !empty($_POST['end_date']) &&
+    !empty($_POST['status']) &&
+    !empty($_POST['empresa_id'])
+) {
+    // Crear una nueva instancia de PeriodoData
+    $periodo = new PeriodoData();
 
-    // Crear el nuevo periodo en la base de datos
-    $sql = "INSERT INTO periods (name, start_date, end_date, status) 
-            VALUES ('$periodName', '$startDate', '$endDate', '$status')";
+    // Asignar los valores del formulario a las propiedades del objeto
+    $periodo->name = $_POST['name'];
+    $periodo->start_date = $_POST['start_date'];
+    $periodo->end_date = $_POST['end_date'];
+    $periodo->status = $_POST['status'];
+    $periodo->empresa_id = $_POST['empresa_id'];
 
-    // Ejecutar la consulta
-    $result = Executor::doit($sql);
+    // Intentar guardar el nuevo periodo
+    $periodo->add();
 
-    if ($result) {
-        // Responder con éxito en formato JSON
-        echo json_encode(['status' => 'success', 'message' => 'El periodo fue creado exitosamente.']);
-    } else {
-        // Responder con un mensaje de error en formato JSON
-        echo json_encode(['status' => 'error', 'message' => 'Hubo un error al crear el periodo.']);
-    }
+    // Enviar respuesta de éxito
+    echo json_encode(['status' => 'success', 'message' => 'Periodo agregado correctamente.']);
+} else {
+    // Si faltan datos, enviar un mensaje de error
+    echo json_encode(['status' => 'error', 'message' => 'Todos los campos son obligatorios.']);
 }
-?>

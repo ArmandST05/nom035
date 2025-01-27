@@ -1,22 +1,31 @@
 <?php
+
+// Verificar si el ID está presente en la URL y no está vacío
 if (isset($_GET['id']) && !empty($_GET['id'])) {
-    $period_id = intval($_GET['id']); // Aseguramos que el ID es un número entero
+    // Obtener el ID como un número entero
+    $period_id = intval($_GET['id']); 
+
+    // Intentar obtener el periodo desde la base de datos usando el ID
     $periodo = PeriodoData::getById($period_id);
 
     if ($periodo) {
-        // Devolver la información del periodo en formato JSON
+        // Si se encuentra el periodo, devolver la información en formato JSON
         echo json_encode([
-            "id" => $periodo->id,
-            "name" => $periodo->name,
-            "start_date" => $periodo->start_date,
-            "end_date" => $periodo->end_date,
-            "status" => $periodo->status,
+            "status" => "success", // Indicar que la operación fue exitosa
+            "data" => [
+                "id" => $periodo->id,
+                "name" => $periodo->name,
+                "start_date" => $periodo->start_date,
+                "end_date" => $periodo->end_date,
+                "status" => $periodo->status,
+                "empresa_id" => $periodo->empresa_id // Incluir más datos si es necesario
+            ]
         ]);
     } else {
-        // Mensaje de error si no se encuentra el periodo
-        echo json_encode(["error" => "No se encontró el registro."]);
+        // Si no se encuentra el periodo, devolver mensaje de error
+        echo json_encode(["status" => "error", "message" => "No se encontró el registro."]);
     }
 } else {
-    // Mensaje de error si el ID no es válido
-    echo json_encode(["error" => "ID no válido."]);
+    // Si el ID no está presente o es inválido, devolver mensaje de error
+    echo json_encode(["status" => "error", "message" => "ID no válido."]);
 }

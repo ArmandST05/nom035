@@ -8,10 +8,17 @@ class PeriodoData {
         $this->name = "";
         $this->start_date = "";
         $this->end_date = "";
-        $this->status = ""; // Puedes agregar un campo de estado (activo o inactivo)
+        $this->status = ""; 
+        $this->empresa_id = "";
     }
-
-   
+    public function add() {    
+        $sql = "INSERT INTO " . self::$tablename . " 
+                (name, start_date, end_date, status, empresa_id) 
+                VALUES (\"$this->name\", \"$this->start_date\", \"$this->end_date\", \"$this->status\", \"$this->empresa_id\")";
+        Executor::doit($sql);
+    }
+    
+    
     // Obtener un periodo por ID
     public static function getById($id) {
         $sql = "SELECT * FROM ".self::$tablename." WHERE id = '$id'";

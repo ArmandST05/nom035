@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal</title>
+    <title>Departamentos</title>
     
     <style>
         ul {
@@ -64,6 +64,10 @@
                         <div class="form-group">
                             <label for="employeeRole">Puesto</label>
                             <input type="text" class="form-control" id="employeeRole" placeholder="Ingrese el puesto">
+                        </div>
+                        <div class="form-group">
+                            <label for="employeeRole">Empresa a la que pertenece este departamento</label>
+                            <select class="form-control" name="empresa_id" id="empresa_id"></select>
                         </div>
                     </form>
                 </div>

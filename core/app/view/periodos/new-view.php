@@ -74,6 +74,7 @@ $periodos = PeriodoData::getAll();
             <th>Nombre del Periodo</th>
             <th>Fecha de Inicio</th>
             <th>Fecha de Fin</th>
+            <th>Empresa asiganda</th>
             <th>Status</th>
             <th>Acciones</th>
         </tr>
@@ -85,6 +86,7 @@ $periodos = PeriodoData::getAll();
                 <td><?php echo htmlspecialchars($periodo->name); ?></td>
                 <td><?php echo htmlspecialchars($periodo->start_date); ?></td>
                 <td><?php echo htmlspecialchars($periodo->end_date); ?></td>
+                <td><?php echo htmlspecialchars($periodo->empresa_id); ?></td>
                 <td><?php echo htmlspecialchars($periodo->status); ?></td>
                 <!-- Aquí, dentro de la tabla, agregamos el botón de editar -->
                 <td>
@@ -119,28 +121,40 @@ $periodos = PeriodoData::getAll();
                 </button>
             </div>
             <div class="modal-body">
-                <form id="nuevoPeriodoForm" action="index.php?action=periodos/add-period" method="POST">
-                    <div class="form-group">
-                        <label for="period-name">Nombre del Periodo</label>
-                        <input type="text" class="form-control" id="period-name" name="period_name" placeholder="Ingrese el nombre del periodo" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="start-date">Fecha de Inicio</label>
-                        <input type="date" id="start-date" name="start_date" class="form-control" required>
+            <form id="nuevoPeriodoForm" action="index.php?action=periodos/add-period" method="POST">
+    <div class="form-group">
+        <label for="period-name">Nombre del Periodo</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Ingrese el nombre del periodo" required>
+    </div>
+    <div class="form-group">
+        <label for="start-date">Fecha de Inicio</label>
+        <input type="date" id="start-date" name="start_date" class="form-control" required>
+    </div>
+    <div class="form-group">
+        <label for="end-date">Fecha de Fin</label>
+        <input type="date" class="form-control" id="end-date" name="end_date" required>
+    </div>
+    <div class="form-group">
+        <label for="status">Estado</label>
+        <select class="form-control" id="status" name="status" required>
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="empresa">Empresa asignada</label>
+        <select name="empresa_id" id="empresa_id" class="form-control" required>
+            <option value="">Selecciona la empresa a la que se va a asignar</option>
+            <?php
+                $empresas = EmpresaData::getAll();
+                foreach ($empresas as $empresa) {
+                    echo '<option value="' . $empresa->id . '">' . $empresa->nombre . '</option>'; 
+                }
+            ?>
+        </select>
+    </div>
+</form>
 
-                    </div>
-                    <div class="form-group">
-                        <label for="end-date">Fecha de Fin</label>
-                        <input type="date" class="form-control" id="end-date" name="end_date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="status">Estado</label>
-                        <select class="form-control" id="status" name="status" required>
-                            <option value="activo">Activo</option>
-                            <option value="inactivo">Inactivo</option>
-                        </select>
-                    </div>
-                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -231,33 +245,47 @@ function openModalEditarPeriodo() {
     $('#EditPeriodModal').modal('show');
 }
 
-// Función para enviar el formulario usando AJAX
-function submitNuevoPeriodoForm() {
-    // Recoger los datos del formulario
-    var formData = $('#nuevoPeriodoForm').serialize();
-
-    // Enviar los datos con AJAX
+// Función para obtener la lista actualizada de periodos
+function refreshPeriodosList() {
     $.ajax({
-        url: 'index.php?action=periodos/add-period', // Ruta del backend
-        type: 'POST', // Método de envío
-        data: formData, // Los datos del formulario
+        url: './?action=periodos/get-all-periods', // Ruta que devuelve la lista de periodos
+        type: 'GET', // Método de envío
         dataType: 'json', // Esperamos una respuesta JSON
         success: function(response) {
-            // Comprobar si la respuesta es exitosa
-            if (response.status == 'success') {
-                alert('Periodo creado exitosamente');
-                $('#NuevoPeriodoModal').modal('hide'); // Cerrar el modal
-                // Aquí puedes agregar código para refrescar la lista de periodos si es necesario
+            console.log('Lista de periodos actualizada:', response); // Verifica la respuesta
+            if (response.status === 'success') {
+                // Llamar a la función para actualizar la tabla con los nuevos datos
+                updatePeriodosTable(response.data);
             } else {
-                alert('Error: ' + response.message);
+                alert('Error al obtener la lista de periodos.');
             }
         },
         error: function(xhr, status, error) {
-            // Mostrar un mensaje de error en caso de fallar la solicitud
-            alert('Hubo un error al crear el periodo. Intenta de nuevo.');
+            console.error('Error de AJAX al obtener la lista de periodos:', xhr.responseText);
+            alert('Hubo un error al obtener la lista de periodos.');
         }
     });
 }
+
+// Función para actualizar la tabla de periodos con los datos recibidos
+function updatePeriodosTable(periodos) {
+    var tableBody = $('#periodosTable tbody'); // Asume que tienes una tabla con ID 'periodosTable'
+    tableBody.empty(); // Limpiar la tabla antes de agregar los nuevos registros
+
+    // Iterar sobre los periodos y agregar cada uno como una fila de la tabla
+    periodos.forEach(function(periodo) {
+        var row = '<tr>' +
+            '<td>' + periodo.name + '</td>' +
+            '<td>' + periodo.start_date + '</td>' +
+            '<td>' + periodo.end_date + '</td>' +
+            '<td>' + periodo.status + '</td>' +
+            '<td>' + periodo.empresa_nombre + '</td>' + // Asume que "empresa_nombre" es el nombre de la empresa
+            '</tr>';
+        tableBody.append(row); // Agregar la nueva fila a la tabla
+    });
+}
+
+
 // Escuchar eventos para la edición y eliminación de periodos
 $(document).ready(function () {
     // Manejar clic en los botones del menú desplegable

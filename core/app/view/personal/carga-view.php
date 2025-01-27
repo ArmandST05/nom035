@@ -77,7 +77,7 @@
     <form id="uploadForm" enctype="multipart/form-data">
         <div class="drop-zone" id="dropZone">
             Arrastra y suelta tu archivo aquí o haz clic para seleccionarlo
-            <input type="file" name="file" id="fileInput" accept=".xls,.xlsx,.csv" style="display: none;" required>
+            <input type="file" name="file" id="file" accept=".xls,.xlsx,.csv" style="display: none;" required>
         </div>
     </form>
 
@@ -86,57 +86,68 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function () {
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
+$(document).ready(function () {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('file'); // Asegúrate de que el input tenga id="fileInput"
 
-        // Abrir selector de archivo al hacer clic en el área de arrastre
-        dropZone.addEventListener('click', () => fileInput.click());
+    // Abrir selector de archivo al hacer clic en el área de arrastre
+    dropZone.addEventListener('click', () => fileInput.click());
 
-        // Cambiar estilo al arrastrar un archivo sobre el área
-        dropZone.addEventListener('dragover', (event) => {
-            event.preventDefault();
-            dropZone.classList.add('dragover');
-        });
+    // Cambiar estilo al arrastrar un archivo sobre el área
+    dropZone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropZone.classList.add('dragover');
+    });
 
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
 
-        // Manejar el archivo soltado
-        dropZone.addEventListener('drop', (event) => {
-            event.preventDefault();
-            dropZone.classList.remove('dragover');
-            const files = event.dataTransfer.files;
-            if (files.length) {
-                fileInput.files = files; // Asignar el archivo al input oculto
-                handleFileUpload();
-            }
-        });
-
-        // Manejar el envío del formulario
-        $('#uploadForm').on('submit', function (event) {
-            event.preventDefault();
+    // Manejar el archivo soltado
+    dropZone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropZone.classList.remove('dragover');
+        const files = event.dataTransfer.files;
+        if (files.length) {
+            fileInput.files = files; // Asignar el archivo al input oculto
             handleFileUpload();
-        });
-
-        function handleFileUpload() {
-            const formData = new FormData($('#uploadForm')[0]);
-            $.ajax({
-                url: './?action=personal/carga',
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    $('#response').html(response);
-                },
-                error: function () {
-                    $('#response').html('Error al subir el archivo.');
-                }
-            });
         }
     });
+
+    // Manejar el envío del formulario
+    $('#uploadForm').on('submit', function (event) {
+        event.preventDefault();
+        handleFileUpload();
+    });
+
+    function handleFileUpload() {
+        const empresaId = $('#empresa_id').val();  // Obtener el id de la empresa seleccionada
+        console.log(empresaId)
+        // Verificar que se haya seleccionado una empresa
+        if (!empresaId) {
+            $('#response').html('Por favor, selecciona una empresa.');
+            return; // Detener si no se ha seleccionado empresa
+        }
+
+        const formData = new FormData($('#uploadForm')[0]);
+        formData.append('empresa_id', empresaId);  // Agregar el id de la empresa al FormData
+
+        $.ajax({
+            url: './?action=personal/carga',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                $('#response').html(response);
+            },
+            error: function () {
+                $('#response').html('Error al subir el archivo.');
+            }
+        });
+    }
+});
+
 </script>
 
 </body>
