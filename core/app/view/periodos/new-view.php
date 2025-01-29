@@ -266,6 +266,30 @@ function refreshPeriodosList() {
         }
     });
 }
+function submitNuevoPeriodoForm() {
+    $.ajax({
+        url: './?action=periodos/add-period',
+        type: 'POST',
+        data: $('#nuevoPeriodoForm').serialize(),  // Captura los datos del formulario
+        dataType: 'json',
+        success: function(response) {
+            console.log("Todo salió bien:", response);
+            
+            // Cierra el modal
+            $('#NuevoPeriodoModal').modal('hide');
+
+            // Muestra un mensaje de éxito
+            alert('Periodo guardado correctamente');
+
+            // Opcional: recargar la página o actualizar la lista de periodos
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al guardar el periodo:', xhr.responseText);
+            alert('Hubo un error al guardar el periodo.');
+        }
+    });
+}
 
 // Función para actualizar la tabla de periodos con los datos recibidos
 function updatePeriodosTable(periodos) {
