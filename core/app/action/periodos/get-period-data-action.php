@@ -29,3 +29,4 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     // Si el ID no está presente o es inválido, devolver mensaje de error
     echo json_encode(["status" => "error", "message" => "ID no válido."]);
 }
+?>

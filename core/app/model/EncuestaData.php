@@ -39,13 +39,14 @@ class EncuestaData{
         }
         return true;
     }
-    
+    public static function getEmployeeByEmpresa($empresa_id){
+       $sql ="SELECT id, empresa_id FROM personal WHERE empresa_id = $empresa_id";
+       $query = Executor::doit($sql);
+       return Model::many($query[0], new EncuestaData());
+    }
     // Método para asignar encuestas a un empleado
     public static function assignSurveysToEmployee($personalId, $surveyIds) {
-        if (empty($surveyIds)) {
-            throw new Exception("No se proporcionaron encuestas para asignar.");
-        }
-        
+
         foreach ($surveyIds as $surveyId) {
             $surveyId = intval($surveyId); // Asegúrate de que sea un número
             $sql = "INSERT INTO personal_surveys (personal_id, survey_id, completed, assigned_at)
@@ -284,24 +285,7 @@ class EncuestaData{
         return Executor::doit($sql);
     }
 
-    /*
-    public static function getResults($personal_id, $survey_id){
-        $sql = "SELECT * FROM survey_answers 
-                INNER JOIN personal_surveys 
-                ON survey_answers.personal_id = personal_surveys.personal_id 
-                WHERE personal_surveys.completed = 1
-                AND survey_answers.personal_id = $personal_id
-                AND survey_answers.survey_id = $survey_id";
-    }
-    public static function getValueResults($personal_id, $survey_id){
-        $sql = "SELECT COUNT(*) FROM survey_answers 
-                INNER JOIN personal_surveys 
-                ON survey_answers.personal_id = personal_surveys.personal_id 
-                WHERE personal_surveys.completed = 1
-                AND survey_answers.personal_id = $personal_id
-                AND survey_answers.survey_id = $survey_id";
-    }
-                */
+  
 }
 
 ?>

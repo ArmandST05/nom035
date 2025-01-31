@@ -101,6 +101,10 @@ $periodos = PeriodoData::getAll();
                             <a href="javascript:void(0)" onclick="deletePeriod(<?php echo $periodo->id; ?>)" class="dropdown-item">
                                 Eliminar
                             </a>
+                            <a href="javascript:void(0)" onclick="openModalAssign(<?php echo $periodo->id; ?>, <?php echo $periodo->empresa_id; ?>)" class="dropdown-item">
+                                Asignar empresa
+                            </a>
+
                         </div>
                     </div>
                 </td>
@@ -153,7 +157,7 @@ $periodos = PeriodoData::getAll();
             ?>
         </select>
     </div>
-</form>
+        </form>
 
             </div>
             <div class="modal-footer">
@@ -165,41 +169,87 @@ $periodos = PeriodoData::getAll();
 </div>
 
 <!-- Modal Editar Periodo -->
-<div class="modal fade" id="EditPeriodModal" tabindex="-1" role="dialog" aria-labelledby="EditPeriodModalTitle" aria-hidden="true">
+<div class="modal fade" id="EditPeriodModal" tabindex="-1" role="dialog" aria-labelledby="EditPeriodModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="EditPeriodModalTitle">Editar Periodo</h4>
+                <h4 class="modal-title" id="EditPeriodModalLabel">Editar Periodo</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editPeriodForm" action="index.php?action=periodos/update" method="POST">
-                    <input type="hidden" id="period-id">
+                <form id="editPeriodForm">
                     <div class="form-group">
+                        <input type="hidden" id="edit-period-id" name="id">
                         <label for="edit-period-name">Nombre del Periodo</label>
-                        <input type="text" class="form-control" id="edit-period-name" required>
+                        <input type="text" class="form-control" id="edit-period-name" name="name">
                     </div>
                     <div class="form-group">
                         <label for="edit-start-date">Fecha de Inicio</label>
-                        <input type="date" class="form-control" id="edit-start-date" required>
+                        <input type="date" class="form-control" id="edit-start-date" name="start_date">
                     </div>
                     <div class="form-group">
                         <label for="edit-end-date">Fecha de Fin</label>
-                        <input type="date" class="form-control" id="edit-end-date" required>
+                        <input type="date" class="form-control" id="edit-end-date" name="end_date">
                     </div>
                     <div class="form-group">
                         <label for="edit-status">Estado</label>
-                        <select class="form-control" id="edit-status">
+                        <select class="form-control" id="edit-status" name="status">
                             <option value="activo">Activo</option>
                             <option value="inactivo">Inactivo</option>
                         </select>
                     </div>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal Asignar Encuestas y encuestas a un periodo -->
+<div class="modal fade" id="assignSurveysModal" tabindex="-1" role="dialog" aria-labelledby="assignSurveysModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="assignSurveysModal">Asignar Encuestas</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editPeriodForm" action="index.php?action=periodos/assign-survey" method="POST">
+                    <input type="hidden" id="empresa-id" name="empresa_id">
+                    <input type="hidden" id="period-id" name="period_id">
+
+                    <div class="form-group">
+                        <label for="edit-period-name">Encuestas</label>
+                        <?php
+                            // Obtener todas las encuestas desde la clase EncuestaData
+                            $encuestas = EncuestaData::getAll();
+
+                            // Verificar si hay encuestas disponibles
+                            if ($encuestas && count($encuestas) > 0) {
+                                foreach ($encuestas as $survey) {
+                                    echo '
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="surveys[]" value="' . $survey->id . '" id="survey' . $survey->id . '">
+                                        <label class="form-check-label" for="survey' . $survey->id . '">
+                                            ' . htmlspecialchars($survey->title) . ' - <small>' . htmlspecialchars($survey->description) . '</small>
+                                        </label>
+                                    </div>';
+                                }
+                            } else {
+                                echo '<p>No se encontraron encuestas disponibles.</p>';
+                            }
+                        ?>
+                    </div>
+
                     <button type="submit" class="btn btn-primary">Guardar Cambios</button>
                 </form>
             </div>
-        </div>v
+        </div>
     </div>
 </div>
 
@@ -240,6 +290,13 @@ $periodos = PeriodoData::getAll();
     // Muestra el modal de nuevo periodo
     $('#NuevoPeriodoModal').modal('show');
 }
+function openModalAssign(periodId, empresaId) {
+    document.getElementById("period-id").value = periodId;
+    document.getElementById("empresa-id").value = empresaId;  // Asigna el ID de la empresa al campo oculto
+    $('#assignSurveysModal').modal('show');
+}
+
+
 function openModalEditarPeriodo() {
     // Muestra el modal de nuevo periodo
     $('#EditPeriodModal').modal('show');
@@ -324,63 +381,75 @@ $(document).ready(function () {
     });
 });
 
-// Función para abrir el modal y cargar los datos del periodo
 function editPeriod(periodId) {
-    
+    console.log("ID enviado: ", periodId); // Verifica en consola
+
     $.ajax({
-        url: './?action=periodos/get-period-data', // Archivo que obtiene los datos del periodo
+        url: './?action=periodos/get-period-data',
         type: 'GET',
         data: { id: periodId },
         success: function(response) {
-            // Asumimos que la respuesta es un JSON con los datos del periodo
-            const data = JSON.parse(response);
-            
-            // Llenamos el modal con los datos del periodo
-            $('#period-id').val(data.id);
-            $('#edit-period-name').val(data.name);
-            $('#edit-start-date').val(data.start_date);
-            $('#edit-end-date').val(data.end_date);
-            $('#edit-status').val(data.status);
+            try {
+                const data = JSON.parse(response);
 
-            // Mostramos el modal
-            $('#EditPeriodModal').modal('show');
+                if (data.status === 'success') {
+                    console.log("Valor actual de #edit-period-id:", $('#edit-period-id').val());
+
+                    $('#edit-period-id').val(periodId);
+
+                    // Asignar valores al formulario
+                    $('#edit-period-name').val(data.data.name);
+                    $('#edit-start-date').val(data.data.start_date);
+                    $('#edit-end-date').val(data.data.end_date);
+                    $('#edit-status').val(data.data.status);
+
+                    // Mostrar el modal
+                    $('#EditPeriodModal').modal('show');
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert('Error al procesar la respuesta del servidor.');
+            }
         },
         error: function() {
-            
             alert('Error al obtener los datos del periodo.');
         }
     });
 }
 
-$('#editPeriodForm').on('submit', function(e) {
-    e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
-    const periodId = $('#period-id').val();
+
+$('#editPeriodForm').on('submit', function(e) {
+    e.preventDefault(); 
+
+    const id = $('#edit-period-id').val(); // Ahora sí se obtiene el ID
     const name = $('#edit-period-name').val();
     const startDate = $('#edit-start-date').val();
     const endDate = $('#edit-end-date').val();
     const status = $('#edit-status').val();
 
+    console.log("ID enviado en la solicitud POST:", id); // Verificar en consola
 
-    // Enviar los datos actualizados al backend usando AJAX
     $.ajax({
-        url: './?action=periodos/update', // Archivo que maneja la actualización del periodo
+        url: './?action=periodos/update',
         type: 'POST',
         data: {
-            id: periodId,
+            id: id, // Ahora el ID se enviará correctamente
             name: name,
             start_date: startDate,
             end_date: endDate,
             status: status
         },
         success: function(response) {
+            console.log("Respuesta del servidor:", response);
             try {
-                const data = JSON.parse(response); // Parsear la respuesta JSON
+                const data = JSON.parse(response);
                 if (data.status === 'success') {
                     alert('Periodo actualizado correctamente.');
-                    location.reload(); // Recargar la página para ver los cambios
+                    location.reload();
                 } else {
-                    alert(data.message); // Mostrar el mensaje de error recibido desde el backend
+                    alert(data.message);
                 }
             } catch (error) {
                 alert('Error al procesar la respuesta del servidor.');
@@ -391,6 +460,8 @@ $('#editPeriodForm').on('submit', function(e) {
         }
     });
 });
+
+
 
 </script>
 

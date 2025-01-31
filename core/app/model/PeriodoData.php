@@ -20,8 +20,8 @@ class PeriodoData {
     
     
     // Obtener un periodo por ID
-    public static function getById($id) {
-        $sql = "SELECT * FROM ".self::$tablename." WHERE id = '$id'";
+    public static function getById($period_id) {
+        $sql = "SELECT * FROM ".self::$tablename." WHERE id = '$period_id'";
         $query = Executor::doit($sql);
         return Model::one($query[0], new PeriodoData());
     }
