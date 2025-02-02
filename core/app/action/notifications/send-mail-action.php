@@ -3,12 +3,10 @@ require_once 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-    $userId = $_POST['id']; // Obtiene el ID del usuario desde el formulario
+    $userId = $_POST['id'];
 
     // Obtener la configuración
     $configuration = ConfigurationData::getAll();
-
-    // Obtener los datos del personal
     $personal = PersonalData::getById($userId);
 
     if (!$personal) {
@@ -19,11 +17,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 
     // Configurar PHPMailer
     $mail = new PHPMailer();
+    $mail->isMail(); // Usa mail() en lugar de SMTP
     $mail->Host = $configuration['name']->value;
-    $mail->From = $configuration['email']->value;
+    
+    $fromEmail = filter_var($configuration['email']->value, FILTER_VALIDATE_EMAIL);
+    if (!$fromEmail) {
+        echo json_encode(['success' => false, 'message' => 'Dirección de correo inválida en la configuración.']);
+        exit;
+    }
+
+    $mail->From = $fromEmail;
     $mail->FromName = $configuration['name']->value;
     $mail->Subject = "Tus credenciales de acceso";
-    $mail->AddAddress($personal->correo); // Dirección del destinatario
+    $mail->AddAddress($personal->correo);
 
     // Contenido del correo
     $body = "
@@ -39,8 +45,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $mail->Body = $body;
     $mail->IsHTML(true);
 
-    // Enviar correo y verificar errores
     if ($mail->Send()) {
+        // Registrar notificación en el sistema
+        $notification = new NotificationData();
+        $notification->personal_id = $personal->id;
+        $notification->type_id = 1; // Correo
+        $notification->status_id = 1; // Enviado
+        $notification->message = $body;
+        $notification->receptor = $personal->correo;
+        $notification->add();
+        
         echo json_encode(['success' => true, 'message' => 'Correo enviado exitosamente.']);
     } else {
         echo json_encode([

@@ -31,14 +31,14 @@ $encuestas = EncuestaData::getAll();
             </div>
         </div>
 </div>
-    <div class="row mb-4">
+<div class="row mb-4">
     <!-- Filtro por Departamento -->
     <div class="col-md-4">
         <div class="form-group">
             <label for="filter-department">Filtrar por Departamento:</label>
-            <select id="filter-department" class="form-control custom-select-width">
-    <option value="">Todos los departamentos</option> <!-- Opción por defecto -->
-</select>
+        <select id="filter-department" class="form-control custom-select-width">
+            <option value="">Todos los departamentos</option> <!-- Opción por defecto -->
+        </select>
 
         </div>
     </div>
@@ -208,55 +208,55 @@ $encuestas = EncuestaData::getAll();
         <label for="editEmployeePhone">Teléfono</label>
         <input type="text" class="form-control" id="editEmployeePhone" placeholder="Ingrese el teléfono (Opcional)">
     </div>
-</form>
+            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" onclick="updatePersonal()">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="updatePersonal()">Guardar Cambios</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal fade" id="assignSurveyModal" tabindex="-1" aria-labelledby="assignSurveyModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="EditPersonalModalTitle">Asignar Encuesta</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="assignSurveyForm" method="POST" action="index.php?action=personal/process-survey"> <!-- Aquí va la acción a la que envías el formulario -->
-                    <!-- Campo oculto para el ID del empleado -->
-                    <input type="hidden" id="employeeId" name="employeeId" value="">
-                    
-                    <!-- Lista de encuestas (se genera dinámicamente con PHP) -->
-                    <?php
-                    // Obtener todas las encuestas desde la clase EncuestaData
-                    $encuestas = EncuestaData::getAll();
+            <div class="modal fade" id="assignSurveyModal" tabindex="-1" aria-labelledby="assignSurveyModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="EditPersonalModalTitle">Asignar Encuesta</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="assignSurveyForm" method="POST" action="index.php?action=personal/process-survey"> <!-- Aquí va la acción a la que envías el formulario -->
+                                <!-- Campo oculto para el ID del empleado -->
+                                <input type="hidden" id="employeeId" name="employeeId" value="">
+                                
+                                <!-- Lista de encuestas (se genera dinámicamente con PHP) -->
+                                <?php
+                                // Obtener todas las encuestas desde la clase EncuestaData
+                                $encuestas = EncuestaData::getAll();
 
-                    // Verificar si hay encuestas disponibles
-                    if ($encuestas && count($encuestas) > 0) {
-                        foreach ($encuestas as $survey) {
-                            echo '
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="surveys[]" value="' . $survey->id . '" id="survey' . $survey->id . '">
-                                <label class="form-check-label" for="survey' . $survey->id . '">
-                                    ' . htmlspecialchars($survey->title) . ' - <small>' . htmlspecialchars($survey->description) . '</small>
-                                </label>
-                            </div>';
-                        }
-                    } else {
-                        echo '<p>No se encontraron encuestas disponibles.</p>';
-                    }
-                    ?>
+                                // Verificar si hay encuestas disponibles
+                                if ($encuestas && count($encuestas) > 0) {
+                                    foreach ($encuestas as $survey) {
+                                        echo '
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="surveys[]" value="' . $survey->id . '" id="survey' . $survey->id . '">
+                                            <label class="form-check-label" for="survey' . $survey->id . '">
+                                                ' . htmlspecialchars($survey->title) . ' - <small>' . htmlspecialchars($survey->description) . '</small>
+                                            </label>
+                                        </div>';
+                                    }
+                                } else {
+                                    echo '<p>No se encontraron encuestas disponibles.</p>';
+                                }
+                                ?>
 
-                    <button type="submit" class="btn btn-primary mt-3">Asignar</button>
-                </form>
-            </div>
-        </div>
-    </div>
+                                <button type="submit" class="btn btn-primary mt-3">Asignar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 </div>
 
 

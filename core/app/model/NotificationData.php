@@ -9,32 +9,26 @@ class NotificationData
 	public static $tablenameSmsPurchases = "sms_purchases";
 	public static $tablenameDefaultMessages = "default_messages";
 
-	public $patient_id;
-	public $reservation_id;
+	public $personal_id;
 	public $type_id;
-	public $direction_id;
 	public $status_id;
-	public $module_id;
 	public $receptor;
 	public $message;
 
 	//Tipos de notificaciones: CORREO ELECTRÓNICO (1), SMS (2)
 	public function __construct()
 	{
-		$this->patient_id = "";
-		$this->reservation_id = "";
+		$this->personal_id = "";
 		$this->type_id = "";
-		$this->direction_id = "";
 		$this->status_id = "";
-		$this->module_id = "";
 		$this->receptor = "";
 		$this->message = "";
 	}
 
 	public function add()
 	{
-		$sql = "INSERT INTO " . self::$tablename . " (patient_id,reservation_id,type_id,direction_id,status_id,module_id,receptor,message) ";
-		$sql .= "value (\"$this->patient_id\",\"$this->reservation_id\",\"$this->type_id\",\"$this->direction_id\",$this->status_id,\"$this->module_id\",\"$this->receptor\",\"$this->message\")";
+		$sql = "INSERT INTO " . self::$tablename . " (personal_id,type_id,status_id,receptor,message) ";
+		$sql .= "value (\"$this->personal_id\",\"$this->type_id\",$this->status_id,\"$this->receptor\",\"$this->message\")";
 		Executor::doit($sql);
 	}
 
