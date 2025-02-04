@@ -15,24 +15,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         exit;
     }
 
-    // Configurar PHPMailer
-    $mail = new PHPMailer();
-    $mail->isMail(); // Usa mail() en lugar de SMTP
-    $mail->Host = $configuration['name']->value;
-    
-    $fromEmail = filter_var($configuration['email']->value, FILTER_VALIDATE_EMAIL);
-    if (!$fromEmail) {
+    // Validar correo del remitente
+    $fromEmail = $configuration['email']->value;
+    if (!filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
         echo json_encode(['success' => false, 'message' => 'Dirección de correo inválida en la configuración.']);
         exit;
     }
 
+    // Configurar PHPMailer
+    $mail = new PHPMailer();
+    $mail->isMail(); // Usa mail() en lugar de SMTP
     $mail->From = $fromEmail;
     $mail->FromName = $configuration['name']->value;
     $mail->Subject = "Tus credenciales de acceso";
     $mail->AddAddress($personal->correo);
+    $mail->CharSet = 'UTF-8';
+    $mail->IsHTML(true);
 
     // Contenido del correo
-    $body = "
+    $mail->Body = "
         <p>Hola <b>{$personal->nombre}</b>,</p>
         <p>Estas son tus credenciales de acceso:</p>
         <ul>
@@ -42,25 +43,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         <p>Por favor, guarda esta información de manera segura.</p>
         <p>Saludos cordiales,<br>Equipo de {$configuration['name']->value}</p>
     ";
-    $mail->Body = $body;
-    $mail->IsHTML(true);
 
+    // Enviar correo y manejar la respuesta
     if ($mail->Send()) {
         // Registrar notificación en el sistema
         $notification = new NotificationData();
         $notification->personal_id = $personal->id;
         $notification->type_id = 1; // Correo
         $notification->status_id = 1; // Enviado
-        $notification->message = $body;
+        $notification->message = $mail->Body;
         $notification->receptor = $personal->correo;
         $notification->add();
-        
+
         echo json_encode(['success' => true, 'message' => 'Correo enviado exitosamente.']);
     } else {
         echo json_encode([
             'success' => false,
             'message' => 'No se pudo enviar el correo.',
-            'errors' => [$mail->ErrorInfo]
+            'error' => $mail->ErrorInfo
         ]);
     }
 } else {
