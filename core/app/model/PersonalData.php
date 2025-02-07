@@ -58,9 +58,17 @@ class PersonalData{
         }
     }
     public static function getByRole($role_id) {
-        $sql = "SELECT * FROM personal WHERE id_puesto = $role_id";
+        // Obtener los datos del personal con el nombre del puesto mediante INNER JOIN
+        $sql = "SELECT personal.id, personal.nombre, personal.id_puesto, personal.id_departamento, personal.fecha_alta, personal.telefono, 
+                       puestos.nombre AS puesto_nombre
+                FROM ".self::$tablename." 
+                INNER JOIN puestos ON personal.id_puesto = puestos.id
+                WHERE personal.id = '$role_id'";
+    
         $query = Executor::doit($sql);
-        return Model::many($query[0], new PersonalData());
+        $personal = Model::one($query[0], new PersonalData());
+    
+        return $personal;
     }
     
 
@@ -69,7 +77,7 @@ class PersonalData{
         $query = Executor::doit($sql);
         return Model::many($query[0], new PersonalData()); // Suponiendo que PersonalData es el modelo para los empleados
     }
-
+   
 }
 
 

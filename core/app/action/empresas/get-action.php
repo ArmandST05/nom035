@@ -2,18 +2,18 @@
 // Validar si el parámetro `id` está presente en la solicitud
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     // Convertir el ID a un entero para mayor seguridad
-    $idPuesto = intval($_GET['id']);
+    $idEmpresa = intval($_GET['id']);
     
     // Obtener el puesto correspondiente utilizando la clase de datos (PuestoData)
-    $puesto = PuestoData::getById($idPuesto);
+    $empresa = EmpresaData::getById($idEmpresa);
 
-    if ($puesto) {
+    if ($empresa) {
         // Si se encuentra el puesto, devolver sus datos como JSON
         echo json_encode([
-            "id" => $puesto->id,
-            "nombre" => $puesto->nombre,
-            "id_departamento" => $puesto->id_departamento,
-            "id_encuesta" => $puesto->id_encuesta
+            "id" => $empresa->id,
+            "nombre" => $empresa->nombre,
+            "comentarios" => $empresa->comentarios,
+            "id_cantidad" => $empresa->id_cantidad
         ]);
     } else {
         // Si no se encuentra el registro, devolver un mensaje de error

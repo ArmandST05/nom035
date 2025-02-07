@@ -105,7 +105,7 @@ $encuestas = EncuestaData::getAll();
                     <form id="addPersonal" action="index.php?action=personal/add" method="POST"> 
                         <div class="form-group">
                             <label for="employeeName">Nombre del Personal</label>
-                            <input type="text" class="form-control" id="employeeName" placeholder="Ingrese el nombre">
+                            <input type="text" class="form-control" id="employeeName" placeholder="Ingrese el nombre" required>
                         </div>
                         <div class="form-group">
                             <label for="employeeEmail">Correo Electrónico</label>
@@ -185,7 +185,18 @@ $encuestas = EncuestaData::getAll();
     </div>
     <div class="form-group">
         <label for="editEmployeeRole">Puesto</label>
-        <input type="text" class="form-control" id="editEmployeeRole" placeholder="Ingrese el puesto">
+        <select class="form-control" id="editEmployeeRole" >
+                 <option value="">Seleccione un puesto</option>
+                                <?php
+                                    $puestos = PuestoData::getAll();
+                                    foreach ($puestos as $puesto) {
+                                        echo "<option value='{$puesto->id}'>{$puesto->nombre}</option>";
+
+                                    }
+
+
+                                ?>                  
+        </select>
     </div>
     <div class="form-group">
         <label for="editEmployeeDepartment">Departamento</label>
@@ -373,7 +384,7 @@ function editPersonal(personalId) {
                 // Asignar los valores recibidos a los campos del formulario
                 $('#editEmployeeName').val(response.nombre);
                 $('#editEmployeeEmail').val(response.correo);
-                $('#editEmployeeRole').val(response.id_puesto);
+                $('#editEmployeeRole').val(response.id_puesto); // Selecciona el puesto por su ID
                 $('#editEmployeeDepartment').val(response.id_departamento);
                 $('#editEmployeeDate').val(response.fecha_alta);
                 $('#editEmployeePhone').val(response.telefono);
@@ -552,32 +563,53 @@ function sendMail(userId) {
         }
     });
 }
-function sendWhatsapp(userId) {
-    // Verifica que userId sea válido
-    if (!userId) {
-        alert("Por favor, proporciona un ID de usuario válido.");
-        return;
-    }
 
+
+function sendWhatsapp(userId) {
     $.ajax({
-        url: './?action=notifications/send-whatsapp', // Ruta al controlador
-        type: 'POST',
-        data: { id: userId }, // Envía el ID del usuario
-        dataType: 'json',
+        type: "POST",
+        url: "./?action=notifications/send-whatsapp",  // El archivo PHP que has creado
+        data: {
+            id: userId  // Enviar el ID del usuario al backend
+        },
+        dataType: "json",  // Especificamos que la respuesta debe interpretarse como JSON
         success: function(response) {
-            if (response.success) {
-                // Abre el enlace de WhatsApp en una nueva pestaña
-                window.open(response.whatsappLink, '_blank');
+            console.log("userId:", userId);
+            console.log("Respuesta del servidor:", response);  
+
+            // Si response llega como string, parsearlo a objeto
+            if (typeof response === "string") {
+                response = JSON.parse(response);
+            }
+
+            console.log("Datos obtenidos correctamente:", response);
+
+            if (response && response.success) {
+                var usuario = response.usuario || "No disponible";
+                var clave = response.clave || "No disponible";
+                var telefono = response.telefono || "No disponible";
+
+                var message = "Hola, aquí tienes tus credenciales de acceso al sistema:\n";
+                message += "Usuario: " + usuario + "\n";
+                message += "Clave: " + clave + "\n";
+               
+
+                var receptor = telefono.replace(/\s+/g, '');  
+                console.log("Receptor:", receptor);
+
+                // Enviar el mensaje por WhatsApp
+                window.open("https://api.whatsapp.com/send/?phone=52" + receptor + "&text=" + encodeURIComponent(message) + "&type=phone_number&app_absent=0");
             } else {
-                alert(response.message || "Error al generar el enlace de WhatsApp.");
+                console.error("Error en la obtención de credenciales:", response.message || "Respuesta inesperada");
             }
         },
         error: function(xhr, status, error) {
             console.error("Error en la solicitud AJAX:", xhr.responseText);
-            alert("Ha ocurrido un error al intentar enviar el mensaje por WhatsApp.");
         }
     });
 }
+
+
 
 
 

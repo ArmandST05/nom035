@@ -1,7 +1,6 @@
 <?php
 
 $cantidadEmpleados = EmpresaData::getCantidades();
-
 $empresas = EmpresaData::getAll();
 ?>
 
@@ -14,24 +13,23 @@ $empresas = EmpresaData::getAll();
     <link rel="stylesheet" href="path_to_bootstrap.css"> <!-- Asegúrate de que la hoja de estilos de Bootstrap esté incluida -->
 </head>
 <body>
-    <div class="container mt-4"> <!-- Asegúrate de usar la clase container para que todo quede dentro del contenedor de Bootstrap -->
+    <div class="container mt-4">
         <div class="row">
             <div class="col-md-8">
                 <h4>Empresas</h4>
                 <p>
-                Indicaciones: En este módulo podrá agregar, editar y eliminar razones sociales. Y podrá administrar a sus empleados depende a la razón social que seleccione.
-
-            </p>
+                    Indicaciones: En este módulo podrá agregar, editar y eliminar razones sociales. Y podrá administrar a sus empleados depende a la razón social que seleccione.
+                </p>
             </div>
             <div class="col-md-4">
                 <div class="d-flex flex-column gap-2">
-                    <button type="button" class="btn btn-primary" onclick="openModalAddPuesto()">Nueva razón socal</button>
+                    <button type="button" class="btn btn-primary" onclick="openModalAddPuesto()">Nueva razón social</button>
                 </div>
             </div>
         </div>
 
         <!-- Card with table -->
-        <div class="card mt-4" style="width: 90%; margin: auto; margin-top: 20px;"> <!-- Agregar mt-4 para dar un margen superior -->
+        <div class="card mt-4" style="width: 90%; margin: auto; margin-top: 20px;">
             <div class="card-body">
                 <table class="table table-striped table-hover">
                     <thead style="background-color: grey; color: white;">
@@ -45,22 +43,22 @@ $empresas = EmpresaData::getAll();
                     </thead>
                     <tbody>
                         <?php 
-                            if(!empty($empresas)){
-                                $index= 1;
-                                foreach ($empresas as $empresa) {
-                                    echo "<tr>";
-                                    echo "<td>{$index}</td>";
-                                    echo "<td>{$empresa->nombre}</td>";
-                                    echo "<td>{$empresa->id_cantidad}</td>";
-                                    echo "<td>{$empresa->comentarios}</td>";
-                                    echo "<td>
-                                            <button class='btn btn-primary btn-sm' onclick='editPersonal({$empresa->id})'>Editar</button>
-                                            <button class='btn btn-danger btn-sm' onclick='deletePersonal({$empresa->id})'>Eliminar</button>
-                                          </td>";
-                                    echo "</tr>";
-                                    $index++;
-                                }
+                        if (!empty($empresas)) {
+                            $index = 1;
+                            foreach ($empresas as $empresa) {
+                                echo "<tr>";
+                                echo "<td>{$index}</td>";
+                                echo "<td>{$empresa->nombre}</td>";
+                                echo "<td>{$empresa->cantidad_descripcion}</td>"; // Se muestra el nombre en vez del ID
+                                echo "<td>{$empresa->comentarios}</td>";
+                                echo "<td>
+                                        <button class='btn btn-primary btn-sm' onclick='editEmpresa({$empresa->id})'>Editar</button>
+                                        <button class='btn btn-danger btn-sm' onclick='deleteEmpresa({$empresa->id}, \"{$empresa->nombre}\")'>Eliminar</button>
+                                      </td>";
+                                echo "</tr>";
+                                $index++;
                             }
+                        }
                         ?>
                     </tbody>
                 </table>
@@ -68,9 +66,11 @@ $empresas = EmpresaData::getAll();
         </div>
 
     </div>
+</body>
+</html>
 
     <!-- Modal for adding new puesto -->
-    <div class="modal fade" id="PuestoModal" tabindex="-1" role="dialog" aria-labelledby="PuestoModalTitle" aria-hidden="true">
+    <div class="modal fade" id="EmpresaModal" tabindex="-1" role="dialog" aria-labelledby="EmpresaModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -84,15 +84,15 @@ $empresas = EmpresaData::getAll();
                     <form id="addPuesto" action="index.php?action=empresas/add" method="POST"> 
                         <div class="form-group">
                             <label for="razonNombre">Nombre de la razón social</label>
-                            <input type="text" class="form-control" name="id_nombre" id="id_nombre" placeholder="Razón social">
+                            <input type="text" class="form-control" name="id_nombre" id="id_nombre" placeholder="Razón social" required>
                         </div>
                         <div class="form-group">
                             <label for="razonComentarios">Comentarios: </label>
-                            <textarea name="id_comentarios" id="id_comentarios" class="form-control" placeholder="Comentarios o descripción de la razón social" rows="4"></textarea>
+                            <textarea name="id_comentarios" id="id_comentarios" class="form-control" placeholder="Comentarios o descripción de la razón social" rows="4" required></textarea>
                         </div>
                         <div class="form-group">
                             <label for="razonCantidad">Número de empleados</label>
-                            <select class="form-control" name="id_cantidad" id="id_cantidad">
+                            <select class="form-control" name="id_cantidad" id="id_cantidad" required>
                                 <option value="">Seleccione una cantidad</option>
                                 <?php 
                                     if(!empty($cantidadEmpleados)){
@@ -113,6 +113,55 @@ $empresas = EmpresaData::getAll();
         </div>
     </div>
 
+
+
+
+
+
+    <div class="modal fade" id="EditEmpresaModal" tabindex="-1" role="dialog" aria-labelledby="EditEmpresaModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">Editar razón social</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario para editar la empresa -->
+                <form id="editPuesto" action="index.php?action=empresas/edit" method="POST">
+                    <input type="hidden" name="id" id="edit_id">
+                    <div class="form-group">
+                        <label for="editRazonNombre">Nombre de la razón social</label>
+                        <input type="text" class="form-control" name="id_nombre" id="edit_id_nombre" placeholder="Razón social" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editRazonComentarios">Comentarios: </label>
+                        <textarea name="id_comentarios" id="edit_id_comentarios" class="form-control" placeholder="Comentarios o descripción de la razón social" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editRazonCantidad">Número de empleados</label>
+                        <select class="form-control" name="id_cantidad" id="edit_id_cantidad" required>
+                            <option value="">Seleccione una cantidad</option>
+                            <?php 
+                                if (!empty($cantidadEmpleados)) {
+                                    foreach ($cantidadEmpleados as $cantidad) {
+                                        echo "<option value='{$cantidad->id}'>{$cantidad->descripcion}</option>";
+                                    }
+                                }
+                            ?>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="savePersonalBtn" class="btn btn-primary" onclick="updateEmpresa()">Guardar cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+                                
     <script>
         function openModalAddPuesto() {
             $('#PuestoModal').modal('show');
@@ -145,6 +194,99 @@ $empresas = EmpresaData::getAll();
                 alert("Este personal ya existe.");
             }
         }
+        function editEmpresa(id) {
+    $.ajax({
+        url: "./?action=empresas/get&id=" + id, // Asegúrate de que esta URL sea correcta
+        type: "GET",
+        dataType: "json", // Asegura que el JSON se procese correctamente
+        success: function(response) {
+            try {
+                // Verificar que los datos sean válidos antes de asignarlos
+                if (response && response.id && response.nombre && response.comentarios !== undefined && response.id_cantidad !== undefined) {
+                    $('#edit_id').val(response.id);
+                    $('#edit_id_nombre').val(response.nombre);
+                    $('#edit_id_comentarios').val(response.comentarios);
+                    $('#edit_id_cantidad').val(response.id_cantidad);
+
+                    $('#EditEmpresaModal').modal('show'); // Mostrar el modal
+                } else {
+                    alert("Error: No se pudieron cargar los datos de la empresa.");
+                }
+            } catch (e) {
+                alert("Error inesperado al procesar los datos.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error en la petición AJAX:", error);
+            alert("Hubo un error al obtener los datos de la empresa.");
+        }
+    });
+}
+function updateEmpresa() {
+    var empresaData = {
+        id: $("#edit_id").val(),
+        id_nombre: $("#edit_id_nombre").val(),
+        id_comentarios: $("#edit_id_comentarios").val(),
+        id_cantidad: $("#edit_id_cantidad").val()
+    };
+
+    // 🔹 Verificar si los campos están vacíos antes de enviar la petición
+    if (!empresaData.id || !empresaData.id_nombre || !empresaData.id_cantidad) {
+        alert("Todos los campos son obligatorios.");
+        return;
+    }
+
+    console.log("Enviando datos al servidor:", empresaData); // 🛠️ Debug 1: Mostrar datos antes de enviarlos
+
+    $.ajax({
+        url: "./?action=empresas/update", // 🔹 Verifica que esta URL sea correcta
+        type: "POST",
+        data: empresaData,
+        success: function(response) {
+            console.log("Respuesta del servidor:", response); // 🛠️ Debug 2: Ver respuesta del backend
+
+            try {
+                if (response.trim() === "success") {
+                    alert("✅ Empresa actualizada correctamente.");
+                    $('#EditEmpresaModal').modal('hide'); // 🔹 Cerrar el modal
+                    location.reload(); // 🔹 Recargar la página para ver los cambios
+                } else {
+                    alert("❌ Error: No se pudo actualizar la empresa. Respuesta del servidor: " + response);
+                }
+            } catch (e) {
+                console.error("❌ Error inesperado al procesar la respuesta:", e);
+                alert("⚠️ Error inesperado al procesar la respuesta.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("❌ Error en la petición AJAX:", status, error, xhr.responseText); // 🛠️ Debug 3: Mostrar error detallado
+            alert("⚠️ Hubo un error al actualizar los datos de la empresa.");
+        }
+    });
+}
+
+
+
+function deleteEmpresa(id, nombre) {
+    const swalWithBootstrapButtons = Swal.mixin({
+        buttonsStyling: true
+    });
+
+    swalWithBootstrapButtons.fire({
+        title: '¿Estás seguro de eliminar la empresa ' + nombre + '?',
+        text: "¡No podrás revertirlo!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminarlo',
+        cancelButtonText: '¡No, cancelarlo!',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.value === true) {
+            window.location.href = "index.php?action=empresas/delete&id=" + id + "&nombre=" + nombre;
+        }
+    });
+}
+
     </script>
 
 </body>

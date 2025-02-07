@@ -1,22 +1,23 @@
 <?php
-if (count($_POST) > 0) {
-    // Obtener el registro del puesto por ID
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!isset($_POST["id"]) || empty($_POST["id"])) {
+        die("Error: ID del puesto no recibido.");
+    }
+
     $puesto = PuestoData::getById($_POST["id"]);
 
-    if ($puesto) {
-        // Actualizar los campos del puesto con los datos del formulario
-        $puesto->nombre = $_POST["nombre"];
-        $puesto->id_departamento = $_POST["id_departamento"];
+    if (!$puesto) {
+        die("Error: No se encontró el puesto.");
+    }
 
-        // Guardar los cambios en la base de datos
-        $puesto->update(); // Método para actualizar en la base de datos
+    $puesto->nombre = $_POST["nombre"];
+    $puesto->id_departamento = $_POST["id_departamento"];
+    $puesto->id_encuesta = $_POST["id_encuesta"];
 
-        // Redirigir al índice de puestos
-        print "<script>window.location='index.php?view=puestos/index';</script>";
+    if ($puesto->update()) {
+        echo "Puesto actualizado correctamente.";
     } else {
-        // Si no se encuentra el puesto, mostrar un mensaje de error
-        echo "<script>alert('Error: No se encontró el puesto a actualizar.');</script>";
-        print "<script>window.location='index.php?view=puestos/index';</script>";
+        die("Error: Falló la actualización en la base de datos.");
     }
 }
 ?>

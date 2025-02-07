@@ -32,12 +32,13 @@ class PuestoData{
         $query = Executor::doit($sql);
         return Model::many($query[0], new DepartamentoData());
     }
-    public static function getById($id){
-        $sql = "SELECT * FROM " . self::$tablename . " WHERE id = '$id'";
+    public static function getById($idPuesto){
+        $id = intval($idPuesto); // Asegurar que sea un número entero
+        $sql = "SELECT * FROM " . self::$tablename . " WHERE id = $idPuesto";
         $query = Executor::doit($sql);
-    
         return Model::one($query[0], new PuestoData());
     }
+    
     public static function delete($id) {
         // Elimina el puesto por el ID
         $sql = "DELETE FROM puestos WHERE id = $id";
@@ -47,6 +48,21 @@ class PuestoData{
         $sql = "SELECT * FROM puestos WHERE id_departamento = $id_departamento";
         $query = Executor::doit($sql);
         return Model::many($query[0], new PuestoData());
+    }
+    public function update() {
+        try {
+            $sql = "UPDATE " . self::$tablename . " 
+                    SET 
+                        nombre = \"$this->nombre\",
+                        id_departamento = \"$this->id_departamento\",
+                        id_encuesta = \"$this->id_encuesta\"
+                    WHERE id = $this->id";
+    
+            Executor::doit($sql);
+            return true; // Si la actualización es exitosa.
+        } catch (Exception $e) {
+            return false; // En caso de error.
+        }
     }
     
 }

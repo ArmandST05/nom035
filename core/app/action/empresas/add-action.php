@@ -7,23 +7,10 @@ if (count($_POST) > 0) {
     $newEmpresa -> id_cantidad= $_POST["id_cantidad"];
 
 
-    try {
         $result = $newEmpresa->add(); // Guarda en la base de datos
-
-        if ($result) {
-            echo json_encode(["success" => true, "message" => "Puesto agregado con éxito."]);
-        } else {
-            http_response_code(500);
-            echo json_encode(["error" => "Error al agregar el puesto en la base de datos."]);
-        }
-    } catch (Exception $e) {
-        http_response_code(500);
-        echo json_encode(["error" => $e->getMessage()]);
-    }
-} else {
-    http_response_code(400);
-    echo json_encode(["error" => "No se recibieron datos."]);
-}
+        Core::alert("¡Empresa agregada exitosamente!");
+        print "<script>window.location='index.php?view=empresas/index';</script>";
+}        
 
 
 

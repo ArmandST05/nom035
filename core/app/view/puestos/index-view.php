@@ -283,7 +283,7 @@ function assignSurveyForRole(puestoId, puestoNombre) {
                                 <?php 
                                     if(!empty($encuestas)){
                                         foreach($encuestas as $encuesta){
-                                            echo "<option value='{$encuesta->id}'>{$encuesta->descripcion}</option>";
+                                            echo "<option value='{$encuesta->id}'>{$encuesta->title}</option>";
                                         }
                                     }
                                 ?>
@@ -332,21 +332,25 @@ function assignSurveyForRole(puestoId, puestoNombre) {
 
     </script>
 <!-- Modal para editar puesto -->
+
 <div class="modal fade" id="EditPuestoModal" tabindex="-1" role="dialog" aria-labelledby="EditPuestoModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="EditPuestoModalLabel">Editar Puesto</h5>
+                <input type="hidden" id="editPuestoId" name="id">
+
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editPuestoForm" action="index.php?action=puestos/update" method="POST">
+                <form id="editPuestoForm">
                     <div class="form-group">
                         <label for="editRoleName">Nombre del Puesto</label>
-                        <input type="text" class="form-control" id="editRoleName" name="nombre" placeholder="Ingrese el nombre" required>
+                        <input type="text" class="form-control" id="editRoleName" name="nombre" required>
                     </div>
+                    
                     <div class="form-group">
                         <label for="editRoleDepartment">Departamento</label>
                         <select class="form-control" id="editRoleDepartment" name="id_departamento" required>
@@ -360,19 +364,23 @@ function assignSurveyForRole(puestoId, puestoNombre) {
                             ?>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label for="editRoleEncuesta">Encuesta</label>
                         <select class="form-control" id="editRoleEncuesta" name="id_encuesta">
-                            <option value="">Seleccione una encuesta</option>
+                            <option value="">Seleccione una encuesta</option> <!-- Opción por defecto -->
+
                             <?php 
-                                if (!empty($encuestas)) {
-                                    foreach ($encuestas as $encuesta) {
-                                        echo "<option value='{$encuesta->id}'>{$encuesta->descripcion}</option>";
-                                    }
+                            if (!empty($encuestas) && is_array($encuestas)) {
+                                foreach ($encuestas as $encuesta) {
+                                    echo "<option value='{$encuesta->id}'>{$encuesta->title}</option>";
                                 }
+                            } 
                             ?>
                         </select>
                     </div>
+
+
                 </form>
             </div>
             <div class="modal-footer">
@@ -384,31 +392,43 @@ function assignSurveyForRole(puestoId, puestoNombre) {
 </div>
 
 <script>
-    // Función para mostrar el modal de edición
-    function editPuesto(id) {
-        $.ajax({
-            url: "./?action=puestos/get&id=" + id,
-            type: "GET",
-            success: function(response) {
-                try {
-                    let data = response;
-                    $('#editRoleName').val(data.nombre);
-                    $('#editRoleDepartment').val(data.id_departamento);
-                    $('#editRoleEncuesta').val(data.id_encuesta);
-                    $('#EditPuestoModal').modal('show');
-                } catch (e) {
-                    console.error("Error al procesar los datos del puesto:", e);
+function editPuesto(id) {
+    $.ajax({
+        url: "./?action=puestos/get&id=" + id,
+        type: "GET",
+        dataType: "json", // Asegura que el JSON se procese correctamente
+        success: function(response) {
+            try {
+
+                // Verificar que los datos sean válidos antes de asignarlos
+               
+                if (response && response.nombre && response.id_departamento !== undefined && response.id_encuesta !== undefined) {
+                    $('#editPuestoId').val(response.id);
+                    $('#editRoleName').val(response.nombre);
+                    $('#editRoleDepartment').val(response.id_departamento);
+                    $('#editRoleEncuesta').val(response.id_encuesta);
+                    $('#EditPuestoModal').modal('show'); // Mostrar el modal
+                } else {
+                    
+                    alert("Error: No se pudieron cargar los datos del puesto.");
                 }
-            },
-            error: function(xhr, status, error) {
-                alert("Hubo un error al obtener los datos del puesto.");
+            } catch (e) {
+                alert("Error inesperado al procesar los datos.");
             }
-        });
-    }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error en la petición AJAX:", error);
+            alert("Hubo un error al obtener los datos del puesto.");
+        }
+    });
+}
+
+
 
     // Función para actualizar el puesto
     function updatePuesto() {
         var updatedPositionData = {
+            "id": $("#editPuestoId").val(),
             "nombre": $('#editRoleName').val(),
             "id_departamento": $('#editRoleDepartment').val(),
             "id_encuesta": $('#editRoleEncuesta').val()
@@ -419,12 +439,10 @@ function assignSurveyForRole(puestoId, puestoNombre) {
             type: 'POST',
             data: updatedPositionData,
             success: function(response) {
-                if (response.success) {
+               
                     alert("Puesto actualizado correctamente.");
                     window.location.reload(); 
-                } else {
-                    alert("Error al actualizar los datos del puesto.");
-                }
+                
             },
             error: function() {
                 alert("Hubo un error al actualizar los datos del puesto.");
