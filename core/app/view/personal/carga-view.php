@@ -87,50 +87,70 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function () {
+    console.log("Documento listo.");
+
     const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('file'); // Asegúrate de que el input tenga id="fileInput"
+    const fileInput = document.getElementById('file');
 
-    // Abrir selector de archivo al hacer clic en el área de arrastre
-    dropZone.addEventListener('click', () => fileInput.click());
+    if (!dropZone) {
+        console.error("Elemento #dropZone no encontrado.");
+    }
+    if (!fileInput) {
+        console.error("Elemento #file no encontrado.");
+    }
 
-    // Cambiar estilo al arrastrar un archivo sobre el área
+    dropZone.addEventListener('click', () => {
+        console.log("Área de dropZone clickeada.");
+        fileInput.click();
+    });
+
     dropZone.addEventListener('dragover', (event) => {
         event.preventDefault();
         dropZone.classList.add('dragover');
+        console.log("Archivo arrastrado sobre dropZone.");
     });
 
     dropZone.addEventListener('dragleave', () => {
         dropZone.classList.remove('dragover');
+        console.log("Archivo salió del dropZone.");
     });
 
-    // Manejar el archivo soltado
     dropZone.addEventListener('drop', (event) => {
         event.preventDefault();
         dropZone.classList.remove('dragover');
+
         const files = event.dataTransfer.files;
+        console.log("Archivo soltado:", files);
+
         if (files.length) {
-            fileInput.files = files; // Asignar el archivo al input oculto
+            fileInput.files = files;
             handleFileUpload();
         }
     });
 
-    // Manejar el envío del formulario
     $('#uploadForm').on('submit', function (event) {
         event.preventDefault();
+        console.log("Formulario enviado.");
         handleFileUpload();
     });
 
     function handleFileUpload() {
-        const empresaId = $('#empresa_id').val();  // Obtener el id de la empresa seleccionada
-        console.log(empresaId)
-        // Verificar que se haya seleccionado una empresa
+        const empresaId = $('#empresa_id').val();
+        console.log("Empresa seleccionada:", empresaId);
+
         if (!empresaId) {
+            console.warn("No se ha seleccionado una empresa.");
             $('#response').html('Por favor, selecciona una empresa.');
-            return; // Detener si no se ha seleccionado empresa
+            return;
         }
 
         const formData = new FormData($('#uploadForm')[0]);
-        formData.append('empresa_id', empresaId);  // Agregar el id de la empresa al FormData
+        formData.append('empresa_id', empresaId);
+
+        formData.forEach((value, key) => {
+    console.log(`${key}:`, value);
+});
+
 
         $.ajax({
             url: './?action=personal/carga',
@@ -139,11 +159,21 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             success: function (response) {
+                console.log("Respuesta del servidor:", response);
                 $('#response').html(response);
             },
-            error: function () {
-                $('#response').html('Error al subir el archivo.');
-            }
+            error: function (xhr, status, error) {
+            console.error("Error en AJAX:");
+            console.error("Estado:", status);
+            console.error("Error:", error);
+            console.error("Código de estado:", xhr.status);
+            console.error("Respuesta del servidor:", xhr.responseText);
+            
+    $('#response').html(
+        `Error al subir el archivo. Código: ${xhr.status} <br> ${xhr.responseText}`
+    );
+}
+
         });
     }
 });

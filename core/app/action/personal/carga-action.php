@@ -1,61 +1,83 @@
 <?php
+// Habilitar la visualización de errores en PHP
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+require_once __DIR__ . '/../../../vendor/autoload.php';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo "<pre>";
+    print_r($_FILES);
+    print_r($_POST);
+    echo "</pre>";
+
     // Verificamos que el archivo y la empresa hayan sido enviados
     if (isset($_FILES['file']) && isset($_POST['empresa_id']) && !empty($_POST['empresa_id'])) {
         // Recoger el id de la empresa
-        $empresa_id = $_POST['empresa_id'];  // Asegurarse que es un número entero
-        
+        $empresa_id = (int) $_POST['empresa_id'];  // Convertir a entero para evitar errores
+
         // Verificar que el archivo sea válido (tipo .xlsx, .xls, .csv)
         $file = $_FILES['file'];
         $fileType = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $fileTmpPath = $file['tmp_name'];
+        $fileName = $file['name'];
+
+        echo "Procesando archivo: $fileName de tipo $fileType <br>";
 
         if (!in_array($fileType, ['xls', 'xlsx', 'csv'])) {
-            echo "El archivo debe ser de tipo .xls, .xlsx o .csv.";
-            exit;
+            die("Error: El archivo debe ser de tipo .xls, .xlsx o .csv.");
+        }
+
+        // Verificar que el archivo se ha subido correctamente
+        if (!is_uploaded_file($fileTmpPath)) {
+            die("Error: No se pudo cargar el archivo.");
         }
 
         // Instanciar la clase CargaData
         $cargaData = new CargaData();
         $cargaData->setEmpresaId($empresa_id);  // Asignamos el empresa_id
 
-        // Subir el archivo
-        $fileName = $file['name'];
-        $fileTmpPath = $file['tmp_name'];
+        // Leer el contenido del archivo
+        $fileData = file_get_contents($fileTmpPath);
+        if ($fileData === false) {
+            die("Error: No se pudo leer el archivo.");
+        }
 
-        // Procesamos el archivo (puedes usar una función para extraer los datos de Excel o CSV)
-        // Aquí se hace la carga del archivo en la base de datos (guardando el archivo como contenido)
-        $fileData = file_get_contents($_FILES['file']['tmp_name']);
-        $cargaData->insertFileToDatabase($fileName, $fileType, $fileData);  // Guardar el archivo en la base de datos
+        // Guardar el archivo en la base de datos
+        $insertResult = $cargaData->insertFileToDatabase($fileName, $fileType, $fileData);
+        
 
-        // Si es un archivo Excel, podemos procesarlo aquí
+        echo "Archivo guardado en la base de datos. <br>";
+
+        // Si es un archivo Excel, lo procesamos
         if ($fileType == 'xls' || $fileType == 'xlsx') {
-            // Aquí podrías usar PhpSpreadsheet para procesar el archivo y extraer los datos
             require_once 'vendor/autoload.php';  // Asegúrate de tener PhpSpreadsheet
 
-            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($fileTmpPath);
-            $sheet = $spreadsheet->getActiveSheet();
-            $data = [];
+            
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($fileTmpPath);
+                $sheet = $spreadsheet->getActiveSheet();
+            
+            echo "Archivo Excel cargado correctamente. <br>";
 
-            // Leer el contenido del archivo Excel (suponiendo que las columnas están en el orden correcto)
+            // Leer el contenido del archivo Excel
             foreach ($sheet->getRowIterator() as $row) {
                 $rowData = [];
                 $cellIterator = $row->getCellIterator();
                 $cellIterator->setIterateOnlyExistingCells(FALSE);
 
                 foreach ($cellIterator as $cell) {
-                    $rowData[] = $cell->getValue();
+                    $rowData[] = trim($cell->getValue());
                 }
 
                 // Limpiar los datos antes de insertarlos
                 $rowData = $cargaData->cleanData($rowData);
 
-                // Aquí procesas los datos y los insertas en la base de datos
+                // Verificar que la fila tiene exactamente 5 valores
                 if (count($rowData) === 5) {
-                    // Extraemos los datos del archivo
                     list($nombre, $puesto, $departamento, $correo, $telefono) = $rowData;
 
                     // Generar automáticamente el usuario
-                    $nombre = trim($nombre);  // Asegúrate que no haya espacios extra al inicio o final
+                    $nombre = trim($nombre);
                     $iniciales = strtoupper(substr($nombre, 0, 1));
                     $palabras = explode(' ', $nombre);
                     if (count($palabras) > 1) {
@@ -72,34 +94,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $positions = $cargaData->getPositions();
                     $departments = $cargaData->getDepartments();
 
-                    // Limpiar los valores de puesto y departamento antes de hacer la búsqueda
+                    // Limpiar y buscar IDs de puesto y departamento
                     $puesto = strtoupper(trim($puesto));
                     $departamento = strtoupper(trim($departamento));
 
                     $id_puesto = $positions[$puesto] ?? null;
                     $id_departamento = $departments[$departamento] ?? null;
 
-                    // Insertar el dato en la base de datos
-                    $fecha_alta = date('Y-m-d H:i:s');
+                    echo "Procesando: Nombre: $nombre, Puesto: $puesto ($id_puesto), Departamento: $departamento ($id_departamento), Usuario: $usuario, Clave: $clave <br>";
+
+                    // Insertar en la base de datos si los IDs son válidos
                     if ($id_puesto && $id_departamento) {
-                        $cargaData->insertIntoDatabase($nombre, $id_puesto, $id_departamento, $correo, $telefono, $usuario, $clave, $fecha_alta);
+                        $fecha_alta = date('Y-m-d H:i:s');
+                        $insertSuccess = $cargaData->insertIntoDatabase($nombre, $id_puesto, $id_departamento, $correo, $telefono, $usuario, $clave, $fecha_alta);
+                        
+                        if (!$insertSuccess) {
+                            echo "Error al insertar en la base de datos: ";
+                            var_dump($cargaData->insertIntoDatabase($nombre, $id_puesto, $id_departamento, $correo, $telefono, $usuario, $clave, $fecha_alta));
+                        }
                     } else {
-                        // Si no encontramos el puesto o departamento, podemos hacer un debug con var_dump
-                        var_dump($cargaData->insertIntoDatabase($nombre, $id_puesto, $id_departamento, $correo, $telefono, $usuario, $clave, $fecha_alta));
+                        echo "⚠️ Advertencia: No se encontró el puesto o departamento para: $nombre <br>";
                     }
+                } else {
+                    echo "⚠️ Advertencia: La fila no tiene 5 valores. Datos: ";
+                    var_dump($rowData);
                 }
             }
 
-            echo "Archivo procesado y datos insertados correctamente.";
+            echo "✅ Archivo procesado y datos insertados correctamente.";
         } else {
-            // Si es CSV, puedes procesarlo de manera similar
-            // Aquí puedes implementar el procesamiento de CSV si lo prefieres
+            echo "⚠️ Advertencia: Procesamiento de archivos CSV aún no implementado.";
         }
     } else {
-        echo "Error: No se seleccionó archivo o empresa.";
+        die("❌ Error: No se seleccionó archivo o empresa.");
     }
 } else {
-    echo "Método no permitido.";
-}
+    die("❌ Error: Método no permitido.");
+    var_dump($_FILES);
+var_dump($_POST);
 
+}
 ?>
