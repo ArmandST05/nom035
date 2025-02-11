@@ -28,40 +28,49 @@ $empresas = EmpresaData::getAll();
             </div>
         </div>
 
-        <!-- Card with table -->
-        <div class="card mt-4" style="width: 90%; margin: auto; margin-top: 20px;">
-            <div class="card-body">
-                <table class="table table-striped table-hover">
-                    <thead style="background-color: grey; color: white;">
-                        <tr>
-                            <th>#</th>
-                            <th>Nombre de la razón social</th>
-                            <th>Cantidad de personal</th>
-                            <th>Comentarios</th>
-                            <th>Opciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php 
-                        if (!empty($empresas)) {
-                            $index = 1;
-                            foreach ($empresas as $empresa) {
-                                echo "<tr>";
-                                echo "<td>{$index}</td>";
-                                echo "<td>{$empresa->nombre}</td>";
-                                echo "<td>{$empresa->cantidad_descripcion}</td>"; // Se muestra el nombre en vez del ID
-                                echo "<td>{$empresa->comentarios}</td>";
-                                echo "<td>
-                                        <button class='btn btn-primary btn-sm' onclick='editEmpresa({$empresa->id})'>Editar</button>
-                                        <button class='btn btn-danger btn-sm' onclick='deleteEmpresa({$empresa->id}, \"{$empresa->nombre}\")'>Eliminar</button>
-                                      </td>";
-                                echo "</tr>";
-                                $index++;
-                            }
-                        }
-                        ?>
-                    </tbody>
-                </table>
+       <!-- Card with table -->
+<div class="card mt-4" style="width: 90%; margin: auto; margin-top: 20px;">
+    <div class="card-body">
+        <table class="table table-striped table-hover">
+            <thead style="background-color: grey; color: white;">
+                <tr>
+                    <th>#</th>
+                    <th>Logo</th> <!-- Nueva columna para el logo -->
+                    <th>Nombre de la razón social</th>
+                    <th>Cantidad de personal</th>
+                    <th>Comentarios</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                if (!empty($empresas)) {
+                    $index = 1;
+                    foreach ($empresas as $empresa) {
+                        // Si la empresa tiene un logo, lo mostramos; si no, ponemos una imagen por defecto
+                        $logoPath = !empty($empresa->logo) ? "uploads/logos/{$empresa->logo}" : "assets/img/default-logo.png";
+
+                        echo "<tr>";
+echo "<td>{$index}</td>";
+echo "<td><img src='" . (!empty($empresa->logo) ? $empresa->logo : "assets/img/default-logo.png") . "' alt='Logo' style='width: 50px; height: 50px; border-radius: 5px;'></td>"; // Imagen del logo
+echo "<td>{$empresa->nombre}</td>";
+echo "<td>{$empresa->cantidad_descripcion}</td>"; 
+echo "<td>{$empresa->comentarios}</td>";
+echo "<td>
+        <button class='btn btn-primary btn-sm' onclick='editEmpresa({$empresa->id})'>Editar</button>
+        <button class='btn btn-danger btn-sm' onclick='deleteEmpresa({$empresa->id}, \"{$empresa->nombre}\")'>Eliminar</button>
+      </td>";
+echo "</tr>";
+$index++;
+
+                    }
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
             </div>
         </div>
 

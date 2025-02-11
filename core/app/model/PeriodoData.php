@@ -51,8 +51,8 @@ class PeriodoData {
     }
 
     // Eliminar un periodo por ID
-    public static function delete($id) {
-        $sql = "DELETE FROM periodos WHERE id = $id";
+    public static function delete($idPeriodo) {
+        $sql = "DELETE FROM periods WHERE id = $idPeriodo";
         Executor::doit($sql);
     }
     

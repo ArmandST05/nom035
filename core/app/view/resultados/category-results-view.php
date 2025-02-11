@@ -130,22 +130,14 @@ if (personal_id === "todos") {
         url = './?action=resultados/get-general-category-results2'; // URL para resultados generales de encuesta 2
     } else if (encuesta_id == 3) {
         url = './?action=resultados/get-general-category-results3'; // URL para resultados generales de encuesta 3
-    } else {
-        console.error("Encuesta no válida.");
-        alert("Por favor, selecciona una encuesta válida.");
-        return;
-    }
+    } 
 } else {
     // Si se selecciona un empleado específico
     if (encuesta_id == 2) {
         url = './?action=resultados/get-category-results-survey2'; // URL para resultados por empleado en encuesta 2
     } else if (encuesta_id == 3) {
         url = './?action/resultados/get-category-results-survey3'; // URL para resultados por empleado en encuesta 3
-    } else {
-        console.error("Encuesta no válida.");
-        alert("Por favor, selecciona una encuesta válida.");
-        return;
-    }
+    } 
 }
 
     // Realizar la petición AJAX

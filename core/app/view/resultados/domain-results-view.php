@@ -127,22 +127,14 @@ function cargarResultados() {
             url = './?action=resultados/get-general-domains-results2'; // URL para resultados generales de encuesta 2
         } else if (encuesta_id == 3) {
             url = './?action=resultados/get-general-domains-results3'; // URL para resultados generales de encuesta 3
-        } else {
-            console.error("Encuesta no válida.");
-            alert("Por favor, selecciona una encuesta válida.");
-            return;
-        }
+        } 
     } else {
         // Si se selecciona un empleado específico
         if (encuesta_id == 2) {
             url = './?action=resultados/get-domain-results-survey2'; // URL para resultados por empleado en encuesta 2
         } else if (encuesta_id == 3) {
             url = './?action/resultados/get-domain-results-survey3'; // URL para resultados por empleado en encuesta 3
-        } else {
-            console.error("Encuesta no válida.");
-            alert("Por favor, selecciona una encuesta válida.");
-            return;
-        }
+        } 
     }
     $.ajax({
     url: url,

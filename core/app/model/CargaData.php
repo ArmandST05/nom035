@@ -70,8 +70,7 @@ public function cleanData($data) {
        
         $sql = "INSERT INTO personal (nombre, id_puesto, id_departamento, correo, telefono, usuario, clave, fecha_alta, empresa_id) 
                 VALUES (\"$nombre\", \"$id_puesto\", \"$id_departamento\", \"$correo\", \"$telefono\", \"$usuario\", \"$clave\", \"$fecha_alta\", \"$this->empresa_id\")";
-        var_dump($sql);
-        // Ejecutar la consulta
+        
         return Executor::doit($sql);
     }
 }
