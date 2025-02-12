@@ -161,6 +161,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                 <li><a href="./?view=personal/listado">Listado Personal</a></li>
                   <li><a href="./?view=personal/carga">Carga Masiva</a></li>
                   <li><a href="./?view=personal/credentials">Enviar credenciales</a></li>
+                  <li><a href="./?view=personal/historial">Historial</a></li>
                 </ul>
                 </li>
 

@@ -284,6 +284,17 @@ class EncuestaData{
         
         return Executor::doit($sql);
     }
+    public static function getAllSurveyStatuses() {
+        $sql = "SELECT personal_surveys.personal_id, personal.nombre, 
+                       personal_surveys.survey_id, surveys.title, 
+                       personal_surveys.completed 
+                FROM personal_surveys
+                INNER JOIN personal ON personal_surveys.personal_id = personal.id
+                INNER JOIN surveys ON personal_surveys.survey_id = surveys.id";
+        $query = Executor::doit($sql);
+        return Model::many($query[0], new PersonalData()); // Retorna múltiples resultados
+    }
+    
 
   
 }

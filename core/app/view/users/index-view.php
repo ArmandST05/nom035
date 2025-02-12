@@ -1,8 +1,8 @@
 <?php
 $searchUserType = (isset($_GET["userType"])) ? $_GET["userType"] : 0;
-$searchStatus = (isset($_GET["status"])) ? $_GET["status"] : 1;
+$searchStatus= (isset($_GET["status"])) ? $_GET["status"] : 1;
 
-$users = UserData::getByUserTypeStatus($searchUserType, $searchStatus);
+$users = UserData::getByUserTypeStatus($searchUserType,$searchStatus);
 $userTypes = UserTypeData::getAll();
 ?>
 <div class="row">
@@ -43,24 +43,18 @@ $userTypes = UserTypeData::getAll();
 			<table class="table table-bordered table-hover">
 				<thead>
 					<th>Nombre completo</th>
-					<th>Correo Electrónico</th>
 					<th>Nombre de usuario</th>
-					<th>Fecha de Nacimiento</th>
-					<th>Departamento</th>
 					<th>Tipo usuario</th>
 					<th>Activo</th>
 					<th>Admin</th>
-					<th>Acciones</th>
+					<th></th>
 				</thead>
 				<?php
 				foreach ($users as $user) {
 				?>
 					<tr>
 						<td><?php echo $user->name . " " . $user->lastname; ?></td>
-						<td><?php echo $user->email; ?></td>
 						<td><?php echo $user->username; ?></td>
-						<td><?php echo $user->date_of_birth; ?></td>
-						
 						<td><?php echo $user->getUserType()->description; ?></td>
 						<td>
 							<?php if ($user->is_active) : ?>
@@ -72,21 +66,20 @@ $userTypes = UserTypeData::getAll();
 								<i class="glyphicon glyphicon-ok"></i>
 							<?php endif; ?>
 						</td>
-						<td>
-							<a href="index.php?view=users/edit&id=<?php echo $user->id; ?>" class="btn btn-warning btn-xs">
-								<i class="fas fa-pencil-alt"></i> Editar
-							</a>
-						</td>
+						<td style="width:30px;"><a href="index.php?view=users/edit&id=<?php echo $user->id; ?>" class="btn btn-warning btn-xs"><i class="fas fa-pencil-alt"></i> Editar</a></td>
 					</tr>
-				<?php
+			<?php
+
 				}
-				?>
-			</table>
-		<?php
-		} else {
-			echo "<p class='alert alert-warning'>No hay usuarios.</p>";
-		}
-		?>
+				echo "</table>";
+			} else {
+				// no hay usuarios
+			}
+
+
+			?>
+
+
 	</div>
 </div>
 <script type="text/javascript">

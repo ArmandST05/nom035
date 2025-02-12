@@ -87,6 +87,9 @@
                         $encuestas = EncuestaData::getAll();
                         if (!empty($encuestas)) {
                             foreach ($encuestas as $encuesta) {
+                                if($encuesta->id == 1){
+                                    continue;
+                                }
                                 echo "<option value='{$encuesta->id}'>{$encuesta->title}</option>";
                             }
                         } else {
@@ -145,8 +148,6 @@ function cargarResultados() {
     },
     success: function (response) {
         console.log("Raw response from server:", response);
-
-        try {
             var jsonResponse = response; // No es necesario hacer un trim si es objeto
             var dominios = jsonResponse.dominios;
 
@@ -172,10 +173,7 @@ function cargarResultados() {
                 console.warn("No se encontraron dominios válidos.");
                 generarGrafico(["Sin resultados"], [0], ["Nulo"]);
             }
-        } catch (error) {
-            console.error("Error al procesar la respuesta:", error);
-            alert("Error al procesar los datos recibidos del servidor. Revisa la consola para más detalles.");
-        }
+        
     },
     error: function (xhr, status, error) {
         console.error("Error en la petición AJAX:");

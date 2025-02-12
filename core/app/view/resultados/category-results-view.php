@@ -88,6 +88,10 @@
                         $encuestas = EncuestaData::getAll();
                         if (!empty($encuestas)) {
                             foreach ($encuestas as $encuesta) {
+                                if($encuesta->id == 1){
+                                    continue;
+                                }
+
                                 echo "<option value='{$encuesta->id}'>{$encuesta->title}</option>";
                             }
                         } else {
@@ -151,7 +155,7 @@ if (personal_id === "todos") {
         success: function (response) {
             console.log("Respuesta cruda del servidor:", response);
 
-            try {
+            
                 // Intentar parsear la respuesta JSON
                 var data = JSON.parse(response);
                 console.log("Respuesta procesada:", data);
@@ -180,10 +184,7 @@ if (personal_id === "todos") {
                     console.warn("No se encontraron categorías válidas.");
                     generarGrafico(["Sin resultados"], [0], ["Nulo"]);
                 }
-            } catch (error) {
-                console.error("Error al procesar la respuesta:", error);
-                alert("Error al procesar los datos recibidos del servidor. Revisa la consola para más detalles.");
-            }
+            
         },
         error: function (xhr, status, error) {
             console.error("Error en la petición AJAX:");
