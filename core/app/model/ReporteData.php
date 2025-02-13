@@ -3,29 +3,25 @@
 class ReporteData {
     public static $tablename = "survey_answers"; // Tabla donde se guardan las respuestas
 
-// Función para obtener los empleados que completaron encuestas
-public static function getCompletedEmployees() {
-    $sql = "SELECT personal_surveys.personal_id AS personal_id, personal.nombre AS personal_name
-            FROM personal_surveys
-            JOIN personal ON personal_surveys.personal_id = personal.id
-            WHERE personal_surveys.completed = 1";
+    public static function getCompletedEmployees() {
+        $sql = "SELECT DISTINCT personal_surveys.personal_id AS personal_id, personal.nombre AS personal_name
+                FROM personal_surveys
+                JOIN personal ON personal_surveys.personal_id = personal.id
+                WHERE personal_surveys.completed = 1";
+        
+        $result = Executor::doit($sql); // Ejecutar la consulta y obtener el resultado
     
-    $result = Executor::doit($sql); // Ejecutar la consulta y obtener el resultado
-
-    // Asegurarnos de que se obtuvo un objeto mysqli_result
-    if ($result && $result[0] instanceof mysqli_result) {
-        // Convertir el resultado en un arreglo
-        $empleados = [];
-        while ($row = $result[0]->fetch_assoc()) {
-            $empleados[] = $row; // Agregar cada fila al arreglo
+        if ($result && $result[0] instanceof mysqli_result) {
+            $empleados = [];
+            while ($row = $result[0]->fetch_assoc()) {
+                $empleados[] = $row;
+            }
+            return $empleados;
         }
-        return $empleados; // Devolver el arreglo con los empleados
+    
+        return [];
     }
-
-    // En caso de error o si no hay resultados
-    return [];
-}
-
+    
 
 
     // Función para obtener las respuestas de un empleado para una encuesta específica

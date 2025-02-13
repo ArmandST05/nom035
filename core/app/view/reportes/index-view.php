@@ -61,7 +61,7 @@
                 $empleados = ReporteData::getCompletedEmployees();
                 if (!empty($empleados)) {
                     foreach ($empleados as $empleado) {
-                        echo "<option value='{$empleado->id}'>{$empleado->nombre}</option>";
+                        echo "<option value='{$empleado['personal_id']}'>{$empleado['personal_name']}</option>";
                     }
                 } else {
                     echo "<option value=''>No hay empleados disponibles</option>";

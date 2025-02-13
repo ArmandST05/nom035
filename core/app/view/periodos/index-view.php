@@ -465,7 +465,7 @@ $('#editPeriodForm').on('submit', function(e) {
 });
 
 function deletePeriod(periodoId, periodoName) {
-    console.log("Ejecutando deletePeriod con ID:", periodoId, "Nombre:", periodoName);
+   
 
     const swalWithBootstrapButtons = Swal.mixin({
         buttonsStyling: true

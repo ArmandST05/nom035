@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h1>Resultados de Encuestas por Empleado</h1>
+    <h1>Resultados de Encuestas por dominio</h1>
 
     <form id="resultados-form">
         <div class="row">

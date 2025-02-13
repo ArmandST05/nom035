@@ -26,14 +26,13 @@ WHERE survey_answers.survey_id = 3";
     if ($result && $result[0]) {
         while ($row = $result[0]->fetch_assoc()) {
             $categoria_id = $row['categoria_id'];
-            if (!isset($categorias[$categoria_id])) {
+            
                 $categorias[$categoria_id] = [
                     'categoria_id' => $categoria_id,
                     'categoria_nombre' => $row['categoria_nombre'],
-                    'total_valor' => 0,
+                    'total_valor' => $row['total_valor'],
                 ];
-            }
-            $categorias[$categoria_id]['total_valor'] += $row['total_valor'];
+            
         }
     }
 
