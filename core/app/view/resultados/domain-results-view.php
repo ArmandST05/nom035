@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h1>Resultados de Encuestas por dominio</h1>
+    <h1>Resultados de encuestas por dominio</h1>
 
     <form id="resultados-form">
         <div class="row">
@@ -124,20 +124,17 @@ function cargarResultados() {
 
     // Seleccionar la URL según la opción seleccionada
     var url = '';
-    if (personal_id === "todos") {
-        // Si se seleccionan todos los empleados
-        if (encuesta_id == 2) {
-            url = './?action=resultados/get-general-domains-results2'; // URL para resultados generales de encuesta 2
-        } else if (encuesta_id == 3) {
-            url = './?action=resultados/get-general-domains-results3'; // URL para resultados generales de encuesta 3
-        } 
+    var url = '';
+    if (encuesta_id == 2) {
+        url = (personal_id === 'todos') 
+            ? './?action=resultados/get-general-domain-results2' 
+            : './?action=resultados/get-domain-results-survey2';
+    } else if (encuesta_id == 3) {
+        url = (personal_id === 'todos') 
+            ? './?action=resultados/get-general-domain-results3' 
+            : './?action=resultados/get-domain-results-survey3';
     } else {
-        // Si se selecciona un empleado específico
-        if (encuesta_id == 2) {
-            url = './?action=resultados/get-domain-results-survey2'; // URL para resultados por empleado en encuesta 2
-        } else if (encuesta_id == 3) {
-            url = './?action/resultados/get-domain-results-survey3'; // URL para resultados por empleado en encuesta 3
-        } 
+        url = "";
     }
     $.ajax({
     url: url,
@@ -147,7 +144,8 @@ function cargarResultados() {
         personal_id: personal_id
     },
     success: function (response) {
-        console.log("Raw response from server:", response);
+
+        
             var jsonResponse = response; // No es necesario hacer un trim si es objeto
             var dominios = jsonResponse.dominios;
 
@@ -166,21 +164,12 @@ function cargarResultados() {
                         categoriasNiveles.push(dominio.nivel);
                     }
                 }
-
-                // Llamar a la función para generar el gráfico de dominios
                 generarGrafico(categoriasLabels, categoriasValores, categoriasNiveles);
             } else {
-                console.warn("No se encontraron dominios válidos.");
+                console.log(response);
                 generarGrafico(["Sin resultados"], [0], ["Nulo"]);
             }
         
-    },
-    error: function (xhr, status, error) {
-        console.error("Error en la petición AJAX:");
-        console.error("Status:", status);
-        console.error("Error:", error);
-        console.error("Detalles de la respuesta:", xhr.responseText);
-        alert("Ocurrió un error al cargar los resultados.");
     }
 });
 

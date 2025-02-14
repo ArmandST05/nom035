@@ -39,7 +39,7 @@ if ($_SESSION['typeUser'] === 'e') {
                             Responder Encuesta de Riesgo Psicosocial
                         </a>
                     <?php else: ?>
-                        <a href="./index.php?view=encuestas/responder_general&survey_id=<?php echo $encuesta->id ?>">
+                        <a href="./index.php?view=encuestas/responder&survey_id=<?php echo $encuesta->id ?>">
                             Responder Encuesta General
                         </a>
                     <?php endif; ?>

@@ -97,9 +97,7 @@
         <table id="tabla_preguntas" class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Preguntas</th>
-                    <th>Sí</th>
-                    <th>No</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -123,9 +121,9 @@
                     personal_id: personal_id
                 },
                 success: function(response) {
-                    // Insertar las preguntas generadas en la tabla
-                    $("#tabla_preguntas").html(response);
+                    $("#tabla_preguntas tbody").html(response); // Insertar las filas correctamente
                 },
+
                 error: function () {
                     alert('Ocurrió un error al cargar las preguntas y respuestas.');
                 }

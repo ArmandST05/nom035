@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados de Encuestas por Empleado</title>
+    <title>Resultados de Encuestas por categoria</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
        
@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h1>Resultados de Encuestas por cstegoria</h1>
+    <h1>Resultados de encuestas por categoria</h1>
 
     <form id="resultados-form">
         <div class="row">
@@ -91,7 +91,6 @@
                                 if($encuesta->id == 1){
                                     continue;
                                 }
-
                                 echo "<option value='{$encuesta->id}'>{$encuesta->title}</option>";
                             }
                         } else {
@@ -119,49 +118,42 @@
                 cargarResultados();
             });
         });
-function cargarResultados() {
+        
+        function cargarResultados() {
     var encuesta_id = $("#survey_id").val();
     var personal_id = $("#personal_id").val();
 
-    console.log("Encuesta seleccionada:", encuesta_id);
-    console.log("Empleado seleccionado:", personal_id);
 
+    // Selección de la URL según el ID de la encuesta y si es un cálculo general o por empleado
     var url = '';
-    if (personal_id === "todos") {
-        if (encuesta_id == 2) {
-            url = './?action=resultados/get-general-category-results2';
-        } else if (encuesta_id == 3) {
-            url = './?action/resultados/get-general-category-results3';
-        }
+    if (encuesta_id == 2) {
+        url = (personal_id === 'todos') 
+            ? './?action=resultados/get-general-category-results2' 
+            : './?action=resultados/get-category-results-survey2';
+    } else if (encuesta_id == 3) {
+        url = (personal_id === 'todos') 
+            ? './?action=resultados/get-general-category-results3' 
+            : './?action=resultados/get-category-results-survey3';
     } else {
-        if (encuesta_id == 2) {
-            url = './?action=resultados/get-category-results-survey2';
-        } else if (encuesta_id == 3) {
-            url = './?action/resultados/get-category-results-survey3';
-        }
+        url = "";
     }
 
-    if (url === '') {
-        console.warn("No se seleccionó una encuesta válida.");
-        return;
-    }
-
-    console.log("URL de la petición AJAX:", url);
-
+    // Realizar la petición AJAX
     $.ajax({
         url: url,
         type: 'GET',
         data: {
             survey_id: encuesta_id,
-            personal_id: personal_id === 'todos' ? null : personal_id
+            personal_id: personal_id === 'todos' ? null : personal_id // Enviar null si es "todos"
         },
         success: function (response) {
-            console.log("Respuesta cruda del servidor:", response);
 
-            try {
+            
+                // Intentar parsear la respuesta JSON
                 var data = JSON.parse(response);
                 console.log("Respuesta procesada:", data);
 
+                // Procesar los resultados por categoría
                 var categorias = data.categorias;
 
                 if (categorias && Object.keys(categorias).length > 0) {
@@ -169,6 +161,7 @@ function cargarResultados() {
                     var categoriasValores = [];
                     var categoriasNiveles = [];
 
+                    // Extraer etiquetas, valores y niveles de cada categoría
                     for (var categoriaId in categorias) {
                         if (categorias.hasOwnProperty(categoriaId)) {
                             var categoria = categorias[categoriaId];
@@ -178,15 +171,13 @@ function cargarResultados() {
                         }
                     }
 
+                    // Generar el gráfico con los datos procesados
                     generarGrafico(categoriasLabels, categoriasValores, categoriasNiveles);
                 } else {
                     console.warn("No se encontraron categorías válidas.");
                     generarGrafico(["Sin resultados"], [0], ["Nulo"]);
                 }
-            } catch (e) {
-                console.error("Error al parsear JSON:", e);
-                console.error("Respuesta recibida:", response);
-            }
+           
         },
         error: function (xhr, status, error) {
             console.error("Error en la petición AJAX:");

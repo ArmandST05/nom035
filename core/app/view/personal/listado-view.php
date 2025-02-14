@@ -238,7 +238,7 @@ $encuestas = EncuestaData::getAll();
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form id="assignSurveyForm" method="POST" action="index.php?action=personal/process-survey"> <!-- Aquí va la acción a la que envías el formulario -->
+                            <form id="assignSurveyForm" method="POST" action=""> <!-- Aquí va la acción a la que envías el formulario -->
                                 <!-- Campo oculto para el ID del empleado -->
                                 <input type="hidden" id="employeeId" name="employeeId" value="">
                                 
