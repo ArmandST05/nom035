@@ -173,7 +173,7 @@ $index++;
                                 
     <script>
         function openModalAddPuesto() {
-            $('#PuestoModal').modal('show');
+            $('#EmpresaModal').modal('show');
         }
 
         var newEmpresaId = null;

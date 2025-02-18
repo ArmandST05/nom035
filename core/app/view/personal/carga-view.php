@@ -63,23 +63,24 @@
     </div> 
     
     <p>
-        Si tu empresa no aparece, favor de agregarla en el apartado de <a href="index.php?view=empresas/index">empresas</a>
+        Si su empresa no aparece, favor de agregarla en el apartado de <a href="index.php?view=empresas/index">Empresas</a>.
     </p>
     <table class="table">
-        <tr><td>1.- Crear archivo .XLSX o convertir archivo en excel a .XLSX .</td></tr>
-        <tr><td>2.- El archivo debe de pesar menos de 2 MB.</td></tr>
-        <tr><td>3.- Deben ser 5 encabezados y llamarse tal cual: <br> <strong>nombre</strong>, <strong>puesto</strong>,
-        <strong>departamento</strong>, <strong>correo</strong>, <strong>tlefono</strong></td></tr>
-        <tr><td>4.- Enseguida podrá descargar un ejemplo del formato de carga masiva. Sustituya los campos por los datos que desea cargar, 
-                asegurese de no dejar campos en blanco y que no estén duplicados. Descargar ejemplo</td></tr>
+        <tr><td>1.- Crear archivo .XLSX o convertir archivo en Excel a .XLSX.</td></tr>
+        <tr><td>2.- El archivo debe pesar menos de 2 MB.</td></tr>
+        <tr><td>3.- Debe contener 5 encabezados con los siguientes nombres exactos: <br> 
+            <strong>nombre</strong>, <strong>puesto</strong>, <strong>departamento</strong>, <strong>correo</strong>, <strong>teléfono</strong>.</td></tr>
+        <tr><td>4.- A continuación, podrá descargar un ejemplo del formato de carga masiva. Sustituya los campos por los datos que desea cargar, 
+                asegúrese de no dejar campos en blanco y que no estén duplicados. Descargar ejemplo.</td></tr>
     </table>
 
     <form id="uploadForm" enctype="multipart/form-data">
         <div class="drop-zone" id="dropZone">
-            Arrastra y suelta tu archivo aquí o haz clic para seleccionarlo
+            Arrastre y suelte su archivo aquí o haga clic para seleccionarlo.
             <input type="file" name="file" id="file" accept=".xls,.xlsx,.csv" style="display: none;" required>
         </div>
     </form>
+
 
     <div id="response"></div>
 </div>
@@ -87,32 +88,20 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function () {
-    console.log("Documento listo.");
-
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('file');
 
-    if (!dropZone) {
-        console.error("Elemento #dropZone no encontrado.");
-    }
-    if (!fileInput) {
-        console.error("Elemento #file no encontrado.");
-    }
-
     dropZone.addEventListener('click', () => {
-        console.log("Área de dropZone clickeada.");
         fileInput.click();
     });
 
     dropZone.addEventListener('dragover', (event) => {
         event.preventDefault();
         dropZone.classList.add('dragover');
-        console.log("Archivo arrastrado sobre dropZone.");
     });
 
     dropZone.addEventListener('dragleave', () => {
         dropZone.classList.remove('dragover');
-        console.log("Archivo salió del dropZone.");
     });
 
     dropZone.addEventListener('drop', (event) => {
@@ -120,8 +109,6 @@ $(document).ready(function () {
         dropZone.classList.remove('dragover');
 
         const files = event.dataTransfer.files;
-        console.log("Archivo soltado:", files);
-
         if (files.length) {
             fileInput.files = files;
             handleFileUpload();
@@ -130,27 +117,18 @@ $(document).ready(function () {
 
     $('#uploadForm').on('submit', function (event) {
         event.preventDefault();
-        console.log("Formulario enviado.");
         handleFileUpload();
     });
 
     function handleFileUpload() {
         const empresaId = $('#empresa_id').val();
-        console.log("Empresa seleccionada:", empresaId);
-
         if (!empresaId) {
-            console.warn("No se ha seleccionado una empresa.");
             $('#response').html('Por favor, selecciona una empresa.');
             return;
         }
 
         const formData = new FormData($('#uploadForm')[0]);
         formData.append('empresa_id', empresaId);
-
-        formData.forEach((value, key) => {
-    console.log(`${key}:`, value);
-});
-
 
         $.ajax({
             url: './?action=personal/carga',
@@ -159,21 +137,13 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             success: function (response) {
-                console.log("Respuesta del servidor:", response);
                 $('#response').html(response);
             },
-            error: function (xhr, status, error) {
-            console.error("Error en AJAX:");
-            console.error("Estado:", status);
-            console.error("Error:", error);
-            console.error("Código de estado:", xhr.status);
-            console.error("Respuesta del servidor:", xhr.responseText);
-            
-    $('#response').html(
-        `Error al subir el archivo. Código: ${xhr.status} <br> ${xhr.responseText}`
-    );
-}
-
+            error: function (xhr) {
+                $('#response').html(
+                    `Error al subir el archivo. Código: ${xhr.status} <br> ${xhr.responseText}`
+                );
+            }
         });
     }
 });

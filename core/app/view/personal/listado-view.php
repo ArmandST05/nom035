@@ -25,8 +25,9 @@ $encuestas = EncuestaData::getAll();
             <div class="col-md-4">
                 <div class="d-flex flex-column gap-2">
                     
-                            <button type="button" class="btn btn-primary" onclick="openModalAddPersonal()">Agregar Personal</button>
-                                         
+                    <button type="button" class="btn btn-primary" onclick="openModalAddPersonal()">Agregar Personal</button>
+                    <button type="button" class="btn btn-primary" onclick="printPersonal()">Imprimir lista</button>
+       
                 </div>
             </div>
         </div>
@@ -608,9 +609,26 @@ function sendWhatsapp(userId) {
         }
     });
 }
+function printPersonal() {
+    let department_filter = $('#department_filter').val();
+    let custom_search = $('#custom_search').val();
 
-
-
+    $.ajax({
+        url: "./?action=personal/print-personal",  // URL proporcionada
+        type: "POST",
+        data: {
+            department_filter: department_filter,
+            custom_search: custom_search
+        },
+        success: function(response) {
+            // Redirigir para descargar el PDF
+            window.location.href = "./?action=personal/print-personal&download=1&department_filter=" + department_filter + "&custom_search=" + custom_search;
+        },
+        error: function(xhr, status, error) {
+            console.error("Error al generar el PDF:", error);
+        }
+    });
+}
 
 
 

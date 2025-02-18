@@ -152,10 +152,16 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
               <?php if ((isset($_SESSION["user_id"])) && ($_SESSION['typeUser'] == "su")) : ?>
                 <meta charset="UTF-8">
                 <li><a href="./index.php?view=home"><i class='fa fa-home'></i> <span>Inicio</span></a></li>
-                <li><a href="./index.php?view=puestos/index"><i class="fa-solid fa-user-tie"></i>  <span>Puestos</span></a></li>
 
                 <li class="treeview">
+                  <a href="#"><i class="fa-solid fa-user-tie"></i> <span>Puestos</span><i class="fa fa-angle-left pull-right"></i> </a>
+                <ul class="treeview-menu">  
+                <li><a href="./?view=puestos/index">Listado Puestos</a></li>
+                  <li><a href="./?view=puestos/carga">Carga Masiva</a></li>
                   
+                </ul>
+                </li>
+                <li class="treeview">
                 <a href="#"><i class="fa-solid fa-user-nurse"></i>  <span>Personal</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">  
                 <li><a href="./?view=personal/listado">Listado Personal</a></li>
@@ -178,6 +184,7 @@ if (isset($_SESSION['typeUser']) && $_SESSION['typeUser'] === 'e') {
                 <a href="#"><i class="fa-solid fa-calendar"></i>  <span>Periodos</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">  
                   <li><a href="./?view=periodos/index">Ver periodos</a></li>
+                  
                 </ul>
                 </li>
                 <li class="treeview">

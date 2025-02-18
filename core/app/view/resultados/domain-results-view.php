@@ -54,55 +54,59 @@
 <body>
     <h1>Resultados de encuestas por dominio</h1>
 
-    <form id="resultados-form">
-        <div class="row">
-            <!-- Select para empleados -->
-            <div class="col-md-5">
-                <label for="personal_id">Seleccionar Empleado:</label>
-                <div class="form-group">
-                    <select class="form-control" id="personal_id" name="personal_id" required>
-                        <option value="">Selecciona un empleado</option>
-                        <option value="todos">Todos los empleados</option>
-                        <?php
-                        $empleados = ReporteData::getCompletedEmployees();
-                        if (!empty($empleados)) {
-                            foreach ($empleados as $empleado) {
-                                echo "<option value='{$empleado['personal_id']}'>{$empleado['personal_name']}</option>";
-                            }
-                        } else {
-                            echo "<option value=''>No hay empleados disponibles</option>";
-                        }
-                        ?>
-                    </select>
-                </div>
-            </div>
 
-            <!-- Select para encuestas -->
-            <div class="col-md-5">
-                <label for="survey_id">Seleccionar Encuesta:</label>
-                <div class="form-group">
-                    <select class="form-control" id="survey_id" name="survey_id" required>
-                        <option value="">Selecciona una encuesta</option>
-                        <?php 
-                        $encuestas = EncuestaData::getAll();
-                        if (!empty($encuestas)) {
-                            foreach ($encuestas as $encuesta) {
-                                if($encuesta->id == 1){
-                                    continue;
-                                }
-                                echo "<option value='{$encuesta->id}'>{$encuesta->title}</option>";
-                            }
-                        } else {
-                            echo "<option value=''>No hay encuestas disponibles</option>";
+    <form id="resultados-form">
+    <div class="row">
+        <!-- Select para empleados -->
+        <div class="col-md-4">
+            <label for="personal_id">Seleccionar Empleado:</label>
+            <div class="form-group">
+                <select class="form-control" id="personal_id" name="personal_id" required>
+                    <option value="">Selecciona un empleado</option>
+                    <option value="todos">Todos los empleados</option>
+                    <?php
+                    $empleados = ReporteData::getCompletedEmployees();
+                    if (!empty($empleados)) {
+                        foreach ($empleados as $empleado) {
+                            echo "<option value='{$empleado['personal_id']}'>{$empleado['personal_name']}</option>";
                         }
-                        ?>
-                    </select>
-                </div>
-            </div>          
-        </div>  
-        
-        
-    </form>
+                    } else {
+                        echo "<option value=''>No hay empleados disponibles</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+
+        <!-- Select para encuestas -->
+        <div class="col-md-4">
+            <label for="survey_id">Seleccionar Encuesta:</label>
+            <div class="form-group">
+                <select class="form-control" id="survey_id" name="survey_id" required>
+                    <option value="">Selecciona una encuesta</option>
+                    <?php 
+                    $encuestas = EncuestaData::getAll();
+                    if (!empty($encuestas)) {
+                        foreach ($encuestas as $encuesta) {
+                            if($encuesta->id == 1){
+                                continue;
+                            }
+                            echo "<option value='{$encuesta->id}'>{$encuesta->title}</option>";
+                        }
+                    } else {
+                        echo "<option value=''>No hay encuestas disponibles</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+        </div>
+
+        <!-- Botón Exportar -->
+        <div class="col-md-4">
+            <input type="button" id="exportarExcel" value="Exportar a Excel">
+        </div>
+    </div>
+</form>
     <canvas id="graficoDominios"></canvas>
 
             <!-- Agregar la librería Chart.js -->
@@ -239,7 +243,29 @@ function generarGrafico(labels, data, niveles) {
         }
     });
 }
-
+$(document).ready(function () {
+    $("#exportarExcel").click(function () {
+        if (window.dominioChart) {
+            var imageBase64 = window.dominioChart.toBase64Image(); // Convertir gráfico a imagen
+            $.ajax({
+                url: './?action=resultados/export-graphic', // Archivo PHP para procesar la imagen
+                type: 'POST',
+                data: {
+                    image: imageBase64
+                },
+                success: function (response) {
+                    console.log("Imagen enviada correctamente.");
+                    window.location.href = './?action=resultados/export-graphic&download=1'; // Descargar Excel
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al enviar la imagen:", error);
+                }
+            });
+        } else {
+            alert("No hay gráfico disponible para exportar.");
+        }
+    });
+});
     </script>
 </body>
 </html>

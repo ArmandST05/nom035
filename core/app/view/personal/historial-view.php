@@ -16,6 +16,8 @@ foreach ($datos as $dato) {
     }
 }
 ?>
+<button type="button" class="btn btn-primary" onclick="printPersonal()">Imprimir lista</button>
+
 <table border="2" class="table table-bordered"> 
     <thead>
         <tr>
@@ -42,3 +44,30 @@ foreach ($datos as $dato) {
         <?php endforeach; ?>
     </tbody>
 </table>
+
+
+<script>
+function printPersonal() {
+    let department_filter = $('#department_filter').val();
+    let custom_search = $('#custom_search').val();
+
+    $.ajax({
+        url: "./?action=personal/print-historial",  // URL proporcionada
+        type: "POST",
+        data: {
+            department_filter: department_filter,
+            custom_search: custom_search
+        },
+        success: function(response) {
+            // Redirigir para descargar el PDF
+            window.location.href = "./?action=personal/print-historial&download=1&department_filter=" + department_filter + "&custom_search=" + custom_search;
+        },
+        error: function(xhr, status, error) {
+            console.error("Error al generar el PDF:", error);
+        }
+    });
+}
+
+
+
+</script>
