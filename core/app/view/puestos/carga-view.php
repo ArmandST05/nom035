@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subir archivo Excel</title>
     <style>
-       
         .card {
             width: 100%;
             max-width: 600px;
@@ -50,32 +49,18 @@
 <body>
 
 <div class="card">
-    <div class="form-group">
-        <select name="empresa_id" id="empresa_id" class="form-control">
-            <option value="">Seleccione una empresa</option>
-            <?php 
-                $empresas = EmpresaData::getAll();
-                foreach ($empresas as $empresa) {
-                    echo '<option value="' . $empresa->id . '">' . $empresa->nombre . '</option>';
-                }
-            ?>
-        </select>
-    </div> 
     
-    <p>
-        Si tu empresa no aparece, favor de agregarla en el apartado de <a href="index.php?view=empresas/index">empresas</a>
-    </p>
     <table class="table">
-        <tr><td>1.- Crear archivo .XLSX o convertir archivo en excel a .XLSX .</td></tr>
-        <tr><td>2.- El archivo debe de pesar menos de 2 MB.</td></tr>
-        <tr><td>3.- Deben ser 5 encabezados y llamarse tal cual: <br> <strong>nombre</strong>, <strong>departamento</strong></td></tr>
-        <tr><td>4.- Enseguida podrá descargar un ejemplo del formato de carga masiva. Sustituya los campos por los datos que desea cargar, 
-                asegurese de no dejar campos en blanco y que no estén duplicados. Descargar ejemplo</td></tr>
+        <tr><td>1.- Crear un archivo .XLSX o convertir el archivo de Excel a .XLSX.</td></tr>
+        <tr><td>2.- El archivo debe pesar menos de 2 MB.</td></tr>
+        <tr><td>3.- Debe contener 2 encabezados con los siguientes nombres exactos: <br> <strong>nombre</strong>, <strong>departamento</strong>.</td></tr>
+        <tr><td>4.- A continuación, podrá descargar un ejemplo del formato de carga masiva. Sustituya los campos con los datos que desea cargar, 
+                asegúrese de no dejar campos en blanco y que no estén duplicados. <a href="#">Descargar ejemplo</a></td></tr>
     </table>
 
     <form id="uploadForm" enctype="multipart/form-data">
         <div class="drop-zone" id="dropZone">
-            Arrastra y suelta tu archivo aquí o haz clic para seleccionarlo
+            Arrastra y suelta tu archivo aquí o haz clic para seleccionarlo.
             <input type="file" name="file" id="file" accept=".xls,.xlsx,.csv" style="display: none;" required>
         </div>
     </form>
@@ -134,25 +119,14 @@ $(document).ready(function () {
     });
 
     function handleFileUpload() {
-        const empresaId = $('#empresa_id').val();
-        console.log("Empresa seleccionada:", empresaId);
-
-        if (!empresaId) {
-            console.warn("No se ha seleccionado una empresa.");
-            $('#response').html('Por favor, selecciona una empresa.');
-            return;
-        }
-
         const formData = new FormData($('#uploadForm')[0]);
-        formData.append('empresa_id', empresaId);
 
         formData.forEach((value, key) => {
-    console.log(`${key}:`, value);
-});
-
+            console.log(`${key}:`, value);
+        });
 
         $.ajax({
-            url: './?action=personal/carga',
+            url: './?action=puestos/carga',
             type: 'POST',
             data: formData,
             contentType: false,
@@ -162,21 +136,19 @@ $(document).ready(function () {
                 $('#response').html(response);
             },
             error: function (xhr, status, error) {
-            console.error("Error en AJAX:");
-            console.error("Estado:", status);
-            console.error("Error:", error);
-            console.error("Código de estado:", xhr.status);
-            console.error("Respuesta del servidor:", xhr.responseText);
-            
-    $('#response').html(
-        `Error al subir el archivo. Código: ${xhr.status} <br> ${xhr.responseText}`
-    );
-}
-
+                console.error("Error en AJAX:");
+                console.error("Estado:", status);
+                console.error("Error:", error);
+                console.error("Código de estado:", xhr.status);
+                console.error("Respuesta del servidor:", xhr.responseText);
+                
+                $('#response').html(
+                    `Error al subir el archivo. Código: ${xhr.status} <br> ${xhr.responseText}`
+                );
+            }
         });
     }
 });
-
 </script>
 
 </body>

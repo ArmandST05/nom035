@@ -73,5 +73,21 @@ public function cleanData($data) {
         
         return Executor::doit($sql);
     }
+    public function insertDepartment($nombreDepartamento) {
+        $stmt = $this->db->prepare("INSERT INTO departamentos (nombre) VALUES (?) ON DUPLICATE KEY UPDATE idDepartamento=LAST_INSERT_ID(idDepartamento)");
+        $stmt->bind_param("s", $nombreDepartamento);
+        $stmt->execute();
+        $idDepartamento = $stmt->insert_id;
+        $stmt->close();
+        return $idDepartamento;
+    }
+    
+    public function insertPosition($nombrePuesto, $idDepartamento) {
+        $stmt = $this->db->prepare("INSERT INTO puestos (nombre, idDepartamento) VALUES (?, ?)");
+        $stmt->bind_param("si", $nombrePuesto, $idDepartamento);
+        $stmt->execute();
+        $stmt->close();
+    }
+    
 }
 ?>
