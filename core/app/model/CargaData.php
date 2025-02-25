@@ -74,20 +74,27 @@ public function cleanData($data) {
         return Executor::doit($sql);
     }
     public function insertDepartment($nombreDepartamento) {
-        $stmt = $this->db->prepare("INSERT INTO departamentos (nombre) VALUES (?) ON DUPLICATE KEY UPDATE idDepartamento=LAST_INSERT_ID(idDepartamento)");
+        // Preparamos la consulta para insertar el departamento
+        $query = "INSERT INTO departamentos (nombre) VALUES (?) ON DUPLICATE KEY UPDATE idDepartamento = LAST_INSERT_ID(idDepartamento)";
+        $stmt = $this->db->prepare($query);
         $stmt->bind_param("s", $nombreDepartamento);
         $stmt->execute();
+    
+        // Recuperamos el ID del departamento insertado o actualizado
         $idDepartamento = $stmt->insert_id;
         $stmt->close();
-        return $idDepartamento;
+    
+        return $idDepartamento;  // Este valor es el ID correcto.
     }
     
+    
+    
+    
     public function insertPosition($nombrePuesto, $idDepartamento) {
-        $stmt = $this->db->prepare("INSERT INTO puestos (nombre, idDepartamento) VALUES (?, ?)");
-        $stmt->bind_param("si", $nombrePuesto, $idDepartamento);
-        $stmt->execute();
-        $stmt->close();
+        $sql = "INSERT INTO puestos (nombre, id_departamento) VALUES (\"$nombrePuesto\", \"$idDepartamento\")";
+        return Executor::doit($sql);
     }
+    
     
 }
 ?>

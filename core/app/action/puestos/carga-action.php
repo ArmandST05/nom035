@@ -8,11 +8,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fileTmpPath = $file['tmp_name'];
 
         if (!in_array($fileType, ['xls', 'xlsx'])) {
-            die("Error: El archivo debe ser de tipo .xls o .xlsx.");
+            die("❌ Error: El archivo debe ser de tipo .xls o .xlsx.");
         }
 
         if (!is_uploaded_file($fileTmpPath)) {
-            die("Error: No se pudo cargar el archivo.");
+            die("❌ Error: No se pudo cargar el archivo.");
         }
 
         require_once 'vendor/autoload.php';
@@ -21,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $cargaData = new CargaData();
         
-
         $departments = [];
         $positions = [];
 
@@ -52,8 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $departmentIds = [];
         foreach ($departments as $nombreDepartamento) {
             $idDepartamento = $cargaData->insertDepartment($nombreDepartamento);
-            if ($idDepartamento) {
+
+            if ($idDepartamento && $idDepartamento > 0) {
                 $departmentIds[$nombreDepartamento] = $idDepartamento;
+            } else {
+                echo "❌ Error: No se pudo obtener el ID del departamento $nombreDepartamento.<br>";
             }
         }
 
@@ -61,11 +63,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nombrePuesto = $position['puesto'];
             $nombreDepartamento = $position['departamento'];
 
-            if (isset($departmentIds[$nombreDepartamento])) {
+            if (isset($departmentIds[$nombreDepartamento]) && $departmentIds[$nombreDepartamento] > 0) {
                 $idDepartamento = $departmentIds[$nombreDepartamento];
+
+                // Depuración antes de insertar
+                echo "✅ Insertando puesto: $nombrePuesto en el departamento $nombreDepartamento con ID: $idDepartamento <br>";
+
                 $cargaData->insertPosition($nombrePuesto, $idDepartamento);
             } else {
-                echo "Error: No se encontró el ID del departamento $nombreDepartamento <br>";
+                echo "❌ Error: No se encontró un ID válido para el departamento $nombreDepartamento.<br>";
             }
         }
 
