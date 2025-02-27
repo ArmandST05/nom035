@@ -534,68 +534,36 @@ $('#assignSurveyForm').submit(function (e) {
 
 });
 function sendMail(userId) {
-    if (!userId) {
-        console.error("Error: userId es inválido o está vacío.");
-        alert("ID de usuario no válido.");
-        return;
-    }
 
-    console.log("Enviando solicitud AJAX para enviar correo...", { userId });
-
+    // Solicitud AJAX para enviar el correo
     $.ajax({
-        url: './?action=notifications/send-mail', // Ruta al backend
-        type: 'POST',
-        data: { id: userId },
-        dataType: 'json',
-        success: function(response, textStatus, xhr) {
+        url: './?action=notifications/send-mail', // Ruta al controlador en el backend
+        type: 'POST', // Método de la solicitud
+        data: { id: userId }, // Parámetro enviado al backend
+        dataType: 'json', // Espera una respuesta JSON
+        success: function(response) {
             try {
-                console.log("Respuesta completa del servidor:", response);
-                console.log("Código de estado HTTP:", xhr.status);
+                console.log("Respuesta del servidor:", response);
 
-                if (typeof response !== 'object') {
-                    console.warn("La respuesta no es un objeto JSON válido:", response);
-                    alert("Error inesperado: Respuesta inválida del servidor.");
-                    return;
-                }
-
-                if (response.success) {
-                    console.log("✅ Correo enviado con éxito:", response);
-                    alert(response.message || "Correo enviado correctamente.");
+                // Verifica si hay un mensaje en la respuesta
+                if (response.message) {
+                    alert(response.message); // Mostrar el mensaje del servidor
                 } else {
-                    console.warn("⚠️ Fallo al enviar el correo:", response);
-                    alert(response.message || "No se pudo enviar el correo.");
+                    console.error("Respuesta inesperada del servidor:", response);
+                    alert("Ha ocurrido un error inesperado.");
                 }
             } catch (error) {
-                console.error("❌ Error al procesar la respuesta JSON:", error, response);
-                alert("Error inesperado al procesar la respuesta.");
+                console.error("Error al procesar la respuesta:", error);
+                alert("Error inesperado al procesar la respuesta del servidor.");
             }
         },
         error: function(xhr, status, error) {
-            console.error("❌ Error en la solicitud AJAX:");
-            console.table({
-                "Estado HTTP": xhr.status,
-                "Estado AJAX": status,
-                "Mensaje de error": error,
-                "Respuesta del servidor": xhr.responseText
-            });
-
-            let errorMessage = "Error al intentar enviar el correo.";
-            if (xhr.status === 404) {
-                errorMessage = "Error 404: Endpoint no encontrado.";
-            } else if (xhr.status === 500) {
-                errorMessage = "Error 500: Fallo interno del servidor.";
-            } else if (xhr.status === 0) {
-                errorMessage = "Error: No se pudo conectar con el servidor. Verifica tu conexión.";
-            }
-
-            alert(errorMessage);
-        },
-        complete: function(xhr, textStatus) {
-            console.log("🛠️ Solicitud AJAX finalizada con estado:", textStatus);
+            // Manejo de errores en la solicitud AJAX
+            console.error("Error en la solicitud AJAX:", xhr.responseText);
+            alert("Error al intentar enviar el correo. Por favor, intenta nuevamente.");
         }
     });
 }
-
 
 
 function sendWhatsapp(userId) {

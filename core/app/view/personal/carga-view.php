@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subir archivo Excel</title>
     <style>
-       
         .card {
             width: 100%;
             max-width: 600px;
@@ -50,19 +49,18 @@
 <body>
 
 <div class="card">
-    <div class="form-group">
+<div class="form-group">
         <select name="empresa_id" id="empresa_id" class="form-control">
             <option value="">Seleccione una empresa</option>
             <?php 
-                $empresas = EmpresaData::getAll();
+                $empresas = EmpresaData::getAllDepartment();
                 foreach ($empresas as $empresa) {
                     echo '<option value="' . $empresa->id . '">' . $empresa->nombre . '</option>';
                 }
             ?>
         </select>
     </div> 
-    
-    <p>
+<p>
         Si su empresa no aparece, favor de agregarla en el apartado de <a href="index.php?view=empresas/index">Empresas</a>.
     </p>
     <table class="table">
