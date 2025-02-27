@@ -1,64 +1,132 @@
-<?php 
+<?php
+
 $departamentos = DepartamentoData::getAll();
+$encuestas = EncuestaData::getAll();
+
+
 ?>
-<div class="card" style="width: 100%; margin-top: 20px">
-    <div class="card-body">
-        <div class="row mb-3">
-            <!-- Filtro por departamento -->
-            <div class="col-md-4">
-                <label for="filter-department">Departamento:</label>
-                <select id="filter-department" class="form-control">
-                    <option value="">Todos</option>
-                    <!-- Opciones cargadas dinámicamente por AJAX -->
-                </select>
-            </div>
 
-            <!-- Búsqueda personalizada -->
-            <div class="col-md-4">
-                <label for="custom-search">Buscar:</label>
-                <input type="text" id="custom-search" class="form-control" placeholder="Buscar...">
-            </div>
 
-            <!-- Selector de cantidad de registros -->
+
+<div class="container mt-4">
+        <div class="row">
+            <!-- Columna del texto -->
+            <div class="col-md-8">
+                <h4>Listado Personal</h4>
+                <p>
+                    Indicaciones: Este modulo es para seleccionar al personal al que se le enviaran las credenciales
+                    por correo o por whatsapp.
+                </p>
+            </div>
+            <!-- Columna de los botones -->
             <div class="col-md-4">
-                <label for="custom-length">Registros por página:</label>
-                <select id="custom-length" class="form-control">
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
+                <div class="d-flex flex-column gap-2">
+                    
+                    <button type="button" class="btn btn-primary" onclick="sendMassiveMail()">Enviar por correo</button>
+                    <button type="button" class="btn btn-primary" onclick="sendMassiveWhatsapp()">Enviar por WhatsApp</button>
+       
+                </div>
             </div>
         </div>
-    <br>
-    <button type="button" class="btn btn-primary" id="btncorreo" onclick="sendMail()">Enviar credenciales por correo</button>
-    <button type="button" class="btn btn-primary" id="btnWhatsapp">Enviar credenciales por Whatsapp</button>
+</div>
+<div class="row mb-4">
+    <!-- Filtro por Departamento -->
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="filter-department">Filtrar por Departamento:</label>
+        <select id="filter-department" class="form-control custom-select-width">
+            <option value="">Todos los departamentos</option> <!-- Opción por defecto -->
+        </select>
 
-    <br>
-        <!-- Tabla para mostrar los resultados -->
+        </div>
+    </div>
+    <!-- Campo de Búsqueda -->
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="custom-search">Buscar:</label>
+            <input type="text" id="custom-search" class="form-control" placeholder="Escribe para buscar...">
+        </div>
+    </div>
+
+    <!-- Selección de Cantidad de Resultados -->
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="custom-length">Mostrar registros:</label>
+            <select id="custom-length" class="form-control">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+    <div class="card" style="width: 100%;  margin-top: 20px">
+    <div class="card-body">
         <table id="lookup" class="table table-striped table-hover">
             <thead style="background-color: #484848; color: white; border-radius: 5px;">
                 <tr>
-                <th><input type="checkbox" id="select-all"></th> <!-- Checkbox para seleccionar todos -->
-                <th>#</th>
-                <th>Nombre</th>
-                <th>Departamento / Puesto</th>
-                <th>Usuario</th>
-                <th>Clave</th>
-                <th>Correo</th>
-                <th>Teléfono</th>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Departamento / Puesto</th>
+                    <th>Usuario</th>
+                    <th>Clave</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    
                 </tr>
             </thead>
             <tbody>
-                <!-- Gestionado dinámicamente por DataTables -->
+                <!-- El cuerpo se gestionará dinámicamente por DataTables -->
             </tbody>
         </table>
     </div>
 </div>
 
+
+    </div>
+</div>
+
+
 <script>
+function getSelectedUsers() {
+    let selectedUsers = [];
+    $(".employee-checkbox:checked").each(function() {
+        selectedUsers.push($(this).val()); // Agregar el ID del usuario seleccionado
+    });
+
+    if (selectedUsers.length === 0) {
+        alert("Por favor, selecciona al menos un usuario.");
+        return null;
+    }
+    return selectedUsers;
+    console.log(selectedUsers)
+}
+
+function sendMassiveMail() {
+    let selectedUsers = getSelectedUsers();
+    if (!selectedUsers) return; // Si no hay usuarios seleccionados, detener la ejecución
+
+    $.ajax({
+        url: './?action=notifications/send-massive-mail',
+        method: 'POST',
+        data: JSON.stringify({ users: selectedUsers }),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function (response) {
+            console.log(response.message);
+        },
+        error: function (xhr) {
+            console.log("Error en la solicitud: " + xhr.status + " " + xhr.responseText);
+        }
+    });
+}
+
+
 $(document).ready(function() {
-    // Inicializar DataTable
+    
     var dataTable = $('#lookup').DataTable({
         "language": {
             "sProcessing": "Procesando...",
@@ -78,84 +146,53 @@ $(document).ready(function() {
         "processing": true,
         "serverSide": true,
         "ajax": {
-            url: "./?action=personal/get-all", // Endpoint del backend
+            url: "./?action=personal/get-all-credentials",
             type: "POST",
             data: function(d) {
-                // Añadir filtros dinámicos
-                d.department_filter = $('#filter-department').val(); // Filtro por departamento
-                d.custom_search = $('#custom-search').val(); // Búsqueda personalizada
-                d.length = $('#custom-length').val(); // Tamaño de paginación
+                d.department_filter = $('#filter-department').val();
+                d.custom_search = $('#custom-search').val();
+                d.length = $('#custom-length').val();
             },
             dataSrc: function(json) {
-                if (json.data) {
-                    return json.data; // DataTables espera un array en 'data'
-                } else {
-                    console.error("Respuesta inválida del servidor: ", json);
-                    return [];
-                }
+                return json.data;  // Asegúrate de que data es lo que DataTable espera
             },
             error: function(xhr, error, code) {
-                console.error("Error al cargar datos: ", error, code);
             }
         },
         "responsive": true,
         "scrollX": true,
-        "dom": '<"datatable-content"t><"datatable-footer"ip>', // Diseño de tabla
+        "dom": '<"datatable-content"t><"datatable-footer"ip>', // Coloca la paginación e información en la parte inferior
     });
 
-    // Cargar opciones de departamentos dinámicamente
     $.ajax({
-        url: './?action=departamentos/get-all', // Endpoint para obtener departamentos
-        method: 'GET',
-        success: function(data) {
-            var departmentSelect = $('#filter-department');
-            data.forEach(function(department) {
-                departmentSelect.append('<option value="' + department.id + '">' + department.nombre + '</option>');
-            });
-        },
-        error: function(xhr, error, code) {
-            console.error("Error al cargar departamentos: ", error, code);
-        }
+    url: './?action=departamentos/get-all', // Endpoint para obtener todos los departamentos
+    method: 'GET',
+    success: function(data) {
+        var departmentSelect = $('#filter-department');
+        data.forEach(function(department) {
+            departmentSelect.append('<option value="' + department.id + '">' + department.nombre + '</option>');
+        });
+    }
+});
+
+    // Recargar DataTable al cambiar el filtro
+    $('#filter-department').change(function() {
+        dataTable.ajax.reload();
+    });
+
+    // Funcionalidad para la búsqueda
+    $('#custom-search').on('keyup', function () {
+        dataTable.ajax.reload();
+    });
+
+    // Funcionalidad para la selección de longitud
+    $('#custom-length').change(function() {
+        dataTable.ajax.reload();
     });
 });
-function sendMail() {
-    var selectedUsers = [];
-    $('#lookup tbody input[type="checkbox"]:checked').each(function() {
-        var rowData = dataTable.row($(this).closest('tr')).data();
-        selectedUsers.push({
-            name: rowData[1], // Nombre
-            department: rowData[2], // Departamento / Puesto
-            username: rowData[3], // Usuario
-            password: rowData[4], // Clave
-            email: rowData[5], // Correo
-            phone: rowData[6], // Teléfono
-        });
-    });
-
-    if (selectedUsers.length === 0) {
-        alert('No hay usuarios seleccionados.');
-        return;
-    }
-
-    $.ajax({
-        url: './?action=notifications/send-massive-mail',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ users: selectedUsers }),
-        success: function(response) {
-            var res = JSON.parse(response);
-            if (res.success) {
-                alert('Correos enviados exitosamente.');
-            } else {
-                alert('Ocurrieron errores al enviar algunos correos:\n' + res.errors.join('\n'));
-            }
-        },
-        error: function(xhr, error, code) {
-            console.error('Error al enviar correos:', error, code);
-            alert('Ocurrió un error al intentar enviar los correos.');
-        }
-    });
-}
 
 
-</script>
+
+
+
+    </script>
